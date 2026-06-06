@@ -139,6 +139,30 @@ func _status_stacking(status_id: StringName) -> StringName:
 	return def.stacking if def != null else &"intensity"
 
 
+# --- Unit-target resolution -------------------------------------------------
+
+## Resolve a unit-targeting effect's `target` to a concrete Combatant.
+##
+## The EffectResolver may hand a unit-effect a Combatant directly OR a Vector2i
+## tile (TILE/AREA cards like Frost Nova have target_type:tile / shape:area and
+## resolve to a cell, not a unit). A bare tile degrades to "the single occupant
+## of that tile" — the single-occupant degrade; true multi-tile AoE (radius > 0)
+## remains deferred per data-schemas §11. An empty tile (or any non-unit value)
+## resolves to null so callers can safely no-op.
+##
+## Uses `is` checks only — never `as` on a Variant that might be a built-in
+## (Vector2i), since casting a non-Object value to an Object class is a hard
+## error in GDScript, not a graceful null (this is the Frost Nova crash).
+func _resolve_unit(target: Variant) -> Combatant:
+	if target is Combatant:
+		return target
+	if target is Vector2i:
+		var occ: Variant = grid.get_occupant(target)
+		if occ is Combatant:
+			return occ
+	return null
+
+
 # ============================================================================
 #  BattleContext implementation (the seam the EffectResolver calls)
 # ============================================================================
@@ -151,7 +175,7 @@ func _status_stacking(status_id: StringName) -> StringName:
 ## as already-modified raw damage.) Lethal results are clamped at 0 hp and
 ## trigger the grid/occupant cleanup.
 func deal_damage(target: Variant, amount: int) -> void:
-	var unit := target as Combatant
+	var unit: Combatant = _resolve_unit(target)
 	if unit == null or amount <= 0 or not unit.is_alive():
 		return
 	var remaining: int = amount
@@ -169,7 +193,7 @@ func deal_damage(target: Variant, amount: int) -> void:
 ## governs whether it decays at turn start (see `_tick_statuses`). Mirrored into
 ## the status dict so UI/status queries see a `block` entry too.
 func add_block(target: Variant, amount: int) -> void:
-	var unit := target as Combatant
+	var unit: Combatant = _resolve_unit(target)
 	if unit == null or amount <= 0:
 		return
 	unit.block += amount
@@ -178,7 +202,7 @@ func add_block(target: Variant, amount: int) -> void:
 
 ## Restore `amount` HP to `target`, clamped to max_hp. The dead are not healed.
 func heal(target: Variant, amount: int) -> void:
-	var unit := target as Combatant
+	var unit: Combatant = _resolve_unit(target)
 	if unit == null or amount <= 0 or not unit.is_alive():
 		return
 	unit.hp = min(unit.max_hp, unit.hp + amount)
@@ -188,7 +212,7 @@ func heal(target: Variant, amount: int) -> void:
 ## `intensity` adds, `duration`/`flag` refresh to the larger of current/incoming.
 ## `block` is routed through add_block so the block field stays authoritative.
 func apply_status(target: Variant, status_id: StringName, stacks: int) -> void:
-	var unit := target as Combatant
+	var unit: Combatant = _resolve_unit(target)
 	if unit == null or stacks == 0:
 		return
 	if status_id == STATUS_BLOCK:
@@ -220,7 +244,7 @@ func move_unit(unit: Variant, to_tile: Vector2i) -> void:
 ## and stops before leaving bounds, hitting blocked terrain, or entering an
 ## occupied tile. Whatever distance it cleared is committed to the grid.
 func push_unit(target: Variant, amount: int, from: Variant) -> void:
-	var unit := target as Combatant
+	var unit: Combatant = _resolve_unit(target)
 	if unit == null or amount <= 0:
 		return
 	var origin: Vector2i = unit.grid_position

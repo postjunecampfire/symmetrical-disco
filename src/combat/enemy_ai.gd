@@ -274,7 +274,7 @@ func _manhattan(a: Vector2i, b: Vector2i) -> int:
 ## `intent` is accepted so a future melee-vs-ranged distinction (stop within the
 ## intent's TargetSpec.range rather than strictly adjacent) can slot in here; the
 ## prototype closes to adjacency, which satisfies single-range melee intents.
-func _move_toward(battle_state: BattleState, enemy: Combatant, target: Combatant, intent: IntentData) -> void:
+func _move_toward(battle_state: BattleState, enemy: Combatant, target: Combatant, _intent: IntentData) -> void:
 	if enemy.move_range <= 0:
 		return
 	var grid: GridModel = battle_state.grid
