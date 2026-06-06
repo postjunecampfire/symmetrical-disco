@@ -15,5 +15,6 @@ Each file records one settled decision: its context, the choice, the alternative
 | [0009](0009-toolchain-and-version-control.md) | Toolchain & version control (Godot pin, git + private GitHub remote) | Accepted |
 | [0010](0010-turn-order-strict-phases.md) | Turn order — strict player/enemy phases (prototype) | Accepted |
 | [0011](0011-death-downed-and-hp-attrition.md) | Death, downed units, and HP attrition (hybrid: TPK ends run) | Accepted |
+| [0012](0012-run-structure-and-map.md) | Run structure & map (v1: StS branching map, card-draft rewards) | Accepted |
 
 **Status values:** Proposed → Accepted → (later) Deprecated / Superseded by ADR-NNNN.
