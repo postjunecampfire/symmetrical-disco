@@ -58,6 +58,7 @@ If a folder doesn't exist yet, create it as needed — but keep to this structur
 
 - **Files:** `snake_case.gd`. **`class_name`:** `PascalCase`. **Functions/variables:** `snake_case`. **Constants:** `ALL_CAPS`. **Private members:** `_leading_underscore`.
 - **Use typed GDScript** everywhere: `var hp: int = 0`, `func take_damage(amount: int) -> void:`. Types are documentation the agent and engine both enforce.
+- **Warnings are treated as errors** in this project. In particular, do **not** infer a type with `:=` from a `Variant`-returning expression (e.g. `var x := some_variant_func()`) — that trips `INFERRED_DECLARATION` and fails the build. Annotate explicitly instead: `var x: Variant = some_variant_func()`, then narrow to a concrete type after any guard (`var t: Vector2i = x`). Agents can't run the engine, so the human GUT run is what catches these — keep the code warning-clean to avoid round-trips.
 - **Signals** are named in the past tense for things that happened: `card_played`, `unit_died`, `turn_ended`.
 - **Scenes/Nodes:** `PascalCase`. One reusable type per file via `class_name`.
 - Prefer composition (child nodes / resources) over deep inheritance.
