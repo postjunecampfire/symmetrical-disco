@@ -1,0 +1,12 @@
+{
+  "id": "enc_combat_04",
+  "display_name": "The Holdfast",
+  "grid_size": [7, 7],
+  "player_spawns": [[1, 3], [1, 4]],
+  "enemy_spawns": [
+    { "enemy": "grunt", "pos": [4, 2] },
+    { "enemy": "shield_bearer", "pos": [5, 3] },
+    { "enemy": "brute", "pos": [5, 5] }
+  ],
+  "win_condition": "defeat_all"
+}

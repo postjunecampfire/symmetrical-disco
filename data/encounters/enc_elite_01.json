@@ -1,0 +1,12 @@
+{
+  "id": "enc_elite_01",
+  "display_name": "Warband Ambush",
+  "grid_size": [8, 7],
+  "player_spawns": [[1, 3], [1, 4]],
+  "enemy_spawns": [
+    { "enemy": "grunt", "pos": [5, 1] },
+    { "enemy": "warband_captain", "pos": [6, 3] },
+    { "enemy": "hexer", "pos": [7, 5] }
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "default_encounter_pool",
+  "display_name": "Act 1 Encounter Pool",
+  "combat": [
+    "enc_combat_01",
+    "enc_combat_02",
+    "enc_combat_03",
+    "enc_combat_04"
+  ],
+  "elite": [
+    "enc_elite_01"
+  ],
+  "boss": [
+    "enc_boss_01"
+  ]
+}

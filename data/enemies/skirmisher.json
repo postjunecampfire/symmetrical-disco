@@ -1,0 +1,30 @@
+{
+  "id": "skirmisher",
+  "display_name": "Skirmisher",
+  "max_hp": 14,
+  "move_range": 4,
+  "speed": 14,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "skirmisher_venom_jab",
+      "telegraph": "attack",
+      "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+      "effects": [
+        { "type": "damage", "amount": 3 },
+        { "type": "apply_status", "status": "poison", "stacks": 3 }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "skirmisher_quick_slash",
+      "telegraph": "attack",
+      "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+      "effects": [
+        { "type": "damage", "amount": 6 }
+      ],
+      "weight": 2
+    }
+  ],
+  "sprite": "res://assets/enemies/skirmisher.png"
+}
