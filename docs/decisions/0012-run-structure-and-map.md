@@ -12,10 +12,11 @@ The combat loop is built and test-proven, and single-encounter telemetry confirm
 
 - **Branching node map, Slay-the-Spire style.** One **act** for v1 (~8–10 nodes deep with branching paths), terminating in a single **boss**. The player chooses a path through the branches.
 - **Node types (v1):** **Combat**, **Elite** (harder combat, better reward), **Rest**, **Event**, **Boss**. **Shop/currency is deferred.**
-- **RunState persists across nodes:** the party, **per-character HP carried over** ([ADR-0011](0011-death-downed-and-hp-attrition.md)), the **run deck** (cards drafted this run), relic/power slots (see deferral below), the run **seed**, and map position. Supports a **mid-run save/resume**.
+- **RunState persists across nodes:** the party, **per-character HP carried over** ([ADR-0011](0011-death-downed-and-hp-attrition.md)), the **run deck** (cards drafted this run), **relics** (a light persistent-modifier system, in v1), the run **seed**, and map position. Supports a **mid-run save/resume**.
 - **Deckbuilding via card rewards:** after each combat, the player picks **1 of N** cards from a **character-tagged pool** to add to the run deck — the core roguelite loop ([ADR-0004](0004-shared-deck-character-tagged-cards.md)).
 - **Rest nodes:** choose **heal a chunk** OR **upgrade a card** (uses the `upgrade_of` field already in the schema).
-- **Events:** minimal, data-driven **choice → outcome** nodes (HP / card / future-relic deltas). Ship a few; may tighten to rest+combat if scope demands.
+- **Relics (light, v1):** a small, data-driven persistent-modifier system — relics are acquired from elites, the boss, and some events, and apply at defined hooks (e.g. +1 energy/turn, start combat with block, draw +1). Ship a handful; broad relic depth grows later.
+- **Events:** minimal, data-driven **choice → outcome** nodes (HP / card / relic deltas). Ship a few; **broad event development is deferred** to later.
 - **HP & death** per [ADR-0011](0011-death-downed-and-hp-attrition.md): HP carries; downed units revive next encounter at low HP; a small post-combat partial heal; **TPK ends the run**; cross-death meta-progression deferred.
 
 ## Options Considered
@@ -26,7 +27,7 @@ The combat loop is built and test-proven, and single-encounter telemetry confirm
 | Into-the-Breach fixed-island structure | Rejected for v1 — less of a deckbuilding-run feel. |
 | Linear encounter sequence | Rejected — removes the path-choice that makes the map interesting. |
 | Shop/currency in v1 | **Deferred** — adds an economy to balance; not needed to prove the loop. |
-| Relics/powers in v1 | **Deferred** — desirable for roguelite texture, but cards + HP attrition carry the first run layer; add once the loop is proven. |
+| Relics/powers in v1 | **Chosen (light)** — relics are core to roguelite build texture; a small data-driven system ships in v1. Broad relic depth grows later. |
 
 ## Consequences
 
@@ -37,6 +38,6 @@ The combat loop is built and test-proven, and single-encounter telemetry confirm
 
 ## Open questions (tunable / deferred)
 
-- **Shop & currency**, **relics/powers**, **cross-death meta-progression**, **multi-act maps** — all deferred from v1; revisit after the loop is proven.
+- **Shop & currency**, **cross-death meta-progression**, **multi-act maps** — deferred from v1; revisit after the loop is proven. **Relics** ship in v1 but lightly (a handful, simple triggers); **Events** ship in v1 but minimal — broad development of both comes later.
 - Exact **map size / node-type distribution**, **heal and reward numbers**, **reward choice count (N)**, and **revive HP** — tunable in data, set during balancing.
 - Whether **Events** ship in v1 or get deferred to a rest+combat-only first cut.
