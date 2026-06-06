@@ -1,0 +1,16 @@
+[
+  {
+    "id": "strike",
+    "display_name": "Strike",
+    "character_tag": "neutral",
+    "target": { "target_type": "enemy", "range": 1 },
+    "effects": [ { "type": "damage", "amount": 4 } ]
+  },
+  {
+    "id": "strike",
+    "display_name": "Strike (duplicate id)",
+    "character_tag": "neutral",
+    "target": { "target_type": "enemy", "range": 1 },
+    "effects": [ { "type": "damage", "amount": 99 } ]
+  }
+]

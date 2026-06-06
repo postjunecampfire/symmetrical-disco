@@ -1,0 +1,8 @@
+[
+  {
+    "id": "broken_card",
+    "character_tag": "neutral",
+    "target": { "target_type": "enemy", "range": 1 },
+    "effects": [ { "type": "damage", "amount": 4 } ]
+  }
+]

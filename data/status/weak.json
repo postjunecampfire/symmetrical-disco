@@ -1,0 +1,6 @@
+{
+  "id": "weak",
+  "display_name": "Weak",
+  "stacking": "duration",
+  "decays_each_turn": true
+}

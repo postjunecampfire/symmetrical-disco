@@ -1,0 +1,12 @@
+[
+  {
+    "id": "skirmish_bad",
+    "display_name": "References A Ghost",
+    "grid_size": [6, 6],
+    "player_spawns": [[1, 2]],
+    "enemy_spawns": [
+      { "enemy": "ghost_that_does_not_exist", "pos": [4, 1] }
+    ],
+    "win_condition": "defeat_all"
+  }
+]

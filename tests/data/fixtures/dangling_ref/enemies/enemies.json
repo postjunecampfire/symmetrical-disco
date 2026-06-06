@@ -1,0 +1,16 @@
+[
+  {
+    "id": "grunt",
+    "display_name": "Grunt",
+    "max_hp": 20,
+    "move_range": 2,
+    "intents": [
+      {
+        "id": "grunt_swing",
+        "telegraph": "attack",
+        "target": { "target_type": "enemy", "range": 1 },
+        "effects": [ { "type": "damage", "amount": 5 } ]
+      }
+    ]
+  }
+]

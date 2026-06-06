@@ -1,0 +1,6 @@
+{
+  "id": "stun",
+  "display_name": "Stun",
+  "stacking": "duration",
+  "decays_each_turn": true
+}

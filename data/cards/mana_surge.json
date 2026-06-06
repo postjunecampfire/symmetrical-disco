@@ -1,0 +1,14 @@
+{
+  "id": "mana_surge",
+  "display_name": "Mana Surge",
+  "description": "Gain 2 energy and draw 2 cards. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 0,
+  "keywords": ["exhaust"],
+  "rarity": "uncommon",
+  "target": { "target_type": "self", "range": 0, "shape": "single" },
+  "effects": [
+    { "type": "gain_energy", "amount": 2 },
+    { "type": "draw", "amount": 2 }
+  ]
+}

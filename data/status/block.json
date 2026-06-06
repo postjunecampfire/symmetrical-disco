@@ -1,0 +1,6 @@
+{
+  "id": "block",
+  "display_name": "Block",
+  "stacking": "intensity",
+  "decays_each_turn": true
+}

@@ -1,0 +1,13 @@
+{
+  "id": "field_dressing",
+  "display_name": "Field Dressing",
+  "description": "Restore 6 HP to a unit (yourself or an ally).",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": { "target_type": "ally", "range": 2, "shape": "single" },
+  "effects": [
+    { "type": "heal", "amount": 6 }
+  ]
+}

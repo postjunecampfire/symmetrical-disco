@@ -1,0 +1,30 @@
+{
+  "id": "brute",
+  "display_name": "Brute",
+  "max_hp": 38,
+  "move_range": 2,
+  "speed": 6,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "brute_smash",
+      "telegraph": "attack",
+      "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+      "effects": [
+        { "type": "damage", "amount": 11 },
+        { "type": "push", "amount": 1 }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "brute_roar",
+      "telegraph": "buff",
+      "target": { "target_type": "self", "range": 0, "shape": "single" },
+      "effects": [
+        { "type": "apply_status", "status": "strength", "stacks": 2 }
+      ],
+      "weight": 1
+    }
+  ],
+  "sprite": "res://assets/enemies/brute.png"
+}

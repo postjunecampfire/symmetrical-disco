@@ -1,0 +1,4 @@
+[
+  { "id": "stun", "display_name": "Stun", "stacking": "duration", "decays_each_turn": true },
+  { "id": "poison", "display_name": "Poison", "stacking": "intensity", "decays_each_turn": true }
+]

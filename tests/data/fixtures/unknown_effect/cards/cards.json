@@ -1,0 +1,9 @@
+[
+  {
+    "id": "weird_card",
+    "display_name": "Weird Card",
+    "character_tag": "neutral",
+    "target": { "target_type": "enemy", "range": 1 },
+    "effects": [ { "type": "summon_dragon", "amount": 1 } ]
+  }
+]

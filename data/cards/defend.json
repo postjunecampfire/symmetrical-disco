@@ -1,0 +1,14 @@
+{
+  "id": "defend",
+  "display_name": "Defend",
+  "description": "Gain 5 Block.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "innate": true,
+  "rarity": "common",
+  "target": { "target_type": "self", "range": 0, "shape": "single" },
+  "effects": [
+    { "type": "block", "amount": 5 }
+  ]
+}

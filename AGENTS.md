@@ -32,7 +32,7 @@ A **card-driven tactical roguelite**: Slay the Spire's run structure and deckbui
   /concept            concept-brief.md
   /decisions          0001-*.md … (ADRs, append-only)
   /systems            card-system.md, combat-grid.md, run-structure.md, data-schemas.md
-/src                  game code, one folder per system (cards/, combat/, run/, units/, ui/)
+/src                  game code, one folder per system (cards/, combat/, grid/, units/, ui/, data/; run/ added when the roguelite run layer lands)
 /data                 card/character/enemy/encounter definitions (.tres or .json)
 /assets               sprites, tilesets, audio (placeholder first)
 /addons               third-party addons (GUT, any templates) — extend via wrappers, don't edit internals

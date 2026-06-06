@@ -1,0 +1,18 @@
+{
+  "id": "mage",
+  "display_name": "Mage",
+  "max_hp": 24,
+  "move_range": 3,
+  "speed": 11,
+  "innate_actions": ["strike", "defend"],
+  "starting_deck": [
+    "arcane_bolt",
+    "venom_dart",
+    "frost_nova",
+    "mana_surge",
+    "field_dressing",
+    "reposition"
+  ],
+  "tags": ["caster"],
+  "sprite": "res://assets/characters/mage.png"
+}
