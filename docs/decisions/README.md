@@ -13,5 +13,6 @@ Each file records one settled decision: its context, the choice, the alternative
 | [0007](0007-build-on-existing-templates.md) | Build on existing template code, wrapped behind our interfaces | Accepted |
 | [0008](0008-target-platforms-distribution.md) | Target platforms & distribution (Steam + Steam Deck; itch.io web demo) | Accepted |
 | [0009](0009-toolchain-and-version-control.md) | Toolchain & version control (Godot pin, git + private GitHub remote) | Accepted |
+| [0010](0010-turn-order-strict-phases.md) | Turn order — strict player/enemy phases (prototype) | Accepted |
 
 **Status values:** Proposed → Accepted → (later) Deprecated / Superseded by ADR-NNNN.
