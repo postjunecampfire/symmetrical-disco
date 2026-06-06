@@ -69,6 +69,17 @@ var _db: ContentDatabase = null
 var _battle: EncounterBattle = null
 var _card_play: CardPlay = null
 
+# --- Telemetry (additive design-analytics layer; owns no game rules) ---------
+# A TelemetryLogger records design-relevant gameplay events to a per-run JSONL
+# file under user://telemetry/. It is fed already-computed snapshots from this
+# view and never touches combat state. The running counters below are folded into
+# the run-end summary written to the rolling runs_summary.jsonl.
+var _telemetry: TelemetryLogger = null
+var _cards_played_count: int = 0
+var _damage_dealt_total: int = 0   # hp lost by enemies over the run
+var _damage_taken_total: int = 0   # hp lost by players over the run
+var _downed_logged: Dictionary = {}  # uid -> true, so each down logs exactly once
+
 # Selection / arming state. Exactly one of `_armed_card` / `_armed_innate` is set
 # while a card is armed; both null means "movement mode" for the selected unit.
 var _selected: Combatant = null
@@ -101,6 +112,7 @@ func _ready() -> void:
 	if not load_result.ok:
 		_show_load_errors(load_result)
 		return
+	_telemetry = TelemetryLogger.new()
 	_build_static_ui()
 	_start_encounter()
 
@@ -113,6 +125,11 @@ func _ready() -> void:
 ## Shared by the initial boot and the Restart button so a battle can be replayed
 ## from a clean state without reloading /data.
 func _start_encounter() -> void:
+	# If a previous run is still open (Restart pressed mid-battle), close it out as
+	# abandoned BEFORE reassigning `_battle`, so its summary reflects the old state.
+	if _telemetry != null and _telemetry.is_active():
+		_telemetry_end_run(&"abandoned")
+
 	var encounter: EncounterData = _db.get_encounter(ENCOUNTER_ID)
 	if encounter == null:
 		_status_text = "Missing encounter '%s'" % ENCOUNTER_ID
@@ -139,6 +156,7 @@ func _start_encounter() -> void:
 	_refresh_telegraphs()
 	_auto_select_first_player()
 	_hide_banner()
+	_telemetry_start_run()
 	_refresh()
 
 
@@ -642,7 +660,9 @@ func _try_move(tile: Vector2i) -> void:
 		_status_text = "Tile is occupied or blocked."
 		_refresh()
 		return
+	var from_tile: Vector2i = _selected.grid_position
 	_battle.move_unit(_selected, tile)
+	_telemetry_log_move(_selected, from_tile, tile)
 	_recompute_reachable()
 	_status_text = "%s moved." % _selected.display_name
 	_refresh()
@@ -721,6 +741,15 @@ func _arm_innate(innate_id: StringName) -> void:
 func _play_armed_at(target: Variant, tile: Vector2i) -> void:
 	if _selected == null or not _selected.is_alive():
 		return
+
+	# Capture pre-play context for telemetry BEFORE the play mutates anything, so a
+	# successful play can derive damage/heal/block from the before/after snapshots.
+	var acting: Combatant = _selected
+	var played_card: CardData = _armed_innate if _armed_innate != null else _armed_card
+	var is_innate_play: bool = _armed_innate != null
+	var energy_before: int = _battle.energy
+	var before: Array = _snapshot_all()
+
 	var result: CardPlay.PlayResult = null
 	if _armed_innate != null:
 		result = _card_play.play_innate(_selected, _armed_innate, _resolve_target(_armed_innate, target, tile))
@@ -737,8 +766,9 @@ func _play_armed_at(target: Variant, tile: Vector2i) -> void:
 		_refresh()
 		return
 
-	# Success: disarm and refresh. The selection's reachable set may have changed
-	# (e.g. a move/push effect), so recompute it.
+	# Success: record telemetry, then disarm and refresh. The selection's reachable
+	# set may have changed (e.g. a move/push effect), so recompute it.
+	_telemetry_log_play(played_card, acting, target, tile, is_innate_play, energy_before, before)
 	_armed_card = null
 	_armed_innate = null
 	_status_text = "Played."
@@ -796,7 +826,14 @@ func _request_end_turn() -> void:
 		return
 	_armed_card = null
 	_armed_innate = null
+
+	# Snapshot every combatant around the enemy phase so enemy damage (and any
+	# downs) it inflicts is captured.
+	var phase_turn: int = _battle.turn_number
+	var before: Array = _snapshot_all()
 	_battle.end_player_turn()
+	var after: Array = _snapshot_all()
+	_telemetry_log_enemy_phase(phase_turn, before, after)
 
 	# The enemy phase may have ended the battle; only roll a new player turn if not.
 	if _battle.check_outcome() == BattleState.Outcome.ONGOING:
@@ -833,8 +870,10 @@ func _evaluate_outcome() -> void:
 	match outcome:
 		BattleState.Outcome.WIN:
 			_show_banner("Victory")
+			_telemetry_end_run(&"WIN")
 		BattleState.Outcome.LOSS:
 			_show_banner("Defeat")
+			_telemetry_end_run(&"LOSS")
 		_:
 			_hide_banner()
 
@@ -851,6 +890,238 @@ func _show_banner(title: String) -> void:
 func _hide_banner() -> void:
 	if _banner_layer != null:
 		_banner_layer.visible = false
+
+
+# ============================================================================
+#  Telemetry (additive — feeds TelemetryLogger; mutates no combat state)
+# ============================================================================
+
+## Open a telemetry run for the freshly-assembled battle and reset the per-run
+## counters. Called from _start_encounter once the battle is live.
+func _telemetry_start_run() -> void:
+	if _telemetry == null or _battle == null:
+		return
+	_cards_played_count = 0
+	_damage_dealt_total = 0
+	_damage_taken_total = 0
+	_downed_logged = {}
+	var party_ids: Array = []
+	for unit in _battle.living_players():
+		party_ids.append(_unit_source_id(unit))
+	var meta: Dictionary = {
+		"encounter": String(ENCOUNTER_ID),
+		"party": party_ids,
+		"grid": [_battle.grid.size.x, _battle.grid.size.y],
+		"rng_seed": RNG_SEED,
+		"turn": _battle.turn_number,
+		"combatants": _snapshot_all(),
+	}
+	_telemetry.start_run(meta)
+
+
+## Close the active run with the given outcome label (WIN / LOSS / abandoned),
+## folding the per-run counters into the summary. Idempotent: a no-op when no run
+## is active, so the per-refresh outcome check can call it freely.
+func _telemetry_end_run(outcome: StringName) -> void:
+	if _telemetry == null or not _telemetry.is_active() or _battle == null:
+		return
+	var party_hp: int = 0
+	for unit in _battle.living_players():
+		party_hp += unit.hp
+	var summary: Dictionary = {
+		"encounter": String(ENCOUNTER_ID),
+		"outcome": String(outcome),
+		"turns": _battle.turn_number,
+		"party_hp_remaining": party_hp,
+		"cards_played": _cards_played_count,
+		"damage_dealt": _damage_dealt_total,
+		"damage_taken": _damage_taken_total,
+		"party": _snapshot_team(Combatant.Team.PLAYER),
+	}
+	_telemetry.end_run(summary)
+
+
+## Log a successful card / innate play with full before/after board snapshots so
+## damage, healing and block deltas are derivable offline.
+func _telemetry_log_play(
+	card: CardData,
+	acting: Combatant,
+	target: Variant,
+	tile: Vector2i,
+	is_innate: bool,
+	energy_before: int,
+	before: Array
+) -> void:
+	if _telemetry == null or card == null or acting == null:
+		return
+	var after: Array = _snapshot_all()
+	var data: Dictionary = {
+		"card": String(card.id),
+		"card_name": card.display_name,
+		"innate": is_innate,
+		"actor": _unit_uid(acting),
+		"actor_name": acting.display_name,
+		"target": _describe_target(target, tile),
+		"energy_before": energy_before,
+		"energy_after": _battle.energy,
+		"turn": _battle.turn_number,
+		"before": before,
+		"after": after,
+	}
+	var event_type: StringName = &"innate_played" if is_innate else &"card_played"
+	_telemetry.log_event(event_type, data)
+	_cards_played_count += 1
+	_accumulate_damage(before, after)
+	_detect_downs(after)
+
+
+## Log a unit move (from/to tile).
+func _telemetry_log_move(unit: Combatant, from_tile: Vector2i, to_tile: Vector2i) -> void:
+	if _telemetry == null or unit == null:
+		return
+	_telemetry.log_event(&"unit_moved", {
+		"unit": _unit_uid(unit),
+		"unit_name": unit.display_name,
+		"from": [from_tile.x, from_tile.y],
+		"to": [to_tile.x, to_tile.y],
+		"turn": _battle.turn_number,
+	})
+
+
+## Log the enemy phase with before/after snapshots so enemy-inflicted damage and
+## any downs are captured.
+func _telemetry_log_enemy_phase(turn: int, before: Array, after: Array) -> void:
+	if _telemetry == null:
+		return
+	_telemetry.log_event(&"end_turn", {
+		"turn": turn,
+		"before": before,
+		"after": after,
+	})
+	_accumulate_damage(before, after)
+	_detect_downs(after)
+
+
+## Fold the hp deltas between two snapshots into the run damage totals: hp lost by
+## enemies counts as damage dealt, hp lost by players as damage taken. Heals (hp
+## increases) are ignored here.
+func _accumulate_damage(before: Array, after: Array) -> void:
+	var before_hp: Dictionary = _hp_by_uid(before)
+	for entry in after:
+		var rec: Dictionary = entry
+		var uid: int = rec["uid"]
+		var now_hp: int = rec["hp"]
+		var prev_hp: int = before_hp.get(uid, now_hp)
+		var lost: int = prev_hp - now_hp
+		if lost <= 0:
+			continue
+		var team: String = rec["team"]
+		if team == "enemy":
+			_damage_dealt_total += lost
+		else:
+			_damage_taken_total += lost
+
+
+## Emit a `unit_downed` event for any combatant that has reached 0 hp and has not
+## already been logged as down this run.
+func _detect_downs(after: Array) -> void:
+	if _telemetry == null:
+		return
+	for entry in after:
+		var rec: Dictionary = entry
+		var uid: int = rec["uid"]
+		var hp: int = rec["hp"]
+		if hp == 0 and not _downed_logged.has(uid):
+			_downed_logged[uid] = true
+			_telemetry.log_event(&"unit_downed", {
+				"unit": uid,
+				"unit_name": rec["name"],
+				"team": rec["team"],
+				"turn": _battle.turn_number,
+			})
+
+
+# --- Snapshot helpers -------------------------------------------------------
+
+## Snapshot every combatant (living or downed) into a plain Array of JSON-safe
+## Dictionaries. `uid` is the stable index into `_battle.combatants` (the list is
+## append-only and downed units remain), so it is comparable across snapshots.
+func _snapshot_all() -> Array:
+	var out: Array = []
+	if _battle == null:
+		return out
+	var index: int = 0
+	for unit in _battle.combatants:
+		out.append(_snapshot_unit(unit, index))
+		index += 1
+	return out
+
+
+## Snapshot only the combatants on `team`.
+func _snapshot_team(team: int) -> Array:
+	var out: Array = []
+	if _battle == null:
+		return out
+	var index: int = 0
+	for unit in _battle.combatants:
+		if unit.team == team:
+			out.append(_snapshot_unit(unit, index))
+		index += 1
+	return out
+
+
+## One combatant → a JSON-safe Dictionary {uid, id, name, team, hp, max_hp, block,
+## pos}. `pos` is an [x, y] array so JSON.stringify keeps it (Vector2i is not JSON).
+func _snapshot_unit(unit: Combatant, uid: int) -> Dictionary:
+	return {
+		"uid": uid,
+		"id": _unit_source_id(unit),
+		"name": unit.display_name,
+		"team": "player" if unit.is_player() else "enemy",
+		"hp": unit.hp,
+		"max_hp": unit.max_hp,
+		"block": unit.block,
+		"pos": [unit.grid_position.x, unit.grid_position.y],
+	}
+
+
+## The stable uid (index into `_battle.combatants`) of `unit`, or -1 if absent.
+func _unit_uid(unit: Combatant) -> int:
+	if _battle == null:
+		return -1
+	return _battle.combatants.find(unit)
+
+
+## The authored source id (CharacterData/EnemyData `id`) of `unit` as a String, or
+## "" when the unit has no source data. Read via `Object.get` so the statically
+## `Resource`-typed `source_data` is queried without an unsafe property access.
+func _unit_source_id(unit: Combatant) -> String:
+	if unit == null or unit.source_data == null:
+		return ""
+	var raw_id: Variant = unit.source_data.get(&"id")
+	if raw_id is StringName or raw_id is String:
+		return String(raw_id)
+	return ""
+
+
+## Describe a play target for the log: always the tile [x, y]; for a unit target,
+## also its uid + name.
+func _describe_target(target: Variant, tile: Vector2i) -> Dictionary:
+	var out: Dictionary = {"tile": [tile.x, tile.y]}
+	if target is Combatant:
+		var unit: Combatant = target
+		out["unit"] = _unit_uid(unit)
+		out["unit_name"] = unit.display_name
+	return out
+
+
+## Index a snapshot Array by uid → hp for cheap before/after delta lookups.
+func _hp_by_uid(snapshot: Array) -> Dictionary:
+	var out: Dictionary = {}
+	for entry in snapshot:
+		var rec: Dictionary = entry
+		out[rec["uid"]] = int(rec["hp"])
+	return out
 
 
 # ============================================================================

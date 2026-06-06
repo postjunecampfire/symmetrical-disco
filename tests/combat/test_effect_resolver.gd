@@ -7,17 +7,17 @@ extends "res://addons/gut/test.gd"
 ## the right arguments — never more than one call per effect — and that an
 ## unknown effect.type is reported (detection path) without mutating anything.
 ##
-## The stub records calls instead of extending BattleContext on purpose: the
-## resolver only relies on the method NAMES/SIGNATURES, so duck-typed recording
-## is the cleanest way to assert dispatch. This mirrors how P1·04's real battle
-## state may either extend BattleContext or implement the same surface.
+## The stub EXTENDS BattleContext and overrides each method to record the call
+## (method name + args). Extending (rather than duck-typing) keeps it
+## type-compatible with the resolver's `context: BattleContext` parameter under
+## strict static type checking, while still capturing dispatch for assertions.
 
 const EffectResolverScript := preload("res://src/combat/effect_resolver.gd")
 
 
 ## Records every BattleContext call the resolver makes. Each entry in `calls` is
 ## { "method": StringName, "args": Array }.
-class RecordingContext extends RefCounted:
+class RecordingContext extends BattleContext:
 	var calls: Array[Dictionary] = []
 
 	func _record(method: StringName, args: Array) -> void:

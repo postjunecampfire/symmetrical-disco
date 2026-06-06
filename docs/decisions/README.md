@@ -14,5 +14,6 @@ Each file records one settled decision: its context, the choice, the alternative
 | [0008](0008-target-platforms-distribution.md) | Target platforms & distribution (Steam + Steam Deck; itch.io web demo) | Accepted |
 | [0009](0009-toolchain-and-version-control.md) | Toolchain & version control (Godot pin, git + private GitHub remote) | Accepted |
 | [0010](0010-turn-order-strict-phases.md) | Turn order — strict player/enemy phases (prototype) | Accepted |
+| [0011](0011-death-downed-and-hp-attrition.md) | Death, downed units, and HP attrition (hybrid: TPK ends run) | Accepted |
 
 **Status values:** Proposed → Accepted → (later) Deprecated / Superseded by ADR-NNNN.
