@@ -38,6 +38,10 @@ const TYPE_LABEL := {
 	&"boss": "BOSS",
 }
 
+## Set before adding to the tree to RESUME a saved run instead of starting fresh
+## (the creation screen's "Continue" path passes the loaded RunState here).
+var resume_state: RunState = null
+
 var _db: ContentDatabase
 var _controller: RunController
 var _nav: RunNavigator
@@ -62,15 +66,20 @@ func _ready() -> void:
 		_status_label.text = "Content failed to load: %s" % str(result.errors)
 		return
 
-	if run_seed == 0:
-		run_seed = randi()
 	_controller = RunController.new(_db)
-	_controller.start_run(party, run_seed, party_races)
-	_controller.run.map = MapGenerator.new().generate(MapGenConfig.new(), run_seed)
+	if resume_state != null:
+		# Resume: drive the loaded run (party/races/deck/level/position all persisted).
+		_controller.run = resume_state
+		run_seed = resume_state.seed
+	else:
+		if run_seed == 0:
+			run_seed = randi()
+		_controller.start_run(party, run_seed, party_races)
+		_controller.run.map = MapGenerator.new().generate(MapGenConfig.new(), run_seed)
 	_nav = RunNavigator.new(_db, _controller.run)
 	_reward = CardReward.new(_db, {})
 
-	_refresh()
+	_refresh()  # also writes the initial save checkpoint
 
 
 # --- Layout -----------------------------------------------------------------
@@ -124,6 +133,10 @@ func _build_layout() -> void:
 func _refresh() -> void:
 	_refresh_status()
 	_refresh_map()
+	# Checkpoint the run at every node transition (saves happen between nodes; a
+	# mid-combat quit rewinds to the node start). Completed runs are cleared instead.
+	if _nav != null and not _nav.is_complete():
+		_save_run()
 
 
 func _refresh_status() -> void:
@@ -455,6 +468,7 @@ func _on_alloc(cid: StringName, stat: StringName) -> void:
 # --- Run end ----------------------------------------------------------------
 
 func _show_run_end(victory: bool) -> void:
+	_clear_save()  # the run is over — don't offer to resume it
 	var panel := _overlay_panel("VICTORY — the act is cleared!" if victory else "DEFEAT — the party fell.")
 	var summary := Label.new()
 	summary.add_theme_color_override("font_color", COL_DIM)
@@ -470,10 +484,25 @@ func _show_run_end(victory: bool) -> void:
 
 
 func _on_new_run() -> void:
+	_clear_save()
 	var creation := CharacterCreation.new()
 	creation.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_parent().add_child(creation)
 	queue_free()
+
+
+# --- Save / resume (P2·02 wiring) -------------------------------------------
+
+## Persist the run to the default save slot (between-node checkpoint).
+func _save_run() -> void:
+	if _controller != null and _controller.run != null:
+		_controller.run.save_to()
+
+
+## Remove the save when the run ends (win/defeat/abandon) so it isn't resumable.
+func _clear_save() -> void:
+	if FileAccess.file_exists(RunState.DEFAULT_SAVE_PATH):
+		DirAccess.remove_absolute(RunState.DEFAULT_SAVE_PATH)
 
 
 # --- Overlay helpers --------------------------------------------------------

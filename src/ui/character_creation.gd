@@ -76,7 +76,27 @@ func _ready() -> void:
 	_hint.add_theme_color_override("font_color", Color(0.85, 0.6, 0.5))
 	controls.add_child(_hint)
 
+	# Offer to resume an in-progress run if one was saved (P2·02 save/resume).
+	if FileAccess.file_exists(RunState.DEFAULT_SAVE_PATH):
+		var cont := Button.new()
+		cont.text = "Continue Run"
+		cont.custom_minimum_size = Vector2(150, 40)
+		cont.pressed.connect(_on_continue_run)
+		controls.add_child(cont)
+
 	_refresh()
+
+
+## Resume the saved run: load the RunState and hand it to a MapView.
+func _on_continue_run() -> void:
+	var state: RunState = RunState.load_from()
+	if state == null:
+		return
+	var view := MapView.new()
+	view.resume_state = state
+	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	get_parent().add_child(view)
+	queue_free()
 
 
 func _build_slot(slot: int) -> Control:

@@ -142,3 +142,23 @@ func test_event_for_picks_a_loaded_event() -> void:
 	var nav := _nav(_run())
 	var ev := nav.event_for(_node(&"e", &"event", 0, []))
 	assert_true(_db.get_event(ev) != null, "event node resolves to a real event: %s" % ev)
+
+
+# --- Resume: navigator works off a SAVED-then-LOADED run (save/resume wiring) -
+
+func test_navigator_resumes_from_a_saved_run() -> void:
+	const PATH := "user://test_resume_nav.json"
+	var run := _run()
+	# Mid-run: entered a_combat and cleared it; frontier should be b_event.
+	run.position = &"a_combat"
+	run.cleared = [&"a_combat"] as Array[StringName]
+	assert_true(run.save_to(PATH), "saved mid-run state")
+
+	var loaded: RunState = RunStateScript.load_from(PATH)
+	assert_not_null(loaded, "loaded the saved run")
+	var nav := RunNavigatorScript.new(_db, loaded)
+	assert_eq(nav.current_node().id, &"a_combat", "position survived the round-trip")
+	var r := nav.reachable()
+	assert_eq(r.size(), 1, "frontier restored")
+	assert_eq(r[0].id, &"b_event", "resumes at the correct next node")
+	DirAccess.remove_absolute(PATH)
