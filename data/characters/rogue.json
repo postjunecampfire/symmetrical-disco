@@ -1,0 +1,24 @@
+{
+  "id": "rogue",
+  "display_name": "Rogue",
+  "speed": 12,
+  "strength": 2,
+  "dexterity": 6,
+  "constitution": 12,
+  "intelligence": 2,
+  "attack_stat": "dex",
+  "innate_actions": [
+    "strike",
+    "defend"
+  ],
+  "starting_deck": [
+    "quick_stab",
+    "venom_strike",
+    "shadowstep",
+    "field_dressing"
+  ],
+  "tags": [
+    "skirmisher"
+  ],
+  "sprite": "res://assets/characters/rogue.png"
+}

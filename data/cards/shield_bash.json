@@ -2,7 +2,7 @@
   "id": "shield_bash",
   "display_name": "Shield Bash",
   "description": "Deal 6 damage and Stun the target for 1 turn. Exhaust.",
-  "character_tag": "vanguard",
+  "character_tag": "fighter",
   "energy_cost": 1,
   "keywords": [
     "exhaust"

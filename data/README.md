@@ -27,28 +27,36 @@ repositioning concepts will return as positionless-native cards later.
 |----|---------------|------|----------|--------|--------|-----------------|
 | `strike` | neutral | 1 | — | yes | enemy | 4 damage |
 | `defend` | neutral | 1 | — | yes | self | 5 block |
-| `shield_bash` | vanguard | 1 | exhaust | no | enemy | 6 damage + 1 stun |
-| `bulwark` | vanguard | 1 | — | no | self | 8 block + 1 strength |
-| `rallying_shout` | vanguard | 1 | — | no | self | 4 block + draw 1 |
+| `shield_bash` | fighter | 1 | exhaust | no | enemy | 6 damage + 1 stun |
+| `bulwark` | fighter | 1 | — | no | self | 8 block + 1 strength |
+| `rallying_shout` | fighter | 1 | — | no | self | 4 block + draw 1 |
+| `quick_stab` | rogue | 1 | — | no | enemy | 4 damage |
+| `venom_strike` | rogue | 1 | — | no | enemy | 3 damage + 3 poison |
+| `shadowstep` | rogue | 1 | — | no | self | 4 block + draw 1 |
+| `fan_of_knives` | rogue | 2 | exhaust | no | all_enemies | 3 damage (AoE) |
 | `arcane_bolt` | mage | 1 | — | no | enemy | 5 damage |
 | `venom_dart` | mage | 1 | — | no | enemy | 3 damage + 4 poison |
 | `frost_nova` | mage | 2 | exhaust | no | all_enemies | 4 damage + 1 weak (AoE) |
 | `mana_surge` | mage | 0 | exhaust | no | self | +2 energy + draw 2 |
 | `field_dressing` | neutral | 1 | — | no | ally | heal 6 |
 
+Owned card damage scales with its owner's `attack_stat` (fighter→STR, rogue→DEX, mage→INT); neutral cards are flat (ADR-0014/0016).
+
 Keyword coverage: `exhaust` ×3 (`shield_bash`, `frost_nova`, `mana_surge`). `return` is reserved for low/no-damage utility — banned on owned (stat-scaling) damage cards (ADR-0017), so no current card uses it.
 
-## Characters (`characters/`)
-CharacterData per §4. Both share innate actions `["strike","defend"]`.
+## Classes / Characters (`characters/`)
+CharacterData per §4 — in this game a **class** *is* the base character template
+(ADR-0015). All share innate `["strike","defend"]`. Stats (ADR-0014): STR/DEX/CON/INT
++ `attack_stat` (`str` \| `dex` \| `int`). `max_hp` is derived (CON × `hp_per_con`=2).
 
-Stats (ADR-0014): STR/DEX/CON/INT + `attack_stat`. `max_hp` is derived (CON × `hp_per_con`=2).
+| id | STR | DEX | CON | INT | attack_stat | max_hp | starting_deck |
+|----|-----|-----|-----|-----|-------------|--------|---------------|
+| `fighter` | 6 | 5 | 17 | 1 | str | 34 | shield_bash, bulwark, rallying_shout, field_dressing |
+| `rogue` | 2 | 6 | 12 | 2 | dex | 24 | quick_stab, venom_strike, shadowstep, field_dressing |
+| `mage` | 1 | 3 | 12 | 6 | int | 24 | arcane_bolt, venom_dart, frost_nova, mana_surge, field_dressing |
 
-| id | STR | DEX | CON | INT | attack_stat | max_hp | tags | starting_deck |
-|----|-----|-----|-----|-----|-------------|--------|------|---------------|
-| `vanguard` | 6 | 5 | 17 | 1 | str | 34 | melee | shield_bash, bulwark, rallying_shout, field_dressing |
-| `mage` | 1 | 3 | 12 | 6 | int | 24 | caster | arcane_bolt, venom_dart, frost_nova, mana_surge, field_dressing |
-
-The assembled shared deck for the prototype party = union of both `starting_deck` lists.
+A run fields **2** of these (ADR-0016); the shared deck is the union of the chosen
+classes' `starting_deck` lists. Race (above) modifies the chosen class at creation.
 
 ## Races (`races/`)
 RaceData (ADR-0015) — a small stat modifier + one custom (neutral) card, applied to a

@@ -40,7 +40,7 @@ func _assembler() -> EncounterAssembler:
 
 
 func _party() -> Array[StringName]:
-	return [&"vanguard", &"mage"] as Array[StringName]
+	return [&"fighter", &"mage"] as Array[StringName]
 
 
 func _build() -> EncounterBattle:
@@ -60,7 +60,7 @@ func test_real_data_loads_ok() -> void:
 	)
 	assert_not_null(_db.get_battle_config(), "battle_config loaded")
 	assert_not_null(_db.get_encounter(ENCOUNTER_ID), "skirmish_01 encounter present")
-	assert_not_null(_db.get_character(&"vanguard"), "vanguard character present")
+	assert_not_null(_db.get_character(&"fighter"), "vanguard character present")
 	assert_not_null(_db.get_character(&"mage"), "mage character present")
 
 
@@ -94,7 +94,7 @@ func test_assembled_spawns_players_and_enemies() -> void:
 
 func test_deck_assembled_from_party_and_excludes_innate() -> void:
 	var battle: EncounterBattle = _build()
-	var vanguard: CharacterData = _db.get_character(&"vanguard")
+	var vanguard: CharacterData = _db.get_character(&"fighter")
 	var mage: CharacterData = _db.get_character(&"mage")
 
 	var expected: int = 0

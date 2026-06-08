@@ -1,0 +1,23 @@
+{
+  "id": "venom_strike",
+  "display_name": "Venom Strike",
+  "description": "Deal 3 damage and apply 3 Poison.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 3
+    }
+  ]
+}

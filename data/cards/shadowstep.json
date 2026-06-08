@@ -1,8 +1,8 @@
 {
-  "id": "rallying_shout",
-  "display_name": "Rallying Shout",
-  "description": "Gain 4 Block and draw 1 card.",
-  "character_tag": "fighter",
+  "id": "shadowstep",
+  "display_name": "Shadowstep",
+  "description": "Gain 4 block and draw 1.",
+  "character_tag": "rogue",
   "energy_cost": 1,
   "keywords": [],
   "rarity": "common",

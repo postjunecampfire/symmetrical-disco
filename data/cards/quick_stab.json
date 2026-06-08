@@ -1,0 +1,18 @@
+{
+  "id": "quick_stab",
+  "display_name": "Quick Stab",
+  "description": "Deal 4 damage.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    }
+  ]
+}

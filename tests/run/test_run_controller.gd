@@ -23,8 +23,8 @@ func _controller() -> RunController:
 
 func test_start_run_sets_full_hp() -> void:
 	var rc := _controller()
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 1)
-	assert_eq(rc.run.party_hp[&"vanguard"], 34, "vanguard starts at full (CON 17 * 2)")
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	assert_eq(rc.run.party_hp[&"fighter"], 34, "vanguard starts at full (CON 17 * 2)")
 	assert_eq(rc.run.party_hp[&"mage"], 24, "mage starts at full (CON 12 * 2)")
 	assert_true(rc.run.downed.is_empty(), "no one downed at run start")
 	assert_gt(rc.run.run_deck.size(), 0, "run deck seeded from starting decks")
@@ -34,13 +34,13 @@ func test_start_run_sets_full_hp() -> void:
 
 func test_downed_unit_revives_at_revive_hp_next_fight() -> void:
 	var rc := _controller()
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 1)
-	rc.run.party_hp[&"vanguard"] = 20  # damaged survivor
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.run.party_hp[&"fighter"] = 20  # damaged survivor
 	rc.run.party_hp[&"mage"] = 0        # downed
 	rc.run.downed = [&"mage"] as Array[StringName]
 
 	var carried: Dictionary = rc._carried_for_next_fight()
-	assert_eq(carried[&"vanguard"], 20, "survivor carries its actual HP")
+	assert_eq(carried[&"fighter"], 20, "survivor carries its actual HP")
 	assert_eq(
 		carried[&"mage"], _db.get_battle_config().revive_hp,
 		"a downed unit revives at the configured revive HP"
@@ -51,9 +51,9 @@ func test_downed_unit_revives_at_revive_hp_next_fight() -> void:
 
 func test_win_heals_survivors_and_marks_downed() -> void:
 	var rc := _controller()
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 1)
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
 	var battle := EncounterAssemblerScript.new().build(
-		_db.get_encounter(&"skirmish_01"), _db, [&"vanguard", &"mage"] as Array[StringName], 1
+		_db.get_encounter(&"skirmish_01"), _db, [&"fighter", &"mage"] as Array[StringName], 1
 	)
 	# vanguard survives wounded; mage is downed (0 HP).
 	for unit in battle.living_players():
@@ -63,22 +63,22 @@ func test_win_heals_survivors_and_marks_downed() -> void:
 	rc._write_back_hp(battle, BattleState.Outcome.WIN)
 
 	var heal: int = _db.get_battle_config().post_combat_heal
-	assert_eq(rc.run.party_hp[&"vanguard"], 10 + heal, "survivor healed post-combat")
+	assert_eq(rc.run.party_hp[&"fighter"], 10 + heal, "survivor healed post-combat")
 	assert_eq(rc.run.party_hp[&"mage"], 0, "a downed unit is NOT healed")
 	assert_true(rc.run.downed.has(&"mage"), "0-HP unit recorded as downed")
-	assert_false(rc.run.downed.has(&"vanguard"), "survivor not downed")
+	assert_false(rc.run.downed.has(&"fighter"), "survivor not downed")
 
 
 func test_heal_caps_at_max_hp() -> void:
 	var rc := _controller()
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 1)
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
 	var battle := EncounterAssemblerScript.new().build(
-		_db.get_encounter(&"skirmish_01"), _db, [&"vanguard", &"mage"] as Array[StringName], 1
+		_db.get_encounter(&"skirmish_01"), _db, [&"fighter", &"mage"] as Array[StringName], 1
 	)
 	for unit in battle.living_players():
 		unit.hp = unit.max_hp - 1  # one below full
 	rc._write_back_hp(battle, BattleState.Outcome.WIN)
-	assert_eq(rc.run.party_hp[&"vanguard"], 34, "heal clamps to max HP")
+	assert_eq(rc.run.party_hp[&"fighter"], 34, "heal clamps to max HP")
 	assert_eq(rc.run.party_hp[&"mage"], 24)
 
 
@@ -86,7 +86,7 @@ func test_heal_caps_at_max_hp() -> void:
 
 func test_tpk_ends_the_run() -> void:
 	var rc := _controller()
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 1)
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
 	var noop := func(_b: Variant, _cp: Variant) -> void: pass
 	var summary: Dictionary = rc.run_act([&"enc_boss_01"], noop)
 	assert_false(summary["won"], "doing nothing vs the boss loses")
@@ -98,14 +98,14 @@ func test_tpk_ends_the_run() -> void:
 
 func test_hp_attrition_across_two_fights() -> void:
 	var rc := _controller()
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 7)
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 7)
 	var greedy := func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
 	rc.resolve_combat(&"enc_combat_01", greedy)
 	rc.resolve_combat(&"enc_combat_01", greedy)
-	var total: int = int(rc.run.party_hp[&"vanguard"]) + int(rc.run.party_hp[&"mage"])
+	var total: int = int(rc.run.party_hp[&"fighter"]) + int(rc.run.party_hp[&"mage"])
 	assert_lt(total, 34 + 24, "the party is below full HP after two fights (attrition)")
 	# HP stays in valid range.
-	assert_between(int(rc.run.party_hp[&"vanguard"]), 0, 34, "vanguard HP in range")
+	assert_between(int(rc.run.party_hp[&"fighter"]), 0, 34, "vanguard HP in range")
 	assert_between(int(rc.run.party_hp[&"mage"]), 0, 24, "mage HP in range")
 
 
@@ -126,7 +126,7 @@ class _SpyLogger extends TelemetryLogger:
 func test_run_emits_run_level_telemetry() -> void:
 	var spy := _SpyLogger.new()
 	var rc := RunControllerScript.new(_db, spy)
-	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 3)
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 3)
 	var greedy := func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
 	rc.run_act([&"enc_combat_01"], greedy)
 

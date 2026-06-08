@@ -1,0 +1,20 @@
+{
+  "id": "fan_of_knives",
+  "display_name": "Fan of Knives",
+  "description": "Deal 3 damage to all enemies. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    }
+  ]
+}

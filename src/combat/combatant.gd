@@ -119,6 +119,8 @@ func attack_power() -> int:
 	match attack_stat:
 		&"str":
 			return strength
+		&"dex":
+			return dexterity
 		&"int":
 			return intelligence
 		_:

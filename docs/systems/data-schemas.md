@@ -186,7 +186,7 @@ as `constitution * BattleConfig.hp_per_con` (not authored directly).
 | `dexterity` | int | no | `0` | Block bonus. |
 | `constitution` | int | yes | `0` | Drives `max_hp` (= CON × `hp_per_con`). |
 | `intelligence` | int | no | `0` | Magic attack bonus (when `attack_stat == int`). |
-| `attack_stat` | StringName | yes | `str` | `str` \| `int` — which stat boosts this character's attacks. |
+| `attack_stat` | StringName | yes | `str` | `str` \| `dex` \| `int` — which stat boosts this character's attacks (fighter/rogue/mage). |
 | `speed` | int | no | `10` | Unused under strict phases (ADR-0010). |
 | `innate_actions` | Array[StringName] | yes | `["strike","defend"]` | Card ids flagged `innate`; never enter the deck (ADR-0005). |
 | `starting_deck` | Array[StringName] | yes | `[]` | Card ids this character contributes to the shared deck. |

@@ -67,12 +67,23 @@ func test_int_attack_stat_adds_to_damage() -> void:
 	assert_eq(foe.hp, 20, "magic damage scales with INT")
 
 
+func test_dex_attack_stat_adds_to_damage() -> void:
+	# Rogue-style: attacks scale with DEX.
+	var s := _state()
+	var rogue := _player(s, &"dex", 0, 5, 0)
+	var foe := _enemy(s, 30)
+	s.apply_effects(rogue, foe, [_dmg(4)])  # 4 base + DEX 5 = 9
+	assert_eq(foe.hp, 21, "physical/finesse damage scales with DEX")
+
+
 func test_attack_power_picks_the_right_stat() -> void:
 	var s := _state()
 	var martial := _player(s, &"str", 6, 0, 9)
 	assert_eq(martial.attack_power(), 6, "str attacker ignores INT")
 	var caster := _player(s, &"int", 9, 0, 6)
 	assert_eq(caster.attack_power(), 6, "int attacker ignores STR")
+	var rogue := _player(s, &"dex", 9, 7, 9)
+	assert_eq(rogue.attack_power(), 7, "dex attacker uses DEX")
 
 
 func test_strength_status_stacks_with_attack_stat() -> void:

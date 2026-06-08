@@ -1,6 +1,6 @@
 {
-  "id": "vanguard",
-  "display_name": "Vanguard",
+  "id": "fighter",
+  "display_name": "Fighter",
   "speed": 9,
   "strength": 6,
   "dexterity": 5,
@@ -20,5 +20,5 @@
   "tags": [
     "melee"
   ],
-  "sprite": "res://assets/characters/vanguard.png"
+  "sprite": "res://assets/characters/fighter.png"
 }

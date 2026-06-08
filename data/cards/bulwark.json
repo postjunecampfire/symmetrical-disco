@@ -2,7 +2,7 @@
   "id": "bulwark",
   "display_name": "Bulwark",
   "description": "Gain 8 Block and 1 Strength.",
-  "character_tag": "vanguard",
+  "character_tag": "fighter",
   "energy_cost": 1,
   "keywords": [],
   "rarity": "common",

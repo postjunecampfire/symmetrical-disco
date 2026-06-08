@@ -16,7 +16,7 @@ extends Control
 
 const DATA_DIR := "res://data"
 const ENCOUNTER_ID: StringName = &"skirmish_01"
-const PARTY: Array[StringName] = [&"vanguard", &"mage"]
+const PARTY: Array[StringName] = [&"fighter", &"mage"]
 
 const COL_BG := Color(0.12, 0.13, 0.17)
 const COL_PANEL := Color(0.18, 0.20, 0.26)
