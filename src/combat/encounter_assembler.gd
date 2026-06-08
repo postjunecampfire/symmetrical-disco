@@ -30,11 +30,15 @@ extends RefCounted
 ## the db). `rng_seed` seeds both the shared deck's shuffle and the enemy AI so a
 ## fixed seed reproduces a battle. The returned battle is registered but NOT yet
 ## started — the caller drives the turn loop (start_player_turn / end_player_turn).
+## `carried_hp` (character_id -> hp) lets the run layer (ADR-0012 §8) spawn party
+## members at their carried-over HP instead of full; a downed unit's revive value
+## is resolved by the caller before this. Omitted/empty -> everyone spawns full.
 func build(
 	encounter: EncounterData,
 	db: ContentDatabase,
 	party_ids: Array[StringName],
-	rng_seed: int = 0
+	rng_seed: int = 0,
+	carried_hp: Dictionary = {}
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
@@ -51,9 +55,21 @@ func build(
 	battle.win_param = encounter.win_param
 
 	_spawn_players(battle, party)
+	if not carried_hp.is_empty():
+		_apply_carried_hp(battle, carried_hp)
 	_spawn_enemies(battle, encounter, db)
 
 	return battle
+
+
+## Override each player's spawn HP from `carried_hp` (clamped to max_hp).
+func _apply_carried_hp(battle: BattleState, carried_hp: Dictionary) -> void:
+	for unit in battle.combatants:
+		if not unit.is_player():
+			continue
+		var data := unit.source_data as CharacterData
+		if data != null and carried_hp.has(data.id):
+			unit.hp = clampi(int(carried_hp[data.id]), 0, unit.max_hp)
 
 
 ## Read the current battle outcome (convenience over BattleState.check_outcome()).

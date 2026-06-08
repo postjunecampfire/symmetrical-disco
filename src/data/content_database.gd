@@ -438,6 +438,8 @@ func _load_battle_config(path: String) -> void:
 	bc.max_hand = _int(d.get("max_hand"), 10)
 	bc.reshuffle_discard = _bool(d.get("reshuffle_discard"), true)
 	bc.hp_per_con = _int(d.get("hp_per_con"), 2)
+	bc.revive_hp = _int(d.get("revive_hp"), 8)
+	bc.post_combat_heal = _int(d.get("post_combat_heal"), 5)
 	battle_config = bc
 
 

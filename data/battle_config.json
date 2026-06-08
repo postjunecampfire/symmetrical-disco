@@ -3,5 +3,7 @@
   "draw_per_turn": 5,
   "max_hand": 10,
   "reshuffle_discard": true,
-  "hp_per_con": 2
+  "hp_per_con": 2,
+  "revive_hp": 8,
+  "post_combat_heal": 5
 }
