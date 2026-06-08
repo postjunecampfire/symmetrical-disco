@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://db345bwsrk2vk"]
 
-[ext_resource type="Script" path="res://src/ui/battle_view.gd" id="1_battleview"]
+[ext_resource type="Script" path="res://src/ui/character_creation.gd" id="1_battleview"]
 
 [node name="Main" type="Control"]
 layout_mode = 3

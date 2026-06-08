@@ -16,7 +16,11 @@ extends Control
 
 const DATA_DIR := "res://data"
 const ENCOUNTER_ID: StringName = &"skirmish_01"
-const PARTY: Array[StringName] = [&"fighter", &"mage"]
+
+## Party + race selections. Set by the creation screen before the node enters the
+## tree; the defaults let battle_view run standalone (e.g. straight from main.tscn).
+var party: Array[StringName] = [&"fighter", &"mage"]
+var party_races: Dictionary = {}
 
 const COL_BG := Color(0.12, 0.13, 0.17)
 const COL_PANEL := Color(0.18, 0.20, 0.26)
@@ -68,7 +72,7 @@ func _load_and_assemble() -> void:
 	if encounter == null:
 		_status_text = "Encounter '%s' not found." % ENCOUNTER_ID
 		return
-	_battle = EncounterAssembler.new().build(encounter, _db, PARTY, randi())
+	_battle = EncounterAssembler.new().build(encounter, _db, party, randi(), {}, party_races)
 	_card_play = CardPlay.new(_battle)
 	_selected_actor = _battle.living_players()[0] if not _battle.living_players().is_empty() else null
 
