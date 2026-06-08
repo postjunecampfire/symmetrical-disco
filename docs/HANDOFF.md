@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 178 passing.
+# Currently: 189 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -69,12 +69,14 @@ could self-test. A human/agent without that runs the headless line above as the 
    model + API are ready for a screen or auto-policy to call.* Class **promotion**
    (P3·06) builds on this.
 3. **Run is single-fight in the UI.** Creation → one encounter. No map/run UI
-   (P2·10) or card-draft-in-UI yet. Node *handlers*: combat (P2·06) ✓,
-   **event (P2·08) ✓ DONE 2026-06-08** — `EventResolver` applies typed outcome
-   deltas (heal/damage_party/add_card/remove_card/add_relic/nothing) to RunState;
-   `RunController.resolve_event(id, choice_index)` is the entry point (policy/UI
-   picks the index, same pattern as combat); two authored events in `data/events/`.
-   Still open: rest (P2·07), relic (P2·12).
+   (P2·10) or card-draft-in-UI yet. Node *handlers* are all built and headless-
+   resolvable via `RunController` (policy/UI supplies the choice, same pattern as
+   combat): combat (P2·06) ✓, **event (P2·08) ✓** (`resolve_event`; `EventResolver`
+   applies heal/damage_party/add_card/remove_card/add_relic/nothing), **rest
+   (P2·07) ✓ DONE 2026-06-08** (`resolve_rest("heal"|"upgrade", card_id)`;
+   `RestResolver` heals by `BattleConfig.rest_heal` or swaps a run-deck card for
+   its `upgrade_of` variant — e.g. `shield_bash`→`shield_bash_plus`). Still open:
+   relic (P2·12). The handlers need a screen (P2·10) to be player-facing.
 4. **Class promotion (P3·06)** and **exit-package meta (P3·08, ADR-0018)** — not built.
 5. **Save/resume** exists on `RunState` but isn't wired into the run loop.
 
@@ -120,10 +122,10 @@ src/data/      content resources + ContentDatabase loader (cards, characters=cla
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
                EnemyAI, EncounterAssembler/Battle
 src/cards/     Deck, CardPlay
-src/run/       RunController, RunState, Leveling, EventResolver, MapGraph/MapGenerator, CardReward
+src/run/       RunController, RunState, Leveling, EventResolver, RestResolver, MapGraph/MapGenerator, CardReward
 src/ui/        character_creation.gd → battle_view.gd (code-driven, asset-free)
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (178 passing)
+tests/         GUT suites mirroring src/  (189 passing)
 ```

@@ -86,6 +86,20 @@ func get_event(id: StringName) -> EventData:
 	return events.get(id, null)
 
 
+## The upgraded variant of card `base_id` — the card whose `upgrade_of` points at
+## it (run-structure.md §5, rest upgrade). Returns null if no upgrade exists. If
+## several cards claim the same base (authoring error), returns the first by id
+## for determinism; the loader flags duplicates.
+func get_upgrade_for(base_id: StringName) -> CardData:
+	var best: CardData = null
+	for key: Variant in cards.keys():
+		var card: CardData = cards[key]
+		if card != null and card.upgrade_of == base_id:
+			if best == null or String(card.id) < String(best.id):
+				best = card
+	return best
+
+
 func get_battle_config() -> BattleConfig:
 	return battle_config
 
@@ -508,6 +522,7 @@ func _load_battle_config(path: String) -> void:
 	bc.hp_per_con = _int(d.get("hp_per_con"), 2)
 	bc.revive_hp = _int(d.get("revive_hp"), 8)
 	bc.post_combat_heal = _int(d.get("post_combat_heal"), 5)
+	bc.rest_heal = _int(d.get("rest_heal"), 12)
 	bc.stat_points_per_level = _int(d.get("stat_points_per_level"), 3)
 	bc.xp_per_combat = _int(d.get("xp_per_combat"), 10)
 	bc.xp_curve_base = _int(d.get("xp_curve_base"), 30)
@@ -536,6 +551,11 @@ func _validate_references() -> void:
 				"card '%s' references unknown character_tag '%s'" % [card.id, card.character_tag]
 			)
 		_validate_effect_statuses(card.effects, "card '%s'" % card.id)
+		# upgrade_of (if set) must point at an existing base card (run-structure §5).
+		if card.upgrade_of != &"" and not cards.has(card.upgrade_of):
+			_result.add_error(
+				"card '%s' upgrade_of references unknown card '%s'" % [card.id, card.upgrade_of]
+			)
 		# ADR-0017: `return` is banned on a card that deals stat-scaling damage
 		# (an owned, i.e. non-neutral, damage card). It would let a cheap nuke
 		# skip the deck-cooldown cycle entirely. `return` stays legal on neutral

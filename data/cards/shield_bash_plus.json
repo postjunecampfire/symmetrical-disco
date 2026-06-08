@@ -1,0 +1,27 @@
+{
+  "id": "shield_bash_plus",
+  "display_name": "Shield Bash+",
+  "description": "Deal 9 damage and Stun the target for 2 turns. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "upgrade_of": "shield_bash",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 9
+    },
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 2
+    }
+  ],
+  "art": "res://assets/cards/shield_bash.png"
+}

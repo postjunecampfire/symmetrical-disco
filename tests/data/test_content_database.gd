@@ -149,6 +149,18 @@ func test_unknown_event_outcome_kind_fails_loudly() -> void:
 	)
 
 
+# --- Validation: dangling card upgrade_of (P2·07) ---
+func test_dangling_upgrade_of_fails_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("dangling_upgrade"))
+
+	assert_false(result.ok, "an upgrade_of pointing at a missing card must fail the load")
+	assert_true(
+		_any_contains(result.errors, "upgrade_of references unknown card"),
+		"error should name the dangling upgrade base: %s" % str(result.errors)
+	)
+
+
 # --- Helper ---
 func _any_contains(errors: PackedStringArray, needle: String) -> bool:
 	for e in errors:

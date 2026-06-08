@@ -236,6 +236,32 @@ func test_allocate_stat_point_through_controller() -> void:
 	assert_false(rc.allocate_stat_point(&"fighter", &"str"), "cannot spend with none left")
 
 
+# --- Rest nodes (P2·07) -----------------------------------------------------
+
+func test_resolve_rest_heal_restores_party() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.run.party_hp[&"fighter"] = 10
+	var amount: int = _db.get_battle_config().rest_heal
+	assert_true(rc.resolve_rest(&"heal"), "heal choice applies")
+	assert_eq(int(rc.run.party_hp[&"fighter"]), 10 + amount, "rest heals by config amount")
+
+
+func test_resolve_rest_upgrade_swaps_card_in_run_deck() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.run.run_deck = [&"shield_bash", &"strike"] as Array[StringName]
+	assert_true(rc.resolve_rest(&"upgrade", &"shield_bash"), "upgrade applies when base + variant exist")
+	assert_true(rc.run.run_deck.has(&"shield_bash_plus"), "the upgraded card is now in the run deck")
+	assert_false(rc.run.run_deck.has(&"shield_bash"), "the base card was replaced")
+
+
+func test_resolve_rest_rejects_unknown_kind() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	assert_false(rc.resolve_rest(&"meditate"), "an unknown rest kind is rejected")
+
+
 # --- Event nodes (P2·08) ----------------------------------------------------
 
 func test_resolve_event_applies_choice_to_run() -> void:

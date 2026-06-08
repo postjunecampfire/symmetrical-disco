@@ -13,6 +13,9 @@ extends Resource
 @export var revive_hp: int = 8
 ## Fixed HP restored to each surviving unit after a won combat (ADR-0011).
 @export var post_combat_heal: int = 5
+## HP restored to each living party member by the "heal" choice at a rest node
+## (run-structure.md §5, P2·07). Tunable; larger than post_combat_heal by design.
+@export var rest_heal: int = 12
 
 # --- Leveling (ADR-0015, P3·05) ---------------------------------------------
 ## Stat points a character may allocate on each level-up (ADR-0015 default 3).

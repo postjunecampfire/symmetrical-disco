@@ -96,9 +96,16 @@ by `EventResolver` against the RunState.
 
 ## Battle config (`battle_config.json`)
 BattleConfig per §7: `energy_per_turn: 3`, `draw_per_turn: 5`, `max_hand: 10`,
-`reshuffle_discard: true`. Leveling knobs (ADR-0015 / P3·05):
-`stat_points_per_level: 3`, `xp_per_combat: 10`, `xp_curve_base: 30`,
-`xp_curve_step: 20`.
+`reshuffle_discard: true`, `rest_heal: 12` (rest-node heal, P2·07). Leveling knobs
+(ADR-0015 / P3·05): `stat_points_per_level: 3`, `xp_per_combat: 10`,
+`xp_curve_base: 30`, `xp_curve_step: 20`.
+
+## Card upgrades (`cards/*.json` with `upgrade_of`)
+A card may declare `upgrade_of: <base_card_id>`, marking it the upgraded variant
+of that base (run-structure.md §5, P2·07). A rest node's "upgrade" choice swaps a
+base copy in the run deck for its variant. Example: `shield_bash_plus`
+(`upgrade_of: shield_bash`) — 9 dmg + Stun 2 vs. the base 6 dmg + Stun 1.
+**Numbers are placeholder/tunable.**
 
 ## Reference integrity
 - Every card `character_tag` is `neutral` or an existing character id (`vanguard`/`mage`).

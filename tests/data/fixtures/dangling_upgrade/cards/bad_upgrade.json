@@ -1,0 +1,18 @@
+{
+  "id": "bad_upgrade",
+  "display_name": "Bad Upgrade",
+  "description": "An upgrade variant whose base card does not exist.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "rarity": "common",
+  "upgrade_of": "ghost_card",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    }
+  ]
+}

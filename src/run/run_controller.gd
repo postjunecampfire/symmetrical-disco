@@ -31,6 +31,8 @@ var _party_races: Dictionary = {}
 var _leveling: Leveling
 ## Event-node resolver (run-structure.md §6 / P2·08): applies choice outcomes.
 var _event_resolver: EventResolver
+## Rest-node resolver (run-structure.md §5 / P2·07): heal or upgrade a card.
+var _rest_resolver: RestResolver
 
 
 func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
@@ -38,6 +40,7 @@ func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
 	telemetry = logger
 	_leveling = Leveling.new(_config())
 	_event_resolver = EventResolver.new(database)
+	_rest_resolver = RestResolver.new(database)
 
 
 # --- Run lifecycle ----------------------------------------------------------
@@ -161,6 +164,36 @@ func resolve_event(event_id: StringName, choice_index: int) -> bool:
 			"deck_size": run.run_deck.size(),
 		})
 	return true
+
+
+# --- Rest nodes (run-structure.md §5 / P2·07) -------------------------------
+
+## Resolve a rest node. `kind` is `heal` or `upgrade`; for `upgrade`, `card_id` is
+## the base card to upgrade in the run deck. Returns true if the choice applied
+## (heal always applies; upgrade only if the base card is present and has an
+## upgrade variant). The choice is supplied by a policy or UI, like combat/events.
+## Logs a `rest_choice` telemetry event on success.
+func resolve_rest(kind: StringName, card_id: StringName = &"") -> bool:
+	var applied: bool = false
+	var detail: String = ""
+	match kind:
+		&"heal":
+			_rest_resolver.heal(run)
+			applied = true
+			detail = "heal"
+		&"upgrade":
+			applied = _rest_resolver.upgrade_card(run, card_id)
+			detail = "upgrade:%s" % card_id
+		_:
+			return false
+	if applied and telemetry != null:
+		telemetry.log_event(&"rest_choice", {
+			"kind": String(kind),
+			"detail": detail,
+			"party_hp": _hp_snapshot(),
+			"deck_size": run.run_deck.size(),
+		})
+	return applied
 
 
 # --- HP attrition (ADR-0011) ------------------------------------------------
