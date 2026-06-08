@@ -107,11 +107,27 @@ across a run?). There's a repeatable harness for this now:
 godot --headless --script res://tools/attrition_sim.gd [seeds]   # default 40
 ```
 
-`tools/attrition_sim.gd` runs **greedy** vs **defensive** cohorts over the same act
-(now 6 fights: `enc_combat_01..04, elite_01, boss_01`) under identical seeds, with
-the FULL loop live — run-deck combat decks, leveling (auto-allocates STR for greedy /
-CON for defensive), and a relic after the elite. It reports win %, avg nodes cleared,
-avg surviving HP, and a death-node histogram.
+`tools/attrition_sim.gd` runs **three** cohorts over the same 6-fight act
+(`enc_combat_01..04, elite_01, boss_01`) under identical seeds, full loop live
+(run decks, leveling, relic after elite): **greedy** (all offense), **defensive**
+(block once then attack), and **turtle** (block hard, chip slowly). The goal is a
+"Goldilocks" result — balanced play beats BOTH rushing and turtling.
+
+**Read (40 seeds, 2026-06-08):** greedy 97.5% (1 death @ elite) · defensive 100% ·
+turtle 100% (final HP greedy 32 < defensive 38 < turtle 44). Greed is mildly
+punished; **turtling is NOT — it's the safest play.**
+
+**KEY FINDING — data-only damage ramp can't punish turtling.** The intended
+"scale damage over time" lever was added as a roll-based self-Strength `buildup`
+intent on Medium/Strong enemies (Medium +2, Strong +3). But a buildup turn is a
+turn the enemy *doesn't* attack, so investing in ramp LOWERS near-term pressure,
+and in fights short enough to win the ramp payoff never lands (raising its weight
+made greedy *safer*, all three → 100%). To actually punish slow play the ramp must
+be **passive** — enemies gain +Strength at the START of each of their turns, with
+no action cost — which is a small ENGINE hook (an EnemyData `ramp_per_turn` applied
+in the enemy phase, like a relic's turn_start). Recommended next lever; pairs with
+reliable Frail/Vulnerable to stop turtles out-blocking the ramp. Final feel is the
+owner's call.
 
 **Read after the enemy-kit redesign (40 seeds, 2026-06-08): greedy 95% (2 deaths at
 the elite) vs defensive 100%; HP gap def−greedy ≈ +6.2.** First time greed is

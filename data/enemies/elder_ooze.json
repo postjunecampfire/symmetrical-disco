@@ -52,6 +52,21 @@
         }
       ],
       "weight": 1
+    },
+    {
+      "id": "elder_ooze_buildup",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 3
+        }
+      ],
+      "weight": 1
     }
   ],
   "sprite": "res://assets/enemies/elder_ooze.png"

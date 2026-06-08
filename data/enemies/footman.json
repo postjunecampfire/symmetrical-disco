@@ -47,6 +47,21 @@
         }
       ],
       "weight": 1
+    },
+    {
+      "id": "footman_buildup",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 2
+        }
+      ],
+      "weight": 1
     }
   ],
   "sprite": "res://assets/enemies/footman.png"

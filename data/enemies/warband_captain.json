@@ -58,7 +58,7 @@
         {
           "type": "apply_status",
           "status": "strength",
-          "stacks": 2
+          "stacks": 3
         }
       ],
       "weight": 1

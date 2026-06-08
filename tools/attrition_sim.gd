@@ -49,7 +49,8 @@ func _initialize() -> void:
 
 	var greedy: Dictionary = _run_cohort("greedy", seeds)
 	var defensive: Dictionary = _run_cohort("defensive", seeds)
-	_print_report(greedy, defensive, seeds)
+	var turtle: Dictionary = _run_cohort("turtle", seeds)
+	_print_report([greedy, defensive, turtle], seeds)
 	quit()
 
 
@@ -64,9 +65,14 @@ func _run_cohort(mode: String, seeds: int) -> Dictionary:
 	for s in range(seeds):
 		var rc := RunController.new(_db)
 		rc.start_run(PARTY, s, RACES)
-		var policy: Callable = (func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)) \
-			if mode == "greedy" \
-			else (func(b: Variant, cp: Variant) -> void: _defensive_turn(b, cp))
+		var policy: Callable
+		match mode:
+			"greedy":
+				policy = func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
+			"turtle":
+				policy = func(b: Variant, cp: Variant) -> void: _turtle_turn(b, cp)
+			_:
+				policy = func(b: Variant, cp: Variant) -> void: _defensive_turn(b, cp)
 
 		var cleared: int = 0
 		for enc_id in ACT:
@@ -156,20 +162,34 @@ func _play_one_offense(battle: Variant, cp: Variant, target: Combatant) -> bool:
 	return false
 
 
+## Turtle: block as much as possible, then chip with a single attack. Drags fights
+## out on purpose — the enemy Strength ramp should make this bleed.
+func _turtle_turn(battle: Variant, cp: Variant) -> void:
+	var guard: int = 0
+	while battle.energy > 1 and guard < 40:
+		guard += 1
+		if not _play_one_defense(battle, cp):
+			break
+	var enemies: Array[Combatant] = battle.living_enemies()
+	if not enemies.is_empty():
+		_play_one_offense(battle, cp, _lowest_hp(enemies))
+
+
 ## Play one block/defend (self) action if affordable: a block card from hand, else
-## innate Defend.
-func _play_one_defense(battle: Variant, cp: Variant) -> void:
+## innate Defend. Returns true if something was played.
+func _play_one_defense(battle: Variant, cp: Variant) -> bool:
 	for card in battle.deck.hand.duplicate():
 		if card.energy_cost > battle.energy or not _is_defensive(card):
 			continue
 		var actor: Combatant = _actor_for_card(battle, card)
 		if actor != null and cp.play_card(actor, card, actor).ok:
-			return
+			return true
 	var defend: CardData = _db.get_card(&"defend")
 	for actor in battle.living_players():
 		if defend != null and defend.energy_cost <= battle.energy:
 			if cp.play_innate(actor, defend, actor).ok:
-				return
+				return true
+	return false
 
 
 # --- Policy helpers ---------------------------------------------------------
@@ -219,7 +239,7 @@ func _lowest_hp(units: Array[Combatant]) -> Combatant:
 
 # --- Report -----------------------------------------------------------------
 
-func _print_report(greedy: Dictionary, defensive: Dictionary, seeds: int) -> void:
+func _print_report(cohorts: Array, seeds: int) -> void:
 	print("\n========================================================")
 	print("  ATTRITION READ — full loop (run decks + leveling + relics)")
 	print("========================================================")
@@ -227,26 +247,33 @@ func _print_report(greedy: Dictionary, defensive: Dictionary, seeds: int) -> voi
 	print("Party: Fighter(Orc) + Mage(Elf).  Relic after elite: %s.  Seeds: %d" % [ELITE_RELIC, seeds])
 	print("--------------------------------------------------------")
 	print("%-11s %7s %12s %12s" % ["policy", "win%", "avgCleared", "avgFinalHP"])
-	for c in [greedy, defensive]:
+	for c in cohorts:
 		print("%-11s %6.1f%% %12.2f %12.1f" % [
 			c["mode"], 100.0 * float(c["wins"]) / float(seeds), c["avg_cleared"], c["avg_final_hp"],
 		])
 	print("--------------------------------------------------------")
 	print("Deaths by node:")
-	for c in [greedy, defensive]:
+	for c in cohorts:
 		print("  %-10s %s" % [c["mode"], _deaths_str(c["deaths"])])
 	print("========================================================")
-	var gw: float = 100.0 * float(greedy["wins"]) / float(seeds)
-	var dw: float = 100.0 * float(defensive["wins"]) / float(seeds)
-	print("Read: greedy %.1f%% vs defensive %.1f%% win.  HP gap %.1f (def - greedy)." % [
-		gw, dw, float(defensive["avg_final_hp"]) - float(greedy["avg_final_hp"]),
-	])
-	if gw >= 99.0 and dw >= 99.0:
-		print("Both ~100% -> combat still too easy; attrition thesis NOT yet testable. Tune harder.")
-	elif gw < dw - 5.0:
-		print("Greedy dies more than defensive -> attrition is biting (thesis supported).")
+	# Win tension: ideal is a "Goldilocks" middle — greedy (too fast) AND turtle
+	# (too slow) should both fare worse than balanced defensive play.
+	var win := {}
+	for c in cohorts:
+		win[c["mode"]] = 100.0 * float(c["wins"]) / float(seeds)
+	print("Read: greedy %.1f%%  |  defensive %.1f%%  |  turtle %.1f%% (win rate)." % [
+		win.get("greedy", 0.0), win.get("defensive", 0.0), win.get("turtle", 0.0)])
+	var g: float = win.get("greedy", 0.0)
+	var d: float = win.get("defensive", 0.0)
+	var t: float = win.get("turtle", 0.0)
+	if d >= g + 5.0 and d >= t + 5.0:
+		print("GOLDILOCKS: balanced play beats both rushing AND turtling — the fast/slow tension works.")
+	elif g >= 99.0 and d >= 99.0 and t >= 99.0:
+		print("All ~100% -> combat still too easy; keep tuning harder.")
+	elif d <= t and d <= g:
+		print("Balanced isn't ahead yet -> tune so BOTH greed (burst) and turtling (ramp) get punished.")
 	else:
-		print("No clear greedy penalty yet -> keep tuning enemies/encounters.")
+		print("Partial: one failure mode bites, the other doesn't yet -> keep tuning.")
 	print("")
 
 

@@ -100,10 +100,10 @@ func test_hp_attrition_across_two_fights() -> void:
 	var rc := _controller()
 	rc.start_run([&"fighter", &"mage"] as Array[StringName], 7)
 	var greedy := func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
-	# Use a fight that actually deals damage (Basic A swarm is too trivial to show
-	# attrition); enc_combat_02 = footman + ooze.
-	rc.resolve_combat(&"enc_combat_02", greedy)
-	rc.resolve_combat(&"enc_combat_02", greedy)
+	# Use a fight that reliably damages the party even after the post-combat heal
+	# (trivial fights end at full HP); enc_combat_04 = brute + ogre (Hard).
+	rc.resolve_combat(&"enc_combat_04", greedy)
+	rc.resolve_combat(&"enc_combat_04", greedy)
 	var total: int = int(rc.run.party_hp[&"fighter"]) + int(rc.run.party_hp[&"mage"])
 	assert_lt(total, 34 + 24, "the party is below full HP after two fights (attrition)")
 	# HP stays in valid range.
