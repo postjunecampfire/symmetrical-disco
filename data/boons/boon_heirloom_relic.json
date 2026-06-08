@@ -1,0 +1,8 @@
+{
+  "id": "boon_heirloom_relic",
+  "display_name": "Heirloom Relic",
+  "description": "Start every run with Iron Brand.",
+  "kind": "relic",
+  "target": "iron_brand",
+  "amount": 0
+}

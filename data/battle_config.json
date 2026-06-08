@@ -11,5 +11,6 @@
   "xp_per_combat": 10,
   "xp_curve_base": 30,
   "xp_curve_step": 20,
-  "promotion_level": 20
+  "promotion_level": 20,
+  "meta_cash_out_acts": 9
 }

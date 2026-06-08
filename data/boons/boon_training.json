@@ -1,0 +1,8 @@
+{
+  "id": "boon_training",
+  "display_name": "Training",
+  "description": "Unlock additional class/race options (when locked content exists).",
+  "kind": "unlock",
+  "target": "",
+  "amount": 0
+}

@@ -54,6 +54,7 @@ var races: Dictionary = {}
 var events: Dictionary = {}
 var relics: Dictionary = {}
 var promotions: Dictionary = {}
+var boons: Dictionary = {}
 ## node_type (StringName) -> Array[StringName] of encounter ids (run-structure.md
 ## §9 / P2·09): which encounters feed which node types when a MapNode has no
 ## explicit payload. Loaded from data/encounter_pool.json.
@@ -98,6 +99,10 @@ func get_relic(id: StringName) -> RelicData:
 
 func get_promotion(id: StringName) -> PromotionData:
 	return promotions.get(id, null)
+
+
+func get_boon(id: StringName) -> BoonData:
+	return boons.get(id, null)
 
 
 ## The promotion branches available to class `class_id` (sorted by id for a stable
@@ -152,6 +157,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	events.clear()
 	relics.clear()
 	promotions.clear()
+	boons.clear()
 	encounter_pool.clear()
 	battle_config = null
 
@@ -167,6 +173,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("events"), _parse_event, events, "event")
 	_load_category(data_dir.path_join("relics"), _parse_relic, relics, "relic")
 	_load_category(data_dir.path_join("promotions"), _parse_promotion, promotions, "promotion")
+	_load_category(data_dir.path_join("boons"), _parse_boon, boons, "boon")
 	_load_encounter_pool(data_dir.path_join("encounter_pool.json"))
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_derive_character_hp()
@@ -472,6 +479,23 @@ func _parse_promotion(d: Dictionary, source: String) -> Dictionary:
 	return {"id": p.id, "value": p}
 
 
+# Cross-run boon (P3·08). relic/card targets are checked in _validate_references.
+func _parse_boon(d: Dictionary, source: String) -> Dictionary:
+	var ok := true
+	ok = _require(d, "id", source, "boon") and ok
+	ok = _require(d, "display_name", source, "boon") and ok
+	if not ok:
+		return {}
+	var b := BoonData.new()
+	b.id = _sn(d.get("id"))
+	b.display_name = _str(d.get("display_name"))
+	b.description = _str(d.get("description"), "")
+	b.kind = _sn(d.get("kind"), &"relic")
+	b.target = _sn(d.get("target"), &"")
+	b.amount = _int(d.get("amount"), 0)
+	return {"id": b.id, "value": b}
+
+
 func _parse_card(d: Dictionary, source: String) -> Dictionary:
 	var ok := true
 	ok = _require(d, "id", source, "card") and ok
@@ -644,6 +668,7 @@ func _load_battle_config(path: String) -> void:
 	bc.xp_curve_base = _int(d.get("xp_curve_base"), 30)
 	bc.xp_curve_step = _int(d.get("xp_curve_step"), 20)
 	bc.promotion_level = _int(d.get("promotion_level"), 20)
+	bc.meta_cash_out_acts = _int(d.get("meta_cash_out_acts"), 9)
 	battle_config = bc
 
 
@@ -747,6 +772,14 @@ func _validate_references() -> void:
 			_result.add_error(
 				"promotion '%s' signature_card references unknown card '%s'" % [promo.id, promo.signature_card]
 			)
+
+	# boons: relic/card kinds must reference a real relic/card.
+	for id in boons:
+		var boon: BoonData = boons[id]
+		if boon.kind == &"relic" and not relics.has(boon.target):
+			_result.add_error("boon '%s' references unknown relic '%s'" % [boon.id, boon.target])
+		elif boon.kind == &"card" and not cards.has(boon.target):
+			_result.add_error("boon '%s' references unknown card '%s'" % [boon.id, boon.target])
 
 	# event outcomes: add_card/remove_card -> card ids. (add_relic references the
 	# relic set, which is deferred — P2·12 — so relic ids are not validated yet.)

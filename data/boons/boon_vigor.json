@@ -1,0 +1,8 @@
+{
+  "id": "boon_vigor",
+  "display_name": "Vigor",
+  "description": "Every party member starts with +2 CON (more max HP).",
+  "kind": "stat",
+  "target": "con",
+  "amount": 2
+}

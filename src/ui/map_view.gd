@@ -46,6 +46,8 @@ var _db: ContentDatabase
 var _controller: RunController
 var _nav: RunNavigator
 var _reward: CardReward
+var _meta: MetaState
+var _meta_progress: MetaProgress
 
 var _status_label: Label
 var _map_box: VBoxContainer
@@ -67,8 +69,11 @@ func _ready() -> void:
 		return
 
 	_controller = RunController.new(_db)
+	_meta = MetaState.load_from()
+	_meta_progress = MetaProgress.new(_db, _meta)
 	if resume_state != null:
-		# Resume: drive the loaded run (party/races/deck/level/position all persisted).
+		# Resume: drive the loaded run (party/races/deck/level/position all persisted;
+		# meta boons were already applied at the original start).
 		_controller.run = resume_state
 		run_seed = resume_state.seed
 	else:
@@ -76,6 +81,7 @@ func _ready() -> void:
 			run_seed = randi()
 		_controller.start_run(party, run_seed, party_races)
 		_controller.run.map = MapGenerator.new().generate(MapGenConfig.new(), run_seed)
+		_meta_progress.apply_boons(_controller.run)  # banked cross-run boons (P3·08)
 	_nav = RunNavigator.new(_db, _controller.run)
 	_reward = CardReward.new(_db, {})
 
@@ -308,8 +314,11 @@ func _on_combat_finished(outcome: int, bv: BattleView) -> void:
 
 	_nav.complete_current()
 	if _nav.is_boss(node):
-		# Act boundary (P3·06): offer any eligible promotions, then end the run.
-		_offer_promotions_then_end()
+		# Act cleared: record meta progress, then chain promotions + meta cash-out
+		# before the victory screen.
+		_meta_progress.record_act_cleared()
+		_meta.save_to()
+		_resolve_act_end()
 	elif node.node_type == &"elite":
 		# Elites grant a relic (run-structure.md §5) in addition to the card draft.
 		_grant_relic("elite")
@@ -470,16 +479,38 @@ func _on_alloc(cid: StringName, stat: StringName) -> void:
 
 # --- Class promotion at the act boundary (P3·06) ----------------------------
 
-## Offer a pick-1-of-2 promotion to the first eligible party member; chaining
-## handles the rest, then the run ends in victory. (Dormant until a member reaches
-## the promotion level — see BattleConfig.promotion_level.)
-func _offer_promotions_then_end() -> void:
+## Act-boundary chain: offer each eligible promotion (pick 1 of 2), then a meta
+## cash-out boon if one is available, then the victory screen. Each choice re-enters
+## here so steps resolve one at a time. (Promotions are dormant until a member hits
+## the promotion level; cash-out until enough acts are cleared.)
+func _resolve_act_end() -> void:
 	for cid in _controller.run.party:
 		var branches: Array[PromotionData] = _controller.eligible_promotions(cid)
 		if not branches.is_empty():
 			_show_promotion(cid, branches)
 			return
+	if _meta_progress != null and _meta_progress.cash_out_available():
+		_show_cashout()
+		return
 	_show_run_end(true)
+
+
+## Cross-run cash-out (P3·08): pick one banked boon for future runs.
+func _show_cashout() -> void:
+	var panel := _overlay_panel("Exit package — bank a boon for future runs")
+	for boon in _meta_progress.boon_choices():
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(420, 40)
+		b.text = "%s — %s" % [boon.display_name, boon.description]
+		b.pressed.connect(_on_cashout_pick.bind(boon.id))
+		panel.add_child(b)
+
+
+func _on_cashout_pick(boon_id: StringName) -> void:
+	_meta_progress.cash_out(boon_id)
+	_meta.save_to()
+	_close_overlay()
+	_resolve_act_end()
 
 
 func _show_promotion(cid: StringName, branches: Array[PromotionData]) -> void:
@@ -501,7 +532,7 @@ func _show_promotion(cid: StringName, branches: Array[PromotionData]) -> void:
 func _on_promotion_pick(cid: StringName, promotion_id: StringName) -> void:
 	_controller.apply_promotion(cid, promotion_id)
 	_close_overlay()
-	_offer_promotions_then_end()  # next eligible member, or run end
+	_resolve_act_end()  # next eligible member, then cash-out, then run end
 
 
 func _show_run_end(victory: bool) -> void:

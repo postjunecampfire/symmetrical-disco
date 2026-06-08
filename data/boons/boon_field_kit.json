@@ -1,0 +1,8 @@
+{
+  "id": "boon_field_kit",
+  "display_name": "Field Kit",
+  "description": "Start every run with an extra Field Dressing.",
+  "kind": "card",
+  "target": "field_dressing",
+  "amount": 0
+}
