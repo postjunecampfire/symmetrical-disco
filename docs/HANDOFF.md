@@ -1,6 +1,6 @@
 # HANDOFF — start-of-session brief
 
-*Authoritative "where things stand" doc. Last updated 2026-06-07. Read this, then
+*Authoritative "where things stand" doc. Last updated 2026-06-08. Read this, then
 `AGENTS.md` and the ADRs, before picking up work.*
 
 ---
@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 142 passing.
+# Currently: 147 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -51,10 +51,13 @@ could self-test. A human/agent without that runs the headless line above as the 
 
 ## 4. Known gaps / deferred (NOT yet done)
 
-1. **`run_deck` → combat deck injection.** Combat still assembles the deck from each
-   class's *starting* deck. So race **custom cards** and any **drafted** cards are
-   tracked in `RunState.run_deck` but **don't appear in fights yet.** (Race *stat*
-   mods DO apply.) This is the highest-leverage wiring gap.
+1. ~~**`run_deck` → combat deck injection.**~~ **DONE 2026-06-08 (commit 4cdbac0).**
+   `RunController.resolve_combat` now feeds `run.run_deck` to
+   `EncounterAssembler.build`, which assembles the combat deck via the new
+   `Deck.assemble_from_card_ids` (falls back to class starting decks if the run
+   deck is empty). Race **custom cards** (and any future **drafted** cards) now
+   appear in fights. 147 GUT green. *Note: needs `git push` from a machine with the
+   repo's SSH key — committed locally, 1 ahead of origin.*
 2. **Leveling (P3·05):** XP + player-allocated stat points — not built.
 3. **Run is single-fight in the UI.** Creation → one encounter. No map/run UI
    (P2·10), no node handlers (rest/event/relic — P2·07/08/12), no card-draft-in-UI.
@@ -74,13 +77,14 @@ All the knobs are data (`data/battle_config.json`, `data/enemies/*`, `data/encou
 
 | Want to… | Do this |
 |----------|---------|
-| Make builds matter (cards from races/rewards show up) | **Wire `run_deck` → combat deck** (gap #1) |
+| ~~Make builds matter (cards from races/rewards show up)~~ | ~~Wire `run_deck` → combat deck~~ **DONE (gap #1, 4cdbac0)** |
 | Make it feel like a *run*, not one fight | **Map/run UI (P2·10)** + run controller drives the UI |
 | Make combat threatening (attrition real) | **Balance pass** — tune enemies/encounters/healing in data |
 | Deepen characters | **Leveling (P3·05)** then promotion (P3·06) |
 
-My recommendation for next session: **balance pass first** (cheap, in data, makes
-playtesting meaningful), then **`run_deck`→combat**, then the **map/run UI**.
+My recommendation for next session: **balance pass** (cheap, in data, makes
+playtesting meaningful) — now also worth re-running attrition WITH the run deck
+live — then the **map/run UI (P2·10)**, then **leveling (P3·05)**.
 
 ## 7. Gotchas / conventions
 
@@ -105,5 +109,5 @@ src/ui/        character_creation.gd → battle_view.gd (code-driven, asset-free
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (142 passing)
+tests/         GUT suites mirroring src/  (147 passing)
 ```
