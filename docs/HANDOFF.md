@@ -92,11 +92,26 @@ could self-test. A human/agent without that runs the headless line above as the 
 ## 5. The balance finding (important)
 
 The run loop's purpose was to test the **attrition thesis** (does greed get punished
-across a run?). Auto-running greedy vs. defensive policies over a full act (40 seeds
-each): **both win 100%.** The P3·02 stat buffs (Strike 4→10, scaling cards) made the
-current encounters trivial, so the thesis **isn't testable until balance is harder**
-(tougher/more enemies, less healing, more fights). **Tabled as a playtest/design call.**
-All the knobs are data (`data/battle_config.json`, `data/enemies/*`, `data/encounters/*`).
+across a run?). There's a repeatable harness for this now:
+
+```
+godot --headless --script res://tools/attrition_sim.gd [seeds]   # default 40
+```
+
+`tools/attrition_sim.gd` runs **greedy** vs **defensive** cohorts over the same act
+(`enc_combat_01, _02, elite_01, _03, boss_01`) under identical seeds, with the FULL
+loop live — run-deck combat decks, leveling (auto-allocates STR for greedy / CON for
+defensive), and a relic after the elite. It reports win %, avg nodes cleared, avg
+surviving HP, and a death-node histogram.
+
+**Latest read (40 seeds, 2026-06-08, full loop): both policies still win 100%**
+(greedy avg final HP ~38.7, defensive ~42.4). So the thesis **still isn't testable —
+combat is too easy** (the P3·02 buffs + now leveling/relics only widen the margin).
+The HP gap (def − greedy ≈ +3.7) is the *only* signal the policies differ; nobody
+dies. **Balance pass needed before the thesis means anything** — tougher/more
+enemies, less healing, more fights. All knobs are data (`data/battle_config.json`,
+`data/enemies/*`, `data/encounters/*`); re-run the harness after each tweak. **This
+is the owner-led playtest/design call.**
 
 ## 6. Suggested next priorities (pick based on goal)
 
