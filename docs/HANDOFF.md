@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 215 passing.
+# Currently: 222 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -133,10 +133,10 @@ src/data/      content resources + ContentDatabase loader (cards, characters=cla
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
                EnemyAI, EncounterAssembler/Battle, RelicEngine
 src/cards/     Deck, CardPlay
-src/run/       RunController, RunState, RunNavigator, Leveling, EventResolver, RestResolver, MapGraph/MapGenerator, CardReward
+src/run/       RunController, RunState, RunNavigator, Leveling, PartyStats, EventResolver, RestResolver, MapGraph/MapGenerator, CardReward
 src/ui/        character_creation → map_view (run) → battle_view (code-driven, asset-free)
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (215 passing)
+tests/         GUT suites mirroring src/  (222 passing)
 ```
