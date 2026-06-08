@@ -70,6 +70,28 @@ func test_passive_ramp_is_free_every_turn() -> void:
 	assert_eq(e.status_stacks(&"strength"), 3, "passive ramp accrues every turn for free")
 
 
+func test_upcoming_special_telegraphs_the_buff_turn() -> void:
+	# The UI peek must flag the buff turn BEFORE it happens so the telegraph is honest.
+	var battle := _battle()
+	var data: EnemyData = EnemyDataScript.new()
+	data.ramp_amount = 2
+	data.ramp_every = 3
+	var e := _enemy()
+	e.source_data = data
+	# Turns 1,2 are normal; the 3rd will be the empower turn.
+	assert_eq(battle.upcoming_special(e), &"", "turn 1 telegraphs a normal action")
+	e.turns_taken = 2
+	assert_eq(battle.upcoming_special(e), &"empower", "next (3rd) turn telegraphs Empower")
+
+
+func test_upcoming_special_telegraphs_summon() -> void:
+	var battle := _battle()
+	var e := _enemy()
+	e.source_data = _db.get_enemy(&"warband_captain")  # summons gremlins every 3
+	e.turns_taken = 2
+	assert_eq(battle.upcoming_special(e), &"summon", "captain telegraphs Reinforce on its summon turn")
+
+
 func test_no_ramp_when_unconfigured() -> void:
 	var battle := _battle()
 	var data: EnemyData = EnemyDataScript.new()  # ramp_amount 0

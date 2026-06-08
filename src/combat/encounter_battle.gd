@@ -87,6 +87,26 @@ func _apply_enemy_summon(enemy: Combatant, data: EnemyData) -> bool:
 	return true
 
 
+## Peek at whether `enemy`'s NEXT action will be a special turn that REPLACES its
+## attack — so the UI can telegraph it honestly (a ramp/summon turn otherwise shows
+## the rolled attack and then the enemy buffs/summons instead). Returns &"summon",
+## &"empower" (scheduled Strength ramp), or &"" (a normal/attack turn — passive ramp
+## counts as normal since it doesn't replace the action). Mirrors the cadence used
+## in _take_enemy_action (summon checked before ramp).
+func upcoming_special(enemy: Combatant) -> StringName:
+	var data := enemy.source_data as EnemyData
+	if data == null:
+		return &""
+	var next_turn: int = enemy.turns_taken + 1
+	if data.summon_id != &"" and data.summon_every > 0 \
+			and next_turn % data.summon_every == 0 and enemy.summons_done < data.summon_max:
+		return &"summon"
+	if data.ramp_amount > 0 and not data.ramp_passive and data.ramp_every > 0 \
+			and next_turn % data.ramp_every == 0:
+		return &"empower"
+	return &""
+
+
 ## Apply `enemy`'s damage ramp for the turn it is about to take. Passive ramp grants
 ## Strength every turn for free (returns false → the enemy still acts). A scheduled
 ## ramp (`ramp_every` > 0) counts the enemy's turns and, every Nth, grants Strength

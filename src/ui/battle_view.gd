@@ -261,9 +261,16 @@ func _unit_panel(unit: Combatant, is_enemy: bool, selected: bool) -> Button:
 	if st != "":
 		second.append(st)
 	if is_enemy:
-		var intent := _intent_summary(unit)
-		if intent != "":
-			second.append("Intent: " + intent)
+		# A ramp/summon turn replaces the attack — telegraph it honestly.
+		var special := _battle.upcoming_special(unit)
+		if special == &"summon":
+			second.append("Intent: Reinforce ▲")
+		elif special == &"empower":
+			second.append("Intent: Empower ▲ (+STR)")
+		else:
+			var intent := _intent_summary(unit)
+			if intent != "":
+				second.append("Intent: " + intent)
 	if not second.is_empty():
 		parts.append("   ".join(second))
 	btn.text = "\n".join(parts)
