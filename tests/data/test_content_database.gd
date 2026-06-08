@@ -62,6 +62,20 @@ func test_happy_path_nested_intents_and_config() -> void:
 	assert_eq(cfg.draw_per_turn, 5)
 
 
+# --- Stats: parsed, and max_hp derived from CON (ADR-0014) ---
+func test_character_stats_and_con_derived_hp() -> void:
+	var db := _db()
+	db.load_from_dir(FIXTURES.path_join("valid"))
+
+	var ch := db.get_character(&"vanguard")
+	assert_not_null(ch, "character resolves")
+	assert_eq(ch.constitution, 15, "CON parsed from data")
+	assert_eq(ch.strength, 5, "STR parsed")
+	assert_eq(ch.attack_stat, &"str", "attack_stat parsed")
+	# max_hp is derived: constitution (15) * hp_per_con (default 2) = 30.
+	assert_eq(ch.max_hp, 30, "max_hp derived from CON * hp_per_con")
+
+
 # --- Validation: duplicate id ---
 func test_duplicate_id_fails_loudly() -> void:
 	var db := _db()

@@ -4,18 +4,13 @@ extends RefCounted
 ## per-battle counterpart to the authored data Resource (CharacterData /
 ## EnemyData, data-schemas.md §4/§5): the Resource is the immutable definition,
 ## this is the live unit that takes damage, holds block, and accrues statuses.
-## Many Combatants can share one data Resource (e.g. three copies of the same
-## grunt) without mutating it.
 ##
 ## Positionless (ADR-0013): a unit has no tile or movement — it is a bag of
-## hp/block/statuses fighting for a team. Targeting is by kind (TargetSpec), not
-## location.
+## hp/block/statuses (and, for party members, RPG stats) fighting for a team.
 ##
-## Statuses are stored as a flat dictionary `status_id (StringName) -> stacks
-## (int)`. BattleState owns the BEHAVIOUR keyed by id (poison damages, stun
-## skips, …); the Combatant only stores the magnitudes. `block` is modelled as a
-## first-class field (not a status entry) because incoming damage consumes it
-## every hit, while StatusData drives how/whether it decays per turn.
+## Stats (ADR-0014): players carry STR/DEX/CON/INT and an `attack_stat` that
+## selects which stat boosts their attacks. Enemies leave stats at 0 and
+## `attack_stat` empty (their intent damage is authored flat).
 
 ## Team a unit fights for. Strict two-side prototype.
 enum Team { PLAYER, ENEMY }
@@ -28,24 +23,29 @@ var display_name: String = ""
 var hp: int = 1
 var max_hp: int = 1
 
-## Current block (armour). Consumed by incoming damage before hp; how it carries
-## or resets across turns is driven by the `block` StatusData in BattleState.
+## Current block (armour). Consumed by incoming damage before hp.
 var block: int = 0
 
-## Active statuses: status_id -> stacks. Absent key == zero stacks. BattleState
-## reads/ticks this; the Combatant just stores it.
+## Active statuses: status_id -> stacks. Absent key == zero stacks.
 var statuses: Dictionary = {}
 
 ## Which side this unit fights for.
 var team: Team = Team.PLAYER
 
-## Link back to the authored definition (CharacterData or EnemyData). Kept as the
-## seam to source values (speed, intents, innate_actions, …) without copying them
-## all onto the runtime unit. Never mutated.
+## RPG stats (ADR-0014). Players copy these from CharacterData; enemies leave 0.
+var strength: int = 0
+var dexterity: int = 0
+var constitution: int = 0
+var intelligence: int = 0
+## Which stat powers this unit's attacks: `str`, `int`, or `&""` (none, enemies).
+var attack_stat: StringName = &""
+
+## Link back to the authored definition (CharacterData or EnemyData).
 var source_data: Resource = null
 
 
-## Build a player combatant from CharacterData.
+## Build a player combatant from CharacterData (max_hp already derived from CON by
+## the loader, ADR-0014).
 static func from_character(data: CharacterData) -> Combatant:
 	var c := Combatant.new()
 	c.source_data = data
@@ -53,10 +53,16 @@ static func from_character(data: CharacterData) -> Combatant:
 	c.display_name = data.display_name
 	c.max_hp = data.max_hp
 	c.hp = data.max_hp
+	c.strength = data.strength
+	c.dexterity = data.dexterity
+	c.constitution = data.constitution
+	c.intelligence = data.intelligence
+	c.attack_stat = data.attack_stat
 	return c
 
 
-## Build an enemy combatant from EnemyData.
+## Build an enemy combatant from EnemyData. Enemies carry no RPG stats; their
+## intent damage is authored directly.
 static func from_enemy(data: EnemyData) -> Combatant:
 	var c := Combatant.new()
 	c.source_data = data
@@ -91,9 +97,8 @@ func has_status(status_id: StringName) -> bool:
 	return status_stacks(status_id) > 0
 
 
-## Add `stacks` of `status_id`. Stacking math (add vs refresh) lives in
-## BattleState, which consults StatusData; the Combatant just records the result.
-## Negative or zero totals erase the key so absent == zero.
+## Add `stacks` of `status_id`. Stacking math lives in BattleState; the Combatant
+## just records the result. Negative or zero totals erase the key.
 func set_status(status_id: StringName, stacks: int) -> void:
 	if stacks <= 0:
 		statuses.erase(status_id)
@@ -104,3 +109,17 @@ func set_status(status_id: StringName, stacks: int) -> void:
 ## Convenience: add `delta` stacks to whatever is already there.
 func add_status_stacks(status_id: StringName, delta: int) -> void:
 	set_status(status_id, status_stacks(status_id) + delta)
+
+
+# --- Stat helpers -----------------------------------------------------------
+
+## The value of this unit's attack stat (STR or INT per `attack_stat`); 0 if none.
+## This is the flat bonus added to the unit's outgoing attack damage (ADR-0014).
+func attack_power() -> int:
+	match attack_stat:
+		&"str":
+			return strength
+		&"int":
+			return intelligence
+		_:
+			return 0

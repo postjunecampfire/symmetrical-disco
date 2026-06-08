@@ -261,18 +261,27 @@ func add_energy(n: int) -> void:
 #  Damage with an attacker (strength / weak)  — used by apply_effects & AI
 # ============================================================================
 
-## Compute the strength/weak-modified outgoing damage `attacker` deals for a base
-## `amount`. Strength adds its stacks; weak reduces by a fixed fraction. Kept as
+## Compute the stat/strength/weak-modified outgoing damage `attacker` deals for a
+## base `amount`. The attacker's attack stat (STR or INT per `attack_stat`,
+## ADR-0014) and Strength stacks add; Weak reduces by a fixed fraction. Kept as
 ## the single place offensive modifiers live so card play and enemy intents route
-## through the same math. Never returns below 0.
+## through the same math. Enemies have no attack stat (attack_power == 0), so their
+## intent damage stays as authored. Never returns below 0.
 func modified_damage(attacker: Combatant, amount: int) -> int:
 	if attacker == null:
 		return max(0, amount)
-	var out: int = amount + attacker.status_stacks(STATUS_STRENGTH)
+	var out: int = amount + attacker.attack_power() + attacker.status_stacks(STATUS_STRENGTH)
 	if attacker.has_status(STATUS_WEAK):
 		# Weak: -25% outgoing (floored). Behaviour in code, the FLAG in data.
 		out = int(floor(float(out) * 0.75))
 	return max(0, out)
+
+
+## Compute the DEX-modified block `source` grants for a base `amount` (ADR-0014:
+## DEX -> block). Enemies have dexterity 0, so their block intents stay flat.
+func modified_block(source: Variant, amount: int) -> int:
+	var dex: int = (source as Combatant).dexterity if source is Combatant else 0
+	return max(0, amount + dex)
 
 
 ## Deal damage FROM `attacker` to `target`, applying strength/weak first, then the
@@ -306,6 +315,10 @@ func apply_effects(source: Combatant, target: Variant, effects: Array) -> void:
 				var modified := e.duplicate() as Effect
 				modified.amount = modified_damage(source, e.amount)
 				_resolver.resolve(modified, source, t, self)
+			elif e.type == &"block":
+				var mb := e.duplicate() as Effect
+				mb.amount = modified_block(source, e.amount)
+				_resolver.resolve(mb, source, t, self)
 			else:
 				_resolver.resolve(e, source, t, self)
 

@@ -41,10 +41,12 @@ Keyword coverage: `exhaust` ×3 (`shield_bash`, `frost_nova`, `mana_surge`); `re
 ## Characters (`characters/`)
 CharacterData per §4. Both share innate actions `["strike","defend"]`.
 
-| id | max_hp | tags | starting_deck |
-|----|--------|------|---------------|
-| `vanguard` | 34 | melee | shield_bash, bulwark, rallying_shout, field_dressing |
-| `mage` | 24 | caster | arcane_bolt, venom_dart, frost_nova, mana_surge, field_dressing |
+Stats (ADR-0014): STR/DEX/CON/INT + `attack_stat`. `max_hp` is derived (CON × `hp_per_con`=2).
+
+| id | STR | DEX | CON | INT | attack_stat | max_hp | tags | starting_deck |
+|----|-----|-----|-----|-----|-------------|--------|------|---------------|
+| `vanguard` | 6 | 5 | 17 | 1 | str | 34 | melee | shield_bash, bulwark, rallying_shout, field_dressing |
+| `mage` | 1 | 3 | 12 | 6 | int | 24 | caster | arcane_bolt, venom_dart, frost_nova, mana_surge, field_dressing |
 
 The assembled shared deck for the prototype party = union of both `starting_deck` lists.
 

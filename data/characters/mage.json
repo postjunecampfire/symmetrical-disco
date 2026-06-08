@@ -1,8 +1,12 @@
 {
   "id": "mage",
   "display_name": "Mage",
-  "max_hp": 24,
   "speed": 11,
+  "strength": 1,
+  "dexterity": 3,
+  "constitution": 12,
+  "intelligence": 6,
+  "attack_stat": "int",
   "innate_actions": [
     "strike",
     "defend"

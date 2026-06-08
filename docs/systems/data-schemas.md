@@ -173,30 +173,48 @@ class_name CardData extends Resource
 
 ## 4. Character / CharacterData
 
-A playable party unit (2–3 per run, ADR-0004).
+A playable party unit (party of 2, ADR-0016). **Stats (ADR-0014):** STR -> physical
+damage, DEX -> block, CON -> max HP, INT -> magic damage. `attack_stat` selects
+which stat powers this character's attacks. `max_hp` is **derived** by the loader
+as `constitution * BattleConfig.hp_per_con` (not authored directly).
 
 | Field | Type | Req | Default | Notes |
 |-------|------|-----|---------|-------|
 | `id` | StringName | yes | — | Used as cards' `character_tag`. |
 | `display_name` | String | yes | — | |
-| `max_hp` | int | yes | `30` | |
-| `speed` | int | no | `10` | Turn-order / initiative input (unused under strict phases, ADR-0010). |
+| `strength` | int | no | `0` | Physical attack bonus (when `attack_stat == str`). |
+| `dexterity` | int | no | `0` | Block bonus. |
+| `constitution` | int | yes | `0` | Drives `max_hp` (= CON × `hp_per_con`). |
+| `intelligence` | int | no | `0` | Magic attack bonus (when `attack_stat == int`). |
+| `attack_stat` | StringName | yes | `str` | `str` \| `int` — which stat boosts this character's attacks. |
+| `speed` | int | no | `10` | Unused under strict phases (ADR-0010). |
 | `innate_actions` | Array[StringName] | yes | `["strike","defend"]` | Card ids flagged `innate`; never enter the deck (ADR-0005). |
 | `starting_deck` | Array[StringName] | yes | `[]` | Card ids this character contributes to the shared deck. |
 | `tags` | Array[StringName] | no | `[]` | Archetype hints (`melee`, `caster`, `support`). |
 | `sprite` | Texture2D | no | null | Placeholder allowed. |
 
+`max_hp` is computed, not authored — do not set it in JSON.
+
 ```gdscript
 class_name CharacterData extends Resource
 @export var id: StringName
 @export var display_name: String
-@export var max_hp: int = 30
+@export var max_hp: int = 30          # derived from CON by the loader
 @export var speed: int = 10
+@export var strength: int = 0
+@export var dexterity: int = 0
+@export var constitution: int = 0
+@export var intelligence: int = 0
+@export var attack_stat: StringName = &"str"
 @export var innate_actions: Array[StringName] = [&"strike", &"defend"]
 @export var starting_deck: Array[StringName] = []
 @export var tags: Array[StringName] = []
 @export var sprite: Texture2D
 ```
+
+**Stat application (ADR-0014):** outgoing attack damage = base + the attacker's
+`attack_stat` value (STR or INT) + Strength stacks, then Weak; block = base + the
+source's DEX. Enemies have no stats, so their authored intent damage is flat.
 
 > **Deck assembly rule:** the run's shared deck = the union of each party member's `starting_deck` (plus cards drafted during the run). `character_tag` on each card controls who can *play* it; innate actions are excluded from the deck entirely.
 
@@ -282,6 +300,7 @@ Single resource at `/data/battle_config.tres`. Holds the knobs ADR-0006 cares ab
 | `draw_per_turn` | int | `5` | Cards drawn at turn start. |
 | `max_hand` | int | `10` | Hand cap. |
 | `reshuffle_discard` | bool | `true` | Discard reshuffles into draw when empty — the cooldown cycle (ADR-0006). |
+| `hp_per_con` | int | `2` | HP granted per point of CON; a character's `max_hp` = CON × this (ADR-0014). |
 
 ---
 

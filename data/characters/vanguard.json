@@ -1,8 +1,12 @@
 {
   "id": "vanguard",
   "display_name": "Vanguard",
-  "max_hp": 34,
   "speed": 9,
+  "strength": 6,
+  "dexterity": 5,
+  "constitution": 17,
+  "intelligence": 1,
+  "attack_stat": "str",
   "innate_actions": [
     "strike",
     "defend"

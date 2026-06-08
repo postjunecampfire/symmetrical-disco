@@ -99,6 +99,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("cards"), _parse_card, cards, "card")
 	_load_category(data_dir.path_join("encounters"), _parse_encounter, encounters, "encounter")
 	_load_battle_config(data_dir.path_join("battle_config.json"))
+	_derive_character_hp()
 
 	_validate_references()
 
@@ -306,14 +307,21 @@ func _parse_character(d: Dictionary, source: String) -> Dictionary:
 	var ok := true
 	ok = _require(d, "id", source, "character") and ok
 	ok = _require(d, "display_name", source, "character") and ok
-	ok = _require(d, "max_hp", source, "character") and ok
+	ok = _require(d, "constitution", source, "character") and ok
+	ok = _require(d, "attack_stat", source, "character") and ok
 	if not ok:
 		return {}
 	var ch := CharacterData.new()
 	ch.id = _sn(d.get("id"))
 	ch.display_name = _str(d.get("display_name"))
-	ch.max_hp = _int(d.get("max_hp"), 30)
 	ch.speed = _int(d.get("speed"), 10)
+	# Stats (ADR-0014). max_hp is derived from CON in _derive_character_hp() once
+	# battle_config (hp_per_con) has loaded.
+	ch.strength = _int(d.get("strength"), 0)
+	ch.dexterity = _int(d.get("dexterity"), 0)
+	ch.constitution = _int(d.get("constitution"), 0)
+	ch.intelligence = _int(d.get("intelligence"), 0)
+	ch.attack_stat = _sn(d.get("attack_stat"), &"str")
 	if d.has("innate_actions"):
 		ch.innate_actions = _sn_array(d.get("innate_actions"))
 	if d.has("starting_deck"):
@@ -405,7 +413,18 @@ func _load_battle_config(path: String) -> void:
 	bc.draw_per_turn = _int(d.get("draw_per_turn"), 5)
 	bc.max_hand = _int(d.get("max_hand"), 10)
 	bc.reshuffle_discard = _bool(d.get("reshuffle_discard"), true)
+	bc.hp_per_con = _int(d.get("hp_per_con"), 2)
 	battle_config = bc
+
+
+## Derive every character's max_hp from CON (ADR-0014: CON -> max HP) using the
+## loaded BattleConfig.hp_per_con. Runs after both characters and battle_config
+## have loaded so the formula's knob comes from data.
+func _derive_character_hp() -> void:
+	var per_con: int = battle_config.hp_per_con if battle_config != null else 2
+	for id in characters:
+		var ch: CharacterData = characters[id]
+		ch.max_hp = ch.constitution * per_con
 
 
 # --- Reference validation (data-schemas.md §8 relationships) ---

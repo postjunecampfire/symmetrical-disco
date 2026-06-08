@@ -2,7 +2,6 @@
   {
     "id": "vanguard",
     "display_name": "Vanguard",
-    "max_hp": 30,
     "speed": 10,
     "innate_actions": [
       "strike"
@@ -12,6 +11,11 @@
     ],
     "tags": [
       "melee"
-    ]
+    ],
+    "strength": 5,
+    "dexterity": 5,
+    "constitution": 15,
+    "intelligence": 1,
+    "attack_stat": "str"
   }
 ]

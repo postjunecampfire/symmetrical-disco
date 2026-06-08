@@ -2,5 +2,6 @@
   "energy_per_turn": 3,
   "draw_per_turn": 5,
   "max_hand": 10,
-  "reshuffle_discard": true
+  "reshuffle_discard": true,
+  "hp_per_con": 2
 }
