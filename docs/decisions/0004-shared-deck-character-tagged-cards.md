@@ -1,6 +1,6 @@
 # ADR-0004: Shared deck with character-tagged cards
 
-**Status:** Accepted
+**Status:** Accepted — *party sizing (2–3) is superseded by [ADR-0016](0016-party-size-two-owner-tagged-cards.md) (fixed at 2); the shared-deck + character-tagged-cards model stands and is reaffirmed there.*
 **Date:** 2026-06-05
 **Deciders:** Michael (owner); Claude (build partner)
 

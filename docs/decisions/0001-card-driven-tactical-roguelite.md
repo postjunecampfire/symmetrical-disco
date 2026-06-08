@@ -1,6 +1,6 @@
 # ADR-0001: Adopt a card-driven tactical roguelite structure
 
-**Status:** Accepted
+**Status:** Accepted — *the tactical-grid-combat pillar is superseded by [ADR-0013](0013-positionless-combat-drop-grid.md) (combat is now positionless); the run/roguelite and card pillars stand.*
 **Date:** 2026-06-05
 **Deciders:** Michael (owner); Claude (build partner)
 
