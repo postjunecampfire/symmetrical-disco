@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 245 passing.
+# Currently: 251 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -75,6 +75,10 @@ could self-test. A human/agent without that runs the headless line above as the 
   the boss. Dormant until a member reaches L20 (data knob).
 - **Save / resume** (P2·02): `MapView` checkpoints the run between nodes and clears
   it on run end; `CharacterCreation` offers **Continue Run** from the saved slot.
+- **Cross-run meta** (P3·08, ADR-0018): `MetaState` (own persistent slot) tracks
+  acts cleared; every `meta_cash_out_acts` (default 9) you bank one player-chosen
+  boon (relic / +1 card / +stat / unlock) that applies at every future run start
+  (`MetaProgress.apply_boons`). Dormant until multi-act content exists.
 - **Telemetry** (`src/telemetry/`): combat/run events; used to produce the attrition read.
 
 ## 4. Known gaps / deferred (NOT yet done)
@@ -106,8 +110,11 @@ could self-test. A human/agent without that runs the headless line above as the 
    per class at an act boundary, eligible at `BattleConfig.promotion_level * N`
    (default 20, accrues). A promotion folds stat mods into `allocated_stats` + adds
    a signature card to `run_deck` (no new wiring). **Dormant at default threshold**
-   until multi-act content reaches L20. **Exit-package meta (P3·08, ADR-0018)** — in
-   progress.
+   until multi-act content reaches L20. ~~**Exit-package meta (P3·08)**~~ **DONE
+   2026-06-08 (9632ce4)** — `MetaState` (persistent, own save slot) + `MetaProgress`:
+   bank a chosen boon (relic / +1 card / +stat / unlock) every `meta_cash_out_acts`
+   (default 9) acts cleared; boons apply at each future run start. Dormant until
+   ~9 acts exist.
 5. ~~**Save/resume** … isn't wired.~~ **DONE 2026-06-08 (23dfe04).** `MapView`
    checkpoints the run between nodes + clears on run end; `CharacterCreation` shows
    **Continue Run** when a save exists. (Saves are between-node; a mid-combat quit
@@ -229,14 +236,14 @@ still-easy combat — tune together). Then **class promotion (P3·06)**.
 
 ```
 src/data/      content resources + ContentDatabase loader (cards, characters=classes,
-               enemies, encounters, races, events, relics, promotions, statuses, battle_config, encounter_pool)
+               enemies, encounters, races, events, relics, promotions, boons, statuses, battle_config, encounter_pool)
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
                EnemyAI, EncounterAssembler/Battle, RelicEngine
 src/cards/     Deck, CardPlay
-src/run/       RunController, RunState, RunNavigator, Leveling, PartyStats, EventResolver, RestResolver, MapGraph/MapGenerator, CardReward
+src/run/       RunController, RunState, RunNavigator, Leveling, PartyStats, MetaState/MetaProgress, EventResolver, RestResolver, MapGraph/MapGenerator, CardReward
 src/ui/        character_creation → map_view (run) → battle_view (code-driven, asset-free)
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (245 passing)
+tests/         GUT suites mirroring src/  (251 passing)
 ```
