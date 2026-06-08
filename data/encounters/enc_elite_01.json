@@ -3,7 +3,7 @@
   "display_name": "Captain's Guard",
   "enemies": [
     "warband_captain",
-    "footman",
+    "occultist",
     "ooze"
   ],
   "win_condition": "defeat_all"

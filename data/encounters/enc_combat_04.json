@@ -2,8 +2,8 @@
   "id": "enc_combat_04",
   "display_name": "Twin Threat",
   "enemies": [
-    "brute",
-    "ogre"
+    "ogre",
+    "coven_witch"
   ],
   "win_condition": "defeat_all"
 }
