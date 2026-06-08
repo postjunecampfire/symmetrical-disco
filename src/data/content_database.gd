@@ -497,6 +497,10 @@ func _parse_enemy(d: Dictionary, source: String) -> Dictionary:
 	en.speed = _int(d.get("speed"), 8)
 	en.intent_pattern = _sn(d.get("intent_pattern"), &"random_weighted")
 	en.intents = _parse_intents(d.get("intents"), source, en.id)
+	# Damage ramp (enemy kit redesign): scheduled buff turn or free passive ramp.
+	en.ramp_amount = _int(d.get("ramp_amount"), 0)
+	en.ramp_every = _int(d.get("ramp_every"), 0)
+	en.ramp_passive = _bool(d.get("ramp_passive"), false)
 	return {"id": en.id, "value": en}
 
 

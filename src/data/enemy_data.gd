@@ -12,3 +12,14 @@ extends Resource
 @export var intents: Array[IntentData] = []
 @export var intent_pattern: StringName = &"random_weighted"
 @export var sprite: Texture2D
+
+## Damage ramp (enemy kit redesign): the enemy gains `ramp_amount` Strength over
+## time so dragging a fight out is punished. Two modes (0 amount = no ramp):
+##   ramp_passive = true  → +Strength at the START of EVERY turn, FREE (boss mode,
+##                          no action cost — they still attack).
+##   ramp_every  > 0      → a scheduled BUFF TURN: every Nth turn the enemy gains
+##                          Strength INSTEAD of acting (Medium ~4, Strong ~3). Greedy
+##                          ends fights before it fires; turtling eats it repeatedly.
+@export var ramp_amount: int = 0
+@export var ramp_every: int = 0
+@export var ramp_passive: bool = false

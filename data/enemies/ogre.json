@@ -18,22 +18,10 @@
         }
       ],
       "weight": 3
-    },
-    {
-      "id": "ogre_roar",
-      "telegraph": "buff",
-      "target": {
-        "target_type": "self"
-      },
-      "effects": [
-        {
-          "type": "apply_status",
-          "status": "strength",
-          "stacks": 3
-        }
-      ],
-      "weight": 1
     }
   ],
+  "ramp_amount": 3,
+  "ramp_every": 3,
+  "ramp_passive": false,
   "sprite": "res://assets/enemies/ogre.png"
 }

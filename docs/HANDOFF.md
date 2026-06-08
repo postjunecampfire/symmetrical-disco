@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 228 passing.
+# Currently: 232 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -113,21 +113,30 @@ godot --headless --script res://tools/attrition_sim.gd [seeds]   # default 40
 (block once then attack), and **turtle** (block hard, chip slowly). The goal is a
 "Goldilocks" result — balanced play beats BOTH rushing and turtling.
 
-**Read (40 seeds, 2026-06-08):** greedy 97.5% (1 death @ elite) · defensive 100% ·
-turtle 100% (final HP greedy 32 < defensive 38 < turtle 44). Greed is mildly
-punished; **turtling is NOT — it's the safest play.**
+**Enemy damage ramp is built (engine).** `EnemyData.ramp_amount/ramp_every/
+ramp_passive`, applied in `EncounterBattle._apply_enemy_ramp`:
+- **Scheduled buff turn** (Medium every 4 turns/+2 Str, Strong every 3/+3): every
+  Nth turn the enemy gains Strength INSTEAD of acting. Greedy ends fights before it
+  fires (faces full burst); turtling eats it repeatedly.
+- **Passive ramp** (boss, +1 Str/turn, free): no action cost, the boss still
+  attacks — boss fights are a race.
+This replaced the old roll-based `buildup` intent (which cannibalised attacks).
 
-**KEY FINDING — data-only damage ramp can't punish turtling.** The intended
-"scale damage over time" lever was added as a roll-based self-Strength `buildup`
-intent on Medium/Strong enemies (Medium +2, Strong +3). But a buildup turn is a
-turn the enemy *doesn't* attack, so investing in ramp LOWERS near-term pressure,
-and in fights short enough to win the ramp payoff never lands (raising its weight
-made greedy *safer*, all three → 100%). To actually punish slow play the ramp must
-be **passive** — enemies gain +Strength at the START of each of their turns, with
-no action cost — which is a small ENGINE hook (an EnemyData `ramp_per_turn` applied
-in the enemy phase, like a relic's turn_start). Recommended next lever; pairs with
-reliable Frail/Vulnerable to stop turtles out-blocking the ramp. Final feel is the
-owner's call.
+**Read (40 seeds, 2026-06-08, engine ramp):** greedy 95% (2 deaths @ elite) ·
+defensive 100% · turtle 100% (final HP greedy 28 < defensive 37 < turtle 42).
+**Greed is punished; turtling still isn't.**
+
+**FINDING — punishing turtle is a BLOCK-DENIAL problem, not a damage-amount one.**
+A dedicated turtle blocks ~2× per turn and out-sustains even ramped enemies in
+fights short enough to win; raising ramp amounts barely moved it (turtle 44→42).
+The hard fights (brute+ogre, captain's guard) have **no Frail applier**, so the
+turtle's block is never cut. Levers to close it (owner design call): (a) put a
+**Frail/Vulnerable applier in every Hard/elite fight** so block gets halved; (b) a
+**soft per-fight turn pressure** (escalating chip after N turns); (c) anti-block
+mechanics (attacks that ignore/break block). The single-fight harness also
+under-counts run-level turtle costs (limited rests, more enemy turns = more chip).
+All amounts are data (`data/enemies/*`, `data/battle_config.json`); re-run the
+3-cohort harness after each tweak.
 
 **Read after the enemy-kit redesign (40 seeds, 2026-06-08): greedy 95% (2 deaths at
 the elite) vs defensive 100%; HP gap def−greedy ≈ +6.2.** First time greed is
@@ -180,5 +189,5 @@ src/ui/        character_creation → map_view (run) → battle_view (code-drive
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (228 passing)
+tests/         GUT suites mirroring src/  (232 passing)
 ```

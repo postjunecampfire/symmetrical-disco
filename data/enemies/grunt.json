@@ -34,5 +34,8 @@
       "weight": 2
     }
   ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
   "sprite": "res://assets/enemies/grunt.png"
 }

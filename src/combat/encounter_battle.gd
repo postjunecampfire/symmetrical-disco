@@ -51,7 +51,31 @@ func _take_enemy_action(enemy: Combatant) -> void:
 	var data: EnemyData = enemy.source_data as EnemyData
 	if data == null:
 		return
+	# Ramp (enemy kit redesign): a scheduled buff turn CONSUMES the action; a passive
+	# ramp is free and the enemy still attacks.
+	if _apply_enemy_ramp(enemy, data):
+		return
 	enemy_ai.take_turn(self, enemy, data)
+
+
+## Apply `enemy`'s damage ramp for the turn it is about to take. Passive ramp grants
+## Strength every turn for free (returns false → the enemy still acts). A scheduled
+## ramp (`ramp_every` > 0) counts the enemy's turns and, every Nth, grants Strength
+## as a BUFF TURN that replaces the action (returns true → caller skips the attack).
+## No ramp configured → false. Strength is the permanent +damage status, so it
+## compounds across a long fight (punishing slow play) without nerfing burst.
+func _apply_enemy_ramp(enemy: Combatant, data: EnemyData) -> bool:
+	if data.ramp_amount <= 0:
+		return false
+	if data.ramp_passive:
+		enemy.add_status_stacks(BattleState.STATUS_STRENGTH, data.ramp_amount)
+		return false
+	if data.ramp_every > 0:
+		enemy.turns_taken += 1
+		if enemy.turns_taken % data.ramp_every == 0:
+			enemy.add_status_stacks(BattleState.STATUS_STRENGTH, data.ramp_amount)
+			return true
+	return false
 
 
 ## Begin a player turn, then apply any turn_start relic effects (gain_energy /

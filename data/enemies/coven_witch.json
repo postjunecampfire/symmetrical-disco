@@ -52,22 +52,10 @@
         }
       ],
       "weight": 1
-    },
-    {
-      "id": "coven_witch_buildup",
-      "telegraph": "buff",
-      "target": {
-        "target_type": "self"
-      },
-      "effects": [
-        {
-          "type": "apply_status",
-          "status": "strength",
-          "stacks": 3
-        }
-      ],
-      "weight": 1
     }
   ],
+  "ramp_amount": 3,
+  "ramp_every": 3,
+  "ramp_passive": false,
   "sprite": "res://assets/enemies/coven_witch.png"
 }

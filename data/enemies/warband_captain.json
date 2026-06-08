@@ -47,22 +47,10 @@
         }
       ],
       "weight": 1
-    },
-    {
-      "id": "captain_warcry",
-      "telegraph": "buff",
-      "target": {
-        "target_type": "self"
-      },
-      "effects": [
-        {
-          "type": "apply_status",
-          "status": "strength",
-          "stacks": 3
-        }
-      ],
-      "weight": 1
     }
   ],
+  "ramp_amount": 3,
+  "ramp_every": 3,
+  "ramp_passive": false,
   "sprite": "res://assets/enemies/warband_captain.png"
 }
