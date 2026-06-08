@@ -1,12 +1,12 @@
 {
-  "id": "grunt",
-  "display_name": "Grunt",
-  "max_hp": 20,
-  "speed": 8,
+  "id": "ogre",
+  "display_name": "Ogre",
+  "max_hp": 55,
+  "speed": 6,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "grunt_slash",
+      "id": "ogre_smash",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,25 +14,26 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 4
+          "amount": 14
         }
       ],
       "weight": 3
     },
     {
-      "id": "grunt_guard",
-      "telegraph": "block",
+      "id": "ogre_roar",
+      "telegraph": "buff",
       "target": {
         "target_type": "self"
       },
       "effects": [
         {
-          "type": "block",
-          "amount": 6
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 2
         }
       ],
-      "weight": 2
+      "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/grunt.png"
+  "sprite": "res://assets/enemies/ogre.png"
 }

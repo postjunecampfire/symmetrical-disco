@@ -1,12 +1,12 @@
 {
-  "id": "hexer",
-  "display_name": "Hexer",
-  "max_hp": 18,
+  "id": "coven_witch",
+  "display_name": "Coven Witch",
+  "max_hp": 48,
   "speed": 11,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "hexer_bolt",
+      "id": "coven_bolt",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,13 +14,13 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 4
+          "amount": 11
         }
       ],
       "weight": 3
     },
     {
-      "id": "hexer_enfeeble",
+      "id": "coven_curse",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
@@ -29,13 +29,18 @@
         {
           "type": "apply_status",
           "status": "frail",
-          "stacks": 1
+          "stacks": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 2
         }
       ],
       "weight": 2
     },
     {
-      "id": "hexer_ward",
+      "id": "coven_ward",
       "telegraph": "block",
       "target": {
         "target_type": "self"
@@ -43,11 +48,11 @@
       "effects": [
         {
           "type": "block",
-          "amount": 5
+          "amount": 12
         }
       ],
       "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/hexer.png"
+  "sprite": "res://assets/enemies/coven_witch.png"
 }

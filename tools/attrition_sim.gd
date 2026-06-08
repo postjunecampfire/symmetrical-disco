@@ -19,10 +19,11 @@ extends SceneTree
 const DATA_DIR := "res://data"
 const DEFAULT_SEEDS := 40
 
-## A representative act: four fights of rising difficulty + a boss. Both cohorts
-## face this identical ladder so attrition is comparable.
+## A representative act of rising difficulty (Basic A→Hard, elite, boss). Both
+## cohorts face this identical ladder so attrition is comparable.
 const ACT: Array[StringName] = [
-	&"enc_combat_01", &"enc_combat_02", &"enc_elite_01", &"enc_combat_03", &"enc_boss_01",
+	&"enc_combat_01", &"enc_combat_02", &"enc_combat_03", &"enc_combat_04",
+	&"enc_elite_01", &"enc_boss_01",
 ]
 ## Granted to BOTH cohorts after the elite, so the relic path is exercised without
 ## biasing the comparison.

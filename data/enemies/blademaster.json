@@ -1,12 +1,12 @@
 {
-  "id": "hexer",
-  "display_name": "Hexer",
-  "max_hp": 18,
-  "speed": 11,
+  "id": "blademaster",
+  "display_name": "Blademaster",
+  "max_hp": 44,
+  "speed": 13,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "hexer_bolt",
+      "id": "blademaster_flurry",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,13 +14,13 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 4
+          "amount": 11
         }
       ],
       "weight": 3
     },
     {
-      "id": "hexer_enfeeble",
+      "id": "blademaster_expose",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
@@ -28,14 +28,19 @@
       "effects": [
         {
           "type": "apply_status",
-          "status": "frail",
+          "status": "weak",
+          "stacks": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "vulnerable",
           "stacks": 1
         }
       ],
       "weight": 2
     },
     {
-      "id": "hexer_ward",
+      "id": "blademaster_parry",
       "telegraph": "block",
       "target": {
         "target_type": "self"
@@ -43,11 +48,11 @@
       "effects": [
         {
           "type": "block",
-          "amount": 5
+          "amount": 12
         }
       ],
       "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/hexer.png"
+  "sprite": "res://assets/enemies/blademaster.png"
 }

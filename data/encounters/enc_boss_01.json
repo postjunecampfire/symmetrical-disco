@@ -1,10 +1,11 @@
 {
   "id": "enc_boss_01",
   "display_name": "The Iron Warden",
-  "win_condition": "defeat_all",
   "enemies": [
     "iron_warden",
-    "archer",
-    "archer"
-  ]
+    "gremlin",
+    "gremlin",
+    "gremlin"
+  ],
+  "win_condition": "defeat_all"
 }

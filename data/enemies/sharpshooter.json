@@ -1,12 +1,12 @@
 {
-  "id": "hexer",
-  "display_name": "Hexer",
-  "max_hp": 18,
-  "speed": 11,
+  "id": "sharpshooter",
+  "display_name": "Sharpshooter",
+  "max_hp": 46,
+  "speed": 12,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "hexer_bolt",
+      "id": "sharpshooter_pierce",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,28 +14,32 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 4
+          "amount": 12
         }
       ],
       "weight": 3
     },
     {
-      "id": "hexer_enfeeble",
+      "id": "sharpshooter_mark",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
       },
       "effects": [
         {
+          "type": "damage",
+          "amount": 3
+        },
+        {
           "type": "apply_status",
-          "status": "frail",
-          "stacks": 1
+          "status": "vulnerable",
+          "stacks": 2
         }
       ],
       "weight": 2
     },
     {
-      "id": "hexer_ward",
+      "id": "sharpshooter_brace",
       "telegraph": "block",
       "target": {
         "target_type": "self"
@@ -43,11 +47,11 @@
       "effects": [
         {
           "type": "block",
-          "amount": 5
+          "amount": 10
         }
       ],
       "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/hexer.png"
+  "sprite": "res://assets/enemies/sharpshooter.png"
 }

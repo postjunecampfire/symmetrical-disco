@@ -6,7 +6,7 @@
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "skirmisher_venom_jab",
+      "id": "skirmisher_jab",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,29 +14,39 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 3
-        },
-        {
-          "type": "apply_status",
-          "status": "poison",
-          "stacks": 3
+          "amount": 4
         }
       ],
       "weight": 3
     },
     {
-      "id": "skirmisher_quick_slash",
-      "telegraph": "attack",
+      "id": "skirmisher_feint",
+      "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
       },
       "effects": [
         {
-          "type": "damage",
-          "amount": 6
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 1
         }
       ],
       "weight": 2
+    },
+    {
+      "id": "skirmisher_dodge",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 5
+        }
+      ],
+      "weight": 1
     }
   ],
   "sprite": "res://assets/enemies/skirmisher.png"

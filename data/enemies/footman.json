@@ -1,12 +1,12 @@
 {
-  "id": "hexer",
-  "display_name": "Hexer",
-  "max_hp": 18,
-  "speed": 11,
+  "id": "footman",
+  "display_name": "Footman",
+  "max_hp": 30,
+  "speed": 9,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "hexer_bolt",
+      "id": "footman_slash",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,13 +14,13 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 4
+          "amount": 7
         }
       ],
       "weight": 3
     },
     {
-      "id": "hexer_enfeeble",
+      "id": "footman_shieldbash",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
@@ -28,14 +28,14 @@
       "effects": [
         {
           "type": "apply_status",
-          "status": "frail",
+          "status": "weak",
           "stacks": 1
         }
       ],
       "weight": 2
     },
     {
-      "id": "hexer_ward",
+      "id": "footman_guard",
       "telegraph": "block",
       "target": {
         "target_type": "self"
@@ -43,11 +43,11 @@
       "effects": [
         {
           "type": "block",
-          "amount": 5
+          "amount": 10
         }
       ],
       "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/hexer.png"
+  "sprite": "res://assets/enemies/footman.png"
 }

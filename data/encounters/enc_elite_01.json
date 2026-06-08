@@ -1,10 +1,10 @@
 {
   "id": "enc_elite_01",
-  "display_name": "Warband Ambush",
-  "win_condition": "defeat_all",
+  "display_name": "Captain's Guard",
   "enemies": [
-    "grunt",
     "warband_captain",
-    "hexer"
-  ]
+    "footman",
+    "ooze"
+  ],
+  "win_condition": "defeat_all"
 }

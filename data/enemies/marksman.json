@@ -1,12 +1,12 @@
 {
-  "id": "hexer",
-  "display_name": "Hexer",
-  "max_hp": 18,
-  "speed": 11,
+  "id": "marksman",
+  "display_name": "Marksman",
+  "max_hp": 28,
+  "speed": 12,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "hexer_bolt",
+      "id": "marksman_aimed",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -14,28 +14,32 @@
       "effects": [
         {
           "type": "damage",
-          "amount": 4
+          "amount": 8
         }
       ],
       "weight": 3
     },
     {
-      "id": "hexer_enfeeble",
+      "id": "marksman_mark",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
       },
       "effects": [
         {
+          "type": "damage",
+          "amount": 2
+        },
+        {
           "type": "apply_status",
-          "status": "frail",
-          "stacks": 1
+          "status": "vulnerable",
+          "stacks": 2
         }
       ],
       "weight": 2
     },
     {
-      "id": "hexer_ward",
+      "id": "marksman_brace",
       "telegraph": "block",
       "target": {
         "target_type": "self"
@@ -43,11 +47,11 @@
       "effects": [
         {
           "type": "block",
-          "amount": 5
+          "amount": 8
         }
       ],
       "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/hexer.png"
+  "sprite": "res://assets/enemies/marksman.png"
 }

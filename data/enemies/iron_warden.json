@@ -56,8 +56,8 @@
         },
         {
           "type": "apply_status",
-          "status": "poison",
-          "stacks": 3
+          "status": "vulnerable",
+          "stacks": 2
         }
       ],
       "weight": 1

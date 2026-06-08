@@ -1,9 +1,11 @@
 {
   "id": "enc_combat_01",
-  "display_name": "Patrol Skirmish",
-  "win_condition": "defeat_all",
+  "display_name": "Gremlin Swarm",
   "enemies": [
-    "grunt",
-    "grunt"
-  ]
+    "gremlin",
+    "gremlin",
+    "gremlin",
+    "gremlin"
+  ],
+  "win_condition": "defeat_all"
 }

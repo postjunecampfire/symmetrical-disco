@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 222 passing.
+# Currently: 228 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -59,6 +59,15 @@ could self-test. A human/agent without that runs the headless line above as the 
   `passive` (max HP) at assembly and `turn_start` (energy/draw) each player turn —
   additive hooks around `EncounterBattle`, no change to `BattleState`. Elites grant
   one; events can too (`add_relic`). Held in `RunState.relics`.
+- **Enemy roster (tiered kit redesign, 2026-06-08):** every archetype follows an
+  **Attack · Debuff · Defend** kit; higher tiers are *scaled variants* of a base
+  (Skirmisher→Hardened Skirmisher→Blademaster; Brute→Ogre; Gremlin→Hobgoblin;
+  Ooze→Elder Ooze) rather than new concepts. 19 enemies across Weak/Medium/Strong/
+  Very-Strong. Debuff slot uses **Weak / Vulnerable (+50% dmg taken) / Frail (−50%
+  block gained)** — Vulnerable+Frail are new statuses in `BattleState`. Encounters
+  rebuilt to Basic (3–4 Weak / 2 Medium / 1 Strong), Hard (2 Strong / 1 Strong+2
+  Medium), Boss (Very-Strong + 2–3 Weak minions). Design source:
+  `enemy_design_review.xlsx` in the project folder.
 - **Telemetry** (`src/telemetry/`): combat/run events; used to produce the attrition read.
 
 ## 4. Known gaps / deferred (NOT yet done)
@@ -99,19 +108,21 @@ godot --headless --script res://tools/attrition_sim.gd [seeds]   # default 40
 ```
 
 `tools/attrition_sim.gd` runs **greedy** vs **defensive** cohorts over the same act
-(`enc_combat_01, _02, elite_01, _03, boss_01`) under identical seeds, with the FULL
-loop live — run-deck combat decks, leveling (auto-allocates STR for greedy / CON for
-defensive), and a relic after the elite. It reports win %, avg nodes cleared, avg
-surviving HP, and a death-node histogram.
+(now 6 fights: `enc_combat_01..04, elite_01, boss_01`) under identical seeds, with
+the FULL loop live — run-deck combat decks, leveling (auto-allocates STR for greedy /
+CON for defensive), and a relic after the elite. It reports win %, avg nodes cleared,
+avg surviving HP, and a death-node histogram.
 
-**Latest read (40 seeds, 2026-06-08, full loop): both policies still win 100%**
-(greedy avg final HP ~38.7, defensive ~42.4). So the thesis **still isn't testable —
-combat is too easy** (the P3·02 buffs + now leveling/relics only widen the margin).
-The HP gap (def − greedy ≈ +3.7) is the *only* signal the policies differ; nobody
-dies. **Balance pass needed before the thesis means anything** — tougher/more
-enemies, less healing, more fights. All knobs are data (`data/battle_config.json`,
-`data/enemies/*`, `data/encounters/*`); re-run the harness after each tweak. **This
-is the owner-led playtest/design call.**
+**Read after the enemy-kit redesign (40 seeds, 2026-06-08): greedy 95% (2 deaths at
+the elite) vs defensive 100%; HP gap def−greedy ≈ +6.2.** First time greed is
+punished at all — the new tiered roster (Attack/Debuff/Defend kit, scaled variants;
+Vulnerable/Frail debuffs) + rebuilt encounters (Basic/Hard/Boss templates) put real
+pressure on. But the gap is still **marginal** (5% win-rate). To make the attrition
+thesis decisively testable, keep tuning: the elite (Captain's Guard) is the current
+pinch point — push enemy damage / cut `post_combat_heal`+`revive_hp` / add a 2nd
+hard fight, re-running the harness after each tweak. All knobs are data
+(`data/battle_config.json`, `data/enemies/*`, `data/encounters/*`). **Final balance
+targets are the owner-led design call.**
 
 ## 6. Suggested next priorities (pick based on goal)
 
@@ -153,5 +164,5 @@ src/ui/        character_creation → map_view (run) → battle_view (code-drive
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (222 passing)
+tests/         GUT suites mirroring src/  (228 passing)
 ```

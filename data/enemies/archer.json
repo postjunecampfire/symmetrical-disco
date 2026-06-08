@@ -20,7 +20,7 @@
       "weight": 3
     },
     {
-      "id": "archer_crippling_shot",
+      "id": "archer_mark",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
@@ -32,11 +32,25 @@
         },
         {
           "type": "apply_status",
-          "status": "weak",
+          "status": "vulnerable",
           "stacks": 1
         }
       ],
       "weight": 2
+    },
+    {
+      "id": "archer_brace",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 4
+        }
+      ],
+      "weight": 1
     }
   ],
   "sprite": "res://assets/enemies/archer.png"

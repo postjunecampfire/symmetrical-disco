@@ -1,10 +1,9 @@
 {
   "id": "enc_combat_04",
-  "display_name": "The Holdfast",
-  "win_condition": "defeat_all",
+  "display_name": "Twin Threat",
   "enemies": [
-    "grunt",
-    "shield_bearer",
-    "brute"
-  ]
+    "brute",
+    "ogre"
+  ],
+  "win_condition": "defeat_all"
 }

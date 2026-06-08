@@ -1,12 +1,12 @@
 {
-  "id": "hexer",
-  "display_name": "Hexer",
-  "max_hp": 18,
-  "speed": 11,
+  "id": "ooze",
+  "display_name": "Ooze",
+  "max_hp": 28,
+  "speed": 5,
   "intent_pattern": "random_weighted",
   "intents": [
     {
-      "id": "hexer_bolt",
+      "id": "ooze_engulf",
       "telegraph": "attack",
       "target": {
         "target_type": "enemy"
@@ -15,12 +15,17 @@
         {
           "type": "damage",
           "amount": 4
+        },
+        {
+          "type": "apply_status",
+          "status": "poison",
+          "stacks": 3
         }
       ],
       "weight": 3
     },
     {
-      "id": "hexer_enfeeble",
+      "id": "ooze_acid",
       "telegraph": "debuff",
       "target": {
         "target_type": "enemy"
@@ -28,14 +33,14 @@
       "effects": [
         {
           "type": "apply_status",
-          "status": "frail",
+          "status": "vulnerable",
           "stacks": 1
         }
       ],
       "weight": 2
     },
     {
-      "id": "hexer_ward",
+      "id": "ooze_congeal",
       "telegraph": "block",
       "target": {
         "target_type": "self"
@@ -43,11 +48,11 @@
       "effects": [
         {
           "type": "block",
-          "amount": 5
+          "amount": 8
         }
       ],
       "weight": 1
     }
   ],
-  "sprite": "res://assets/enemies/hexer.png"
+  "sprite": "res://assets/enemies/ooze.png"
 }

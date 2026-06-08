@@ -1,10 +1,9 @@
 {
   "id": "enc_combat_02",
-  "display_name": "Crossfire",
-  "win_condition": "defeat_all",
+  "display_name": "Holdfast Pair",
   "enemies": [
-    "grunt",
-    "archer",
-    "archer"
-  ]
+    "footman",
+    "ooze"
+  ],
+  "win_condition": "defeat_all"
 }
