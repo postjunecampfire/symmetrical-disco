@@ -2,44 +2,64 @@
   "id": "warband_captain",
   "display_name": "Warband Captain",
   "max_hp": 46,
-  "move_range": 3,
   "speed": 10,
   "intent_pattern": "random_weighted",
   "intents": [
     {
       "id": "captain_cleave",
       "telegraph": "attack",
-      "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+      "target": {
+        "target_type": "enemy"
+      },
       "effects": [
-        { "type": "damage", "amount": 13 },
-        { "type": "push", "amount": 1 }
+        {
+          "type": "damage",
+          "amount": 13
+        }
       ],
       "weight": 3
     },
     {
       "id": "captain_rally",
       "telegraph": "buff",
-      "target": { "target_type": "ally", "range": 3, "shape": "single" },
+      "target": {
+        "target_type": "ally"
+      },
       "effects": [
-        { "type": "apply_status", "status": "strength", "stacks": 2 }
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 2
+        }
       ],
       "weight": 1
     },
     {
       "id": "captain_brace",
       "telegraph": "block",
-      "target": { "target_type": "self", "range": 0, "shape": "single" },
+      "target": {
+        "target_type": "self"
+      },
       "effects": [
-        { "type": "block", "amount": 12 }
+        {
+          "type": "block",
+          "amount": 12
+        }
       ],
       "weight": 1
     },
     {
       "id": "captain_warcry",
       "telegraph": "buff",
-      "target": { "target_type": "self", "range": 0, "shape": "single" },
+      "target": {
+        "target_type": "self"
+      },
       "effects": [
-        { "type": "apply_status", "status": "strength", "stacks": 2 }
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 2
+        }
       ],
       "weight": 1
     }

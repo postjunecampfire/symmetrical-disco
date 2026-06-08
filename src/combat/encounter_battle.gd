@@ -14,8 +14,8 @@ extends BattleState
 ## and injects the EnemyAI so a fully assembled encounter runs its enemy phase
 ## end to end.
 
-## The injected enemy controller. Selection/telegraph/movement/execution all live
-## in EnemyAI (P1·08); this subclass only forwards the per-enemy action to it.
+## The injected enemy controller. Selection/telegraph/execution all live in
+## EnemyAI (P1·08); this subclass only forwards the per-enemy action to it.
 ## Public so a caller (e.g. UI) can read telegraphs via `enemy_ai.get_telegraph`.
 var enemy_ai: EnemyAI = null
 
@@ -25,21 +25,20 @@ var enemy_ai: EnemyAI = null
 ## signature is untouched). `controller` may be passed to wire the AI in one step.
 func _init(
 	battle_config: BattleConfig = null,
-	grid_model: GridModel = null,
 	battle_deck: Deck = null,
 	status_definitions: Dictionary = {},
 	controller: EnemyAI = null
 ) -> void:
-	super(battle_config, grid_model, battle_deck, status_definitions)
+	super(battle_config, battle_deck, status_definitions)
 	enemy_ai = controller
 
 
 ## Override of BattleState's enemy-action hook. Called once per living,
 ## un-stunned enemy during the enemy phase (the stun-skip is handled by the base
-## before this runs). Delegates the whole action — intent selection, movement,
-## and effect resolution — to the injected EnemyAI, passing this battle as the
-## context and the enemy's authored EnemyData (its `source_data`). A no-op if no
-## AI was injected or the enemy carries no EnemyData, so the phase loop stays safe.
+## before this runs). Delegates the whole action — intent selection and effect
+## resolution — to the injected EnemyAI, passing this battle as the context and
+## the enemy's authored EnemyData (its `source_data`). A no-op if no AI was
+## injected or the enemy carries no EnemyData, so the phase loop stays safe.
 func _take_enemy_action(enemy: Combatant) -> void:
 	if enemy_ai == null:
 		return

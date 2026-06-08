@@ -4,12 +4,23 @@
   "description": "Deal 6 damage and Stun the target for 1 turn. Exhaust.",
   "character_tag": "vanguard",
   "energy_cost": 1,
-  "keywords": ["exhaust"],
+  "keywords": [
+    "exhaust"
+  ],
   "rarity": "common",
-  "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+  "target": {
+    "target_type": "enemy"
+  },
   "effects": [
-    { "type": "damage", "amount": 6 },
-    { "type": "apply_status", "status": "stun", "stacks": 1 }
+    {
+      "type": "damage",
+      "amount": 6
+    },
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    }
   ],
   "art": "res://assets/cards/shield_bash.png"
 }

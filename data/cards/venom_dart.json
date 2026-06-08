@@ -6,9 +6,18 @@
   "energy_cost": 1,
   "keywords": [],
   "rarity": "common",
-  "target": { "target_type": "enemy", "range": 4, "shape": "single" },
+  "target": {
+    "target_type": "enemy"
+  },
   "effects": [
-    { "type": "damage", "amount": 3 },
-    { "type": "apply_status", "status": "poison", "stacks": 4 }
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 4
+    }
   ]
 }

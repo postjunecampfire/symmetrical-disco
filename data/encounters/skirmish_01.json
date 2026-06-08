@@ -1,12 +1,10 @@
 {
   "id": "skirmish_01",
   "display_name": "Ambush at the Ford",
-  "grid_size": [6, 6],
-  "player_spawns": [[1, 2], [1, 3]],
-  "enemy_spawns": [
-    { "enemy": "grunt", "pos": [4, 1] },
-    { "enemy": "archer", "pos": [5, 4] },
-    { "enemy": "brute", "pos": [4, 3] }
-  ],
-  "win_condition": "defeat_all"
+  "win_condition": "defeat_all",
+  "enemies": [
+    "grunt",
+    "archer",
+    "brute"
+  ]
 }

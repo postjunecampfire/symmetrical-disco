@@ -33,22 +33,22 @@
 ## 2. Shared vocabulary (used by multiple entities)
 
 ### 2.1 TargetSpec
-How an action chooses what it affects on the grid.
+How an action chooses what it affects. **Positionless (ADR-0013): targeting is by
+KIND, not location** — there is no range/shape/radius and no board.
 
 | Field | Type | Req | Default | Notes |
 |-------|------|-----|---------|-------|
-| `target_type` | StringName | yes | `enemy` | `self` \| `ally` \| `enemy` \| `any_unit` \| `tile` \| `empty_tile` |
-| `range` | int | no | `1` | Tiles from the acting unit. `0` = self / no range. |
-| `shape` | StringName | no | `single` | `single` \| `line` \| `area` |
-| `radius` | int | no | `0` | For `area`: tiles from the chosen target. |
+| `target_type` | StringName | yes | `enemy` | `self` \| `ally` \| `all_allies` \| `enemy` \| `all_enemies` \| `random_enemy` |
 
 ```gdscript
 class_name TargetSpec extends Resource
 @export var target_type: StringName = &"enemy"
-@export var range: int = 1
-@export var shape: StringName = &"single"
-@export var radius: int = 0
 ```
+
+Single-target kinds (`enemy`, `ally`) take one chosen unit; group kinds
+(`all_allies`, `all_enemies`) resolve to every living unit on that side; `self`
+is the acting unit; `random_enemy` picks one living opponent. Resolution lives in
+`BattleState.resolve_targets(spec, actor, chosen)`.
 
 ### 2.2 Effect (the atomic action — the heart of the model)
 A card or enemy intent is a **list of effects**. Each effect has a `type` discriminator the loader dispatches on. This is the extensibility seam: a new mechanic = a new effect `type` + its handler, authored as data everywhere else.
@@ -59,7 +59,6 @@ A card or enemy intent is a **list of effects**. Each effect has a `type` discri
 | `amount` | int | no | `0` | Magnitude (damage, block, heal, stacks for some). |
 | `status` | StringName | no | `""` | For `apply_status`: the status id (§2.4). |
 | `stacks` | int | no | `0` | For `apply_status`: how many. |
-| `target_override` | TargetSpec | no | null | If set, this effect retargets instead of using the card/intent target. |
 | `params` | Dictionary | no | `{}` | Escape hatch for effect-specific data; keep usage rare and documented. |
 
 ```gdscript
@@ -68,9 +67,13 @@ class_name Effect extends Resource
 @export var amount: int = 0
 @export var status: StringName = &""
 @export var stacks: int = 0
-@export var target_override: TargetSpec
 @export var params: Dictionary = {}
 ```
+
+Positionless (ADR-0013): there is **no per-effect `target_override`**. Every effect
+in a card/intent applies to that card/intent's single resolved target set.
+Group target kinds (`all_*`) apply targeted effects to each unit; global effects
+(`draw`, `gain_energy`) fire once regardless of target-set size.
 
 ### 2.3 Effect type registry
 The loader maps each `type` to a handler. **Prototype set** (build these first):
@@ -81,12 +84,12 @@ The loader maps each `type` to a handler. **Prototype set** (build these first):
 | `block` | Grant `amount` block to target. | `amount` |
 | `heal` | Restore `amount` HP. | `amount` |
 | `apply_status` | Add `stacks` of `status` to target. | `status`, `stacks` |
-| `move` | Move the acting unit toward/onto target tile. | `target_override` (tile) |
-| `push` | Shove target `amount` tiles away. | `amount` |
 | `draw` | Draw `amount` cards. | `amount` |
 | `gain_energy` | Add `amount` energy this turn. | `amount` |
 
-**Deferred (post-prototype):** `summon`, `teleport`, `pull`, `multi_hit`, `conditional`, `transform_card`. Add as new handlers; do not overload existing types.
+Positionless (ADR-0013): `move` and `push` were **removed with the grid**.
+
+**Deferred (post-prototype):** `summon`, `multi_hit`, `conditional`, `transform_card`. Add as new handlers; do not overload existing types.
 
 ### 2.4 Status / StatusData
 Reusable status-effect definitions (`/data/status`).
@@ -177,8 +180,7 @@ A playable party unit (2–3 per run, ADR-0004).
 | `id` | StringName | yes | — | Used as cards' `character_tag`. |
 | `display_name` | String | yes | — | |
 | `max_hp` | int | yes | `30` | |
-| `move_range` | int | yes | `3` | Tiles per move. |
-| `speed` | int | no | `10` | Turn-order / initiative input (if used). |
+| `speed` | int | no | `10` | Turn-order / initiative input (unused under strict phases, ADR-0010). |
 | `innate_actions` | Array[StringName] | yes | `["strike","defend"]` | Card ids flagged `innate`; never enter the deck (ADR-0005). |
 | `starting_deck` | Array[StringName] | yes | `[]` | Card ids this character contributes to the shared deck. |
 | `tags` | Array[StringName] | no | `[]` | Archetype hints (`melee`, `caster`, `support`). |
@@ -189,7 +191,6 @@ class_name CharacterData extends Resource
 @export var id: StringName
 @export var display_name: String
 @export var max_hp: int = 30
-@export var move_range: int = 3
 @export var speed: int = 10
 @export var innate_actions: Array[StringName] = [&"strike", &"defend"]
 @export var starting_deck: Array[StringName] = []
@@ -208,8 +209,7 @@ class_name CharacterData extends Resource
 | `id` | StringName | yes | — | |
 | `display_name` | String | yes | — | |
 | `max_hp` | int | yes | `20` | |
-| `move_range` | int | yes | `2` | |
-| `speed` | int | no | `8` | |
+| `speed` | int | no | `8` | Unused under strict phases (ADR-0010). |
 | `intents` | Array[IntentData] | yes | — | Telegraphed actions (Slay-the-Spire style). |
 | `intent_pattern` | StringName | no | `random_weighted` | `random_weighted` \| `sequence`. |
 | `sprite` | Texture2D | no | null | Placeholder allowed. |
@@ -218,7 +218,7 @@ class_name CharacterData extends Resource
 | Field | Type | Req | Default | Notes |
 |-------|------|-----|---------|-------|
 | `id` | StringName | yes | — | |
-| `telegraph` | StringName | yes | `attack` | Icon shown to player: `attack` \| `block` \| `buff` \| `debuff` \| `move`. |
+| `telegraph` | StringName | yes | `attack` | Icon shown to player: `attack` \| `block` \| `buff` \| `debuff`. |
 | `target` | TargetSpec | yes | — | |
 | `effects` | Array[Effect] | yes | — | Reuses the §2.2 Effect model. |
 | `weight` | int | no | `1` | Selection weight for `random_weighted`. |
@@ -228,7 +228,6 @@ class_name EnemyData extends Resource
 @export var id: StringName
 @export var display_name: String
 @export var max_hp: int = 20
-@export var move_range: int = 2
 @export var speed: int = 8
 @export var intents: Array[IntentData] = []
 @export var intent_pattern: StringName = &"random_weighted"
@@ -246,35 +245,27 @@ class_name IntentData extends Resource
 
 ## 6. Encounter / EncounterData
 
-A single tactical skirmish (small grid, ADR-0001). Run/map structure that *sequences* encounters is a separate, later schema.
+A single skirmish. **Positionless (ADR-0013): no grid, terrain, or spawn
+coordinates** — an encounter is a flat roster of enemy ids plus the win
+condition. The party (and its carried HP / run deck) comes from the caller
+(RunState in the run layer, ADR-0012). Run/map structure that *sequences*
+encounters is a separate schema (`run-structure.md`).
 
 | Field | Type | Req | Default | Notes |
 |-------|------|-----|---------|-------|
 | `id` | StringName | yes | — | |
 | `display_name` | String | yes | — | |
-| `grid_size` | Vector2i | yes | `(6,6)` | Keep small (ADR-0001). |
-| `terrain` | Array[TerrainCell] | no | `[]` | Sparse overrides; unset tiles default to `plains`. |
-| `player_spawns` | Array[Vector2i] | yes | — | One per party unit. |
-| `enemy_spawns` | Array[Spawn] | yes | — | `{ enemy: id, pos: Vector2i }`. |
-| `win_condition` | StringName | yes | `defeat_all` | `defeat_all` \| `survive_turns` \| `reach_tile`. |
-| `win_param` | int | no | `0` | Turns to survive, or packed tile for `reach_tile`. |
+| `enemies` | Array[StringName] | yes | — | Enemy ids, resolved to EnemyData at assembly. |
+| `win_condition` | StringName | yes | `defeat_all` | `defeat_all` \| `survive_turns`. |
+| `win_param` | int | no | `0` | Turns to survive (for `survive_turns`). |
 | `rewards` | Array[StringName] | no | `[]` | Card/relic ids granted on win (run layer; may be stubbed in prototype). |
-
-`TerrainCell`: `{ pos: Vector2i, terrain: StringName }` where `terrain` ∈ `plains` \| `cover` \| `blocked` \| `hazard` (move cost / effects defined in a terrain table — deferred; prototype may treat all as `plains` except `blocked`).
-`Spawn`: `{ enemy: StringName, pos: Vector2i }`.
 
 **JSON authoring example:**
 ```json
 {
   "id": "skirmish_01",
   "display_name": "Ambush at the Ford",
-  "grid_size": [6, 6],
-  "player_spawns": [[1, 2], [1, 3]],
-  "enemy_spawns": [
-    { "enemy": "grunt",  "pos": [4, 1] },
-    { "enemy": "grunt",  "pos": [4, 3] },
-    { "enemy": "archer", "pos": [5, 4] }
-  ],
+  "enemies": ["grunt", "archer", "brute"],
   "win_condition": "defeat_all"
 }
 ```
@@ -323,20 +314,19 @@ Every arrow is an ID reference the loader must validate.
 
 - **New card:** create `/data/cards/card_<id>.tres` (or JSON) with the §3 fields. Only use `effect.type`s in the registry; if you need a new one, that's a code task, not a content task — flag it.
 - **New enemy:** §5 fields; intents reuse the Effect model.
-- **New encounter:** §6 fields; reference existing enemy ids and a valid grid.
+- **New encounter:** §6 fields; reference existing enemy ids (positionless — no grid/spawns).
 - Keep all balance numbers in the data. Never edit a script to tune a value.
 
 ---
 
 ## 11. Prototype scope vs deferred
 
-**In scope for the First Playable Prototype:** TargetSpec; Effect types `damage`/`block`/`heal`/`apply_status`/`move`/`draw`/`gain_energy`; statuses `block`/`poison`/`stun`/`strength`/`weak`; CardData, CharacterData (×1–2), EnemyData (×3 intents simple), one EncounterData, BattleConfig.
+**In scope for the First Playable Prototype:** TargetSpec (positionless kinds); Effect types `damage`/`block`/`heal`/`apply_status`/`draw`/`gain_energy`; statuses `block`/`poison`/`stun`/`strength`/`weak`; CardData, CharacterData (×2), EnemyData, EncounterData, BattleConfig.
 
-**Deferred:** terrain effects table, run/map node schema, rewards/relics schema, card upgrade trees, advanced effect types (§2.3 deferred list), line/area targeting beyond `single`.
+**Deferred:** run/map node schema, rewards/relics schema, card upgrade trees, advanced effect types (§2.3 deferred list). Positional concepts (grid, terrain, `move`/`push`, per-effect `target_override`, line/area shapes) were **removed** under ADR-0013, not deferred.
 
 ## 12. Open schema questions
 
-- Turn order: strict player-phase/enemy-phase, or `speed`-based initiative? (affects whether `speed` matters now)
-- Block/armor model: does block carry over turns or reset? (affects StatusData defaults)
+- Block/armor model: does block carry over turns or reset? (affects StatusData defaults — prototype resets each turn)
 - Energy: strictly shared, or any per-character reserve? (currently strictly shared)
-- Card targeting for multi-unit effects: resolved via `target_override` vs a dedicated `area` shape — confirm one path.
+- Multi-unit targeting is resolved by the `all_allies` / `all_enemies` target kinds (§2.1), not by per-effect overrides — path confirmed (ADR-0013).

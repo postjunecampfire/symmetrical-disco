@@ -1,21 +1,17 @@
 extends "res://addons/gut/test.gd"
-## GUT integration suite for task P1·09 — Encounter assembly & win/lose wiring.
+## GUT integration suite for task P1·09 — Encounter assembly & win/lose wiring
+## (positionless, ADR-0013).
 ##
 ## This is the END-TO-END seam test: it loads the REAL authored content from
-## res://data (validating P1·11's content as a side effect), assembles the
-## `skirmish_01` encounter for a chosen party through EncounterAssembler, and
-## drives the resulting EncounterBattle to assert:
+## res://data, assembles the `skirmish_01` encounter for a chosen party through
+## EncounterAssembler, and drives the resulting EncounterBattle to assert:
 ##   - the real /data load is ok (and, if not, surfaces the exact errors);
-##   - the assembled battle has the right grid size, the right player/enemy
-##     Combatants at the encounter's spawn positions, and a deck assembled from
-##     the party's starting decks with innate cards excluded;
-##   - the enemy AI is wired into the turn loop (enemies act on the enemy phase:
-##     a player takes damage and/or an enemy moves);
+##   - the assembled battle has the right player/enemy Combatants and a deck
+##     assembled from the party's starting decks with innate cards excluded;
+##   - the enemy AI is wired into the turn loop (a player takes damage on the
+##     enemy phase within a few turns);
 ##   - a scripted path to all-enemies-dead reports a WIN via check_outcome();
 ##   - a scripted path to all-players-dead reports a LOSS.
-##
-## It builds nothing by hand that the assembler should build — the point is to
-## exercise the integration, not to mock around it.
 
 const EncounterAssemblerScript := preload("res://src/combat/encounter_assembler.gd")
 const EncounterBattleScript := preload("res://src/combat/encounter_battle.gd")
@@ -30,15 +26,11 @@ var _load_ok: bool = false
 
 # --- Shared setup -----------------------------------------------------------
 
-## Load the real content once per test. Kept here (not before_all) so each test
-## gets a clean database and the load itself is part of what every test exercises.
 func before_each() -> void:
 	_db = ContentDatabaseScript.new()
 	var result: ContentDatabase.LoadResult = _db.load_from_dir(DATA_DIR)
 	_load_ok = result.ok
 	if not result.ok:
-		# Surface the EXACT validation errors so a content regression in /data is
-		# diagnosable from the test output (the task asks us to report, not edit).
 		for msg in result.errors:
 			push_warning("[/data load error] " + msg)
 
@@ -58,7 +50,7 @@ func _build() -> EncounterBattle:
 
 
 # ============================================================================
-#  1. Real content loads and validates (end-to-end check of P1·11)
+#  1. Real content loads and validates
 # ============================================================================
 
 func test_real_data_loads_ok() -> void:
@@ -73,17 +65,10 @@ func test_real_data_loads_ok() -> void:
 
 
 # ============================================================================
-#  2. Assembly: grid, combatants at spawns, deck (innate excluded)
+#  2. Assembly: combatants, deck (innate excluded)
 # ============================================================================
 
-func test_assembled_grid_matches_encounter_size() -> void:
-	var battle: EncounterBattle = _build()
-	var encounter: EncounterData = _db.get_encounter(ENCOUNTER_ID)
-	assert_eq(battle.grid.size, encounter.grid_size, "grid sized to encounter.grid_size")
-	assert_eq(battle.grid.size, Vector2i(6, 6), "skirmish_01 is a 6x6 grid")
-
-
-func test_assembled_spawns_players_and_enemies_at_positions() -> void:
+func test_assembled_spawns_players_and_enemies() -> void:
 	var battle: EncounterBattle = _build()
 	var encounter: EncounterData = _db.get_encounter(ENCOUNTER_ID)
 
@@ -91,33 +76,20 @@ func test_assembled_spawns_players_and_enemies_at_positions() -> void:
 	var enemies: Array[Combatant] = battle.living_enemies()
 	assert_eq(players.size(), 2, "two party members spawned (vanguard, mage)")
 	assert_eq(
-		enemies.size(), encounter.enemy_spawns.size(),
-		"one enemy spawned per enemy_spawns entry"
+		enemies.size(), encounter.enemies.size(),
+		"one enemy spawned per encounter.enemies entry"
 	)
 	assert_eq(enemies.size(), 3, "skirmish_01 has three enemies (grunt, archer, brute)")
 
-	# Players occupy the encounter's player_spawns (order preserved by the assembler).
-	for i in range(players.size()):
-		assert_eq(
-			players[i].grid_position, encounter.player_spawns[i],
-			"player %d at its spawn %s" % [i, encounter.player_spawns[i]]
-		)
-		# The grid occupant registry is in sync with the unit.
-		assert_eq(
-			battle.grid.get_occupant(players[i].grid_position), players[i],
-			"player %d registered on the grid" % i
-		)
-
-	# Each enemy spawn position holds an enemy of the named id.
-	for spawn in encounter.enemy_spawns:
-		var pos: Vector2i = spawn.get("pos", Vector2i.ZERO)
-		var enemy_id: StringName = spawn.get("enemy", &"")
-		var occupant: Variant = battle.grid.get_occupant(pos)
-		assert_true(occupant is Combatant, "an enemy occupies spawn %s" % pos)
-		var unit: Combatant = occupant as Combatant
-		assert_eq(unit.team, Combatant.Team.ENEMY, "occupant at %s is on the enemy team" % pos)
+	# Each enemy combatant carries the matching authored EnemyData.
+	var spawned_ids: Array = []
+	for unit in enemies:
+		assert_eq(unit.team, Combatant.Team.ENEMY, "enemy unit is on the enemy team")
 		var data: EnemyData = unit.source_data as EnemyData
-		assert_eq(data.id, enemy_id, "enemy at %s is '%s'" % [pos, enemy_id])
+		assert_not_null(data, "enemy carries EnemyData")
+		spawned_ids.append(data.id)
+	for enemy_id in encounter.enemies:
+		assert_true(spawned_ids.has(enemy_id), "enemy '%s' was spawned" % enemy_id)
 
 
 func test_deck_assembled_from_party_and_excludes_innate() -> void:
@@ -125,7 +97,6 @@ func test_deck_assembled_from_party_and_excludes_innate() -> void:
 	var vanguard: CharacterData = _db.get_character(&"vanguard")
 	var mage: CharacterData = _db.get_character(&"mage")
 
-	# Expected non-innate count = union of both starting decks minus any innate card.
 	var expected: int = 0
 	for character in [vanguard, mage]:
 		for card_id in character.starting_deck:
@@ -139,7 +110,6 @@ func test_deck_assembled_from_party_and_excludes_innate() -> void:
 		"deck holds exactly the party's non-innate starting cards"
 	)
 
-	# Innate Strike/Defend must NOT be in the assembled deck (ADR-0005).
 	for card in battle.deck.all_cards():
 		assert_false(card.innate, "no innate card '%s' is in the deck" % card.id)
 		assert_false(
@@ -156,35 +126,25 @@ func test_enemy_phase_drives_ai_enemies_act() -> void:
 	var battle: EncounterBattle = _build()
 	assert_not_null(battle.enemy_ai, "an EnemyAI is injected into the battle")
 
-	# Snapshot pre-phase state: total player HP and each enemy's position.
-	var players_hp_before: int = 0
-	for p in battle.living_players():
-		players_hp_before += p.hp
-	var enemy_positions_before: Dictionary = {}
-	for e in battle.living_enemies():
-		enemy_positions_before[e] = e.grid_position
-
-	# Run one full player turn so the enemy phase fires (end_player_turn ->
-	# _run_enemy_phase -> _take_enemy_action -> enemy_ai.take_turn).
-	battle.start_player_turn()
-	battle.end_player_turn()
-
-	var players_hp_after: int = 0
-	for p in battle.living_players():
-		players_hp_after += p.hp
-
-	var any_enemy_moved: bool = false
-	for e in battle.living_enemies():
-		if enemy_positions_before.has(e) and enemy_positions_before[e] != e.grid_position:
-			any_enemy_moved = true
+	# Run up to a few full turns; with mostly-offensive enemies, a player takes
+	# damage on the enemy phase. (Positionless: enemies attack rather than move.)
+	var hp_before: int = _total_player_hp(battle)
+	var damaged: bool = false
+	for _turn in range(3):
+		battle.start_player_turn()
+		battle.end_player_turn()
+		if _total_player_hp(battle) < hp_before:
+			damaged = true
 			break
 
-	# The AI either closed distance (moved) or struck a player (hp dropped). Both
-	# only happen if take_turn() actually ran via the overridden hook.
-	assert_true(
-		any_enemy_moved or players_hp_after < players_hp_before,
-		"enemies acted via the AI on the enemy phase (a player took damage or an enemy moved)"
-	)
+	assert_true(damaged, "a player took damage on the enemy phase (AI ran via the hook)")
+
+
+func _total_player_hp(battle: BattleState) -> int:
+	var total: int = 0
+	for p in battle.living_players():
+		total += p.hp
+	return total
 
 
 # ============================================================================
@@ -198,14 +158,12 @@ func test_killing_all_enemies_reports_win() -> void:
 		"battle starts ONGOING with both sides alive"
 	)
 
-	# Script lethal damage onto every enemy through the real damage path.
 	for enemy in battle.living_enemies():
 		battle.deal_damage(enemy, enemy.hp + enemy.block + 1)
 
 	assert_eq(battle.living_enemies().size(), 0, "all enemies are dead")
 	assert_eq(battle.check_outcome(), BattleState.Outcome.WIN, "all enemies dead => WIN")
 
-	# Convenience reader returns the same outcome.
 	assert_eq(
 		_assembler().current_outcome(battle), BattleState.Outcome.WIN,
 		"current_outcome() mirrors check_outcome()"

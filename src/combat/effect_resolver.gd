@@ -5,11 +5,13 @@ extends RefCounted
 ## and translates it into exactly ONE BattleContext call (src/combat/battle_context.gd).
 ##
 ## Scope (deliberately narrow):
-##   - Targeting/selection is NOT here. The card-play task chooses `target` and
-##     hands it over already resolved; the resolver just applies the effect.
+##   - Targeting/selection is NOT here. The card-play / AI layer resolves the
+##     target set (positionless, by TargetSpec.target_type) and hands each
+##     concrete target over; the resolver just applies the effect.
 ##   - Only the §2.3 PROTOTYPE registry is handled: damage, block, heal,
-##     apply_status, move, push, draw, gain_energy. Deferred types (summon,
-##     teleport, …) are intentionally unknown until their handler ships.
+##     apply_status, draw, gain_energy. Positional effects (move, push) were
+##     removed with the grid (ADR-0013). Deferred types (summon, teleport, …)
+##     are intentionally unknown until their handler ships.
 ##
 ## Error reporting follows the ContentDatabase pattern (detection vs. reporting):
 ##   - resolve()        : COLLECTS an unknown-type problem into the returned
@@ -27,8 +29,6 @@ const HANDLED_TYPES: Array[StringName] = [
 	&"block",
 	&"heal",
 	&"apply_status",
-	&"move",
-	&"push",
 	&"draw",
 	&"gain_energy",
 ]
@@ -63,13 +63,6 @@ func resolve(effect: Effect, source: Variant, target: Variant, context: BattleCo
 			context.heal(target, effect.amount)
 		&"apply_status":
 			context.apply_status(target, effect.status, effect.stacks)
-		&"move":
-			# The acting unit (source) relocates onto the resolved destination
-			# tile. Targeting picked the tile and handed it over as `target`.
-			context.move_unit(source, _as_tile(target))
-		&"push":
-			# Shove `target` `amount` tiles away from the acting unit (source).
-			context.push_unit(target, effect.amount, source)
 		&"draw":
 			context.draw_cards(effect.amount)
 		&"gain_energy":
@@ -90,13 +83,3 @@ func resolve_and_report(effect: Effect, source: Variant, target: Variant, contex
 	if not result.ok:
 		push_error("[EffectResolver] " + result.error)
 	return result
-
-
-## Normalize a resolved `move` target into a tile coord. A tile target is a
-## Vector2i already; anything else is passed straight through so a context that
-## models units-as-tiles still works. Kept tiny and isolated so the destination
-## convention lives in one place.
-func _as_tile(target: Variant) -> Vector2i:
-	if target is Vector2i:
-		return target
-	return Vector2i.ZERO

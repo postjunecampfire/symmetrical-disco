@@ -1,5 +1,5 @@
 extends "res://addons/gut/test.gd"
-## GUT suite for src/combat/effect_resolver.gd (task P1·03).
+## GUT suite for src/combat/effect_resolver.gd (task P1·03, positionless ADR-0013).
 ##
 ## Each prototype effect type (§2.3) is dispatched through the resolver onto a
 ## lightweight stub context that simply RECORDS the call (method name + args).
@@ -7,10 +7,7 @@ extends "res://addons/gut/test.gd"
 ## the right arguments — never more than one call per effect — and that an
 ## unknown effect.type is reported (detection path) without mutating anything.
 ##
-## The stub EXTENDS BattleContext and overrides each method to record the call
-## (method name + args). Extending (rather than duck-typing) keeps it
-## type-compatible with the resolver's `context: BattleContext` parameter under
-## strict static type checking, while still capturing dispatch for assertions.
+## Positionless: there are no move/push effects (removed with the grid).
 
 const EffectResolverScript := preload("res://src/combat/effect_resolver.gd")
 
@@ -34,12 +31,6 @@ class RecordingContext extends BattleContext:
 
 	func apply_status(target: Variant, status_id: StringName, stacks: int) -> void:
 		_record(&"apply_status", [target, status_id, stacks])
-
-	func move_unit(unit: Variant, to_tile: Vector2i) -> void:
-		_record(&"move_unit", [unit, to_tile])
-
-	func push_unit(target: Variant, amount: int, from: Variant) -> void:
-		_record(&"push_unit", [target, amount, from])
 
 	func draw_cards(n: int) -> void:
 		_record(&"draw_cards", [n])
@@ -117,37 +108,6 @@ func test_apply_status_passes_status_id_and_stacks() -> void:
 	assert_eq(ctx.calls[0]["args"], [&"goblin", &"poison", 3])
 
 
-# --- move -------------------------------------------------------------------
-
-func test_move_moves_source_unit_onto_target_tile() -> void:
-	# move retargets the ACTING unit (source) onto the resolved destination tile,
-	# which is handed over as `target`.
-	var ctx := RecordingContext.new()
-	var e := _effect(&"move")
-	var dest := Vector2i(3, 4)
-	var result := _resolver().resolve(e, &"hero", dest, ctx)
-
-	assert_true(result.ok)
-	assert_eq(ctx.calls.size(), 1)
-	assert_eq(ctx.calls[0]["method"], &"move_unit")
-	assert_eq(ctx.calls[0]["args"], [&"hero", dest])
-
-
-# --- push -------------------------------------------------------------------
-
-func test_push_shoves_target_away_from_source() -> void:
-	var ctx := RecordingContext.new()
-	var e := _effect(&"push")
-	e.amount = 2
-	var result := _resolver().resolve(e, &"hero", &"goblin", ctx)
-
-	assert_true(result.ok)
-	assert_eq(ctx.calls.size(), 1)
-	assert_eq(ctx.calls[0]["method"], &"push_unit")
-	# push_unit(target, amount, from) — `from` is the acting source.
-	assert_eq(ctx.calls[0]["args"], [&"goblin", 2, &"hero"])
-
-
 # --- draw -------------------------------------------------------------------
 
 func test_draw_calls_draw_cards_with_amount() -> void:
@@ -174,6 +134,23 @@ func test_gain_energy_calls_add_energy_with_amount() -> void:
 	assert_eq(ctx.calls.size(), 1)
 	assert_eq(ctx.calls[0]["method"], &"add_energy")
 	assert_eq(ctx.calls[0]["args"], [1])
+
+
+# --- removed positional types are now unknown -------------------------------
+
+func test_move_effect_type_is_now_unknown() -> void:
+	# `move` was removed with the grid (ADR-0013); it must no longer resolve.
+	var ctx := RecordingContext.new()
+	var result := _resolver().resolve(_effect(&"move"), &"hero", &"target", ctx)
+	assert_false(result.ok, "move is no longer a handled effect type")
+	assert_eq(ctx.calls.size(), 0, "removed type applies nothing")
+
+
+func test_push_effect_type_is_now_unknown() -> void:
+	var ctx := RecordingContext.new()
+	var result := _resolver().resolve(_effect(&"push"), &"hero", &"target", ctx)
+	assert_false(result.ok, "push is no longer a handled effect type")
+	assert_eq(ctx.calls.size(), 0, "removed type applies nothing")
 
 
 # --- unknown type (detection path) ------------------------------------------
@@ -210,3 +187,5 @@ func test_handled_types_match_prototype_registry() -> void:
 	handled.sort()
 	expected.sort()
 	assert_eq(handled, expected, "handled types mirror the loader's registry")
+	assert_false(handled.has(&"move"), "move removed from the registry")
+	assert_false(handled.has(&"push"), "push removed from the registry")

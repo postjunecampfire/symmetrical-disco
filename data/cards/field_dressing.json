@@ -6,8 +6,13 @@
   "energy_cost": 1,
   "keywords": [],
   "rarity": "common",
-  "target": { "target_type": "ally", "range": 2, "shape": "single" },
+  "target": {
+    "target_type": "ally"
+  },
   "effects": [
-    { "type": "heal", "amount": 6 }
+    {
+      "type": "heal",
+      "amount": 6
+    }
   ]
 }

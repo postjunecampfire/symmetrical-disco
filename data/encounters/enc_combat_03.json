@@ -1,12 +1,10 @@
 {
   "id": "enc_combat_03",
   "display_name": "Venom Thicket",
-  "grid_size": [7, 7],
-  "player_spawns": [[1, 3], [1, 4]],
-  "enemy_spawns": [
-    { "enemy": "skirmisher", "pos": [5, 2] },
-    { "enemy": "skirmisher", "pos": [5, 5] },
-    { "enemy": "hexer", "pos": [6, 3] }
-  ],
-  "win_condition": "defeat_all"
+  "win_condition": "defeat_all",
+  "enemies": [
+    "skirmisher",
+    "skirmisher",
+    "hexer"
+  ]
 }

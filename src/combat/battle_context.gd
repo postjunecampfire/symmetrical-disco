@@ -10,14 +10,9 @@ extends RefCounted
 ## seam between "what an effect means" (data, §2.3) and "how combat changes"
 ## (state). Do not grow it without a matching effect-type/registry change.
 ##
-## Conventions:
-##   - `target` / `unit` / `source` are opaque to the resolver: they are whatever
-##     the battle state uses for units (an id, a node, a unit object). The
-##     resolver never inspects them; it only passes them through. P1·04 picks the
-##     concrete type.
-##   - Tile coords are `Vector2i` (matches GridModel / data-schemas.md §6).
-##   - These methods are the WHOLE contract. The resolver calls nothing else on
-##     the context.
+## Positionless (ADR-0013): there are no move/push primitives — combat has no
+## board. `target` / `source` are opaque to the resolver (a Combatant in P1·04);
+## the resolver never inspects them, it only passes them through.
 ##
 ## The bodies below are unimplemented stubs that push_error() if called. A real
 ## context (P1·04) overrides every one. The test suite supplies its own stub
@@ -42,19 +37,6 @@ func heal(_target: Variant, _amount: int) -> void:
 ## Add `stacks` of status `status_id` to `target`. (effect.type == "apply_status")
 func apply_status(_target: Variant, _status_id: StringName, _stacks: int) -> void:
 	push_error("BattleContext.apply_status() not implemented")
-
-
-## Move `unit` onto tile `to_tile`. (effect.type == "move")
-## The acting unit relocates to the resolved destination tile.
-func move_unit(_unit: Variant, _to_tile: Vector2i) -> void:
-	push_error("BattleContext.move_unit() not implemented")
-
-
-## Shove `target` `amount` tiles directly away from `from`. (effect.type == "push")
-## `from` is the push origin (the source/acting unit's position or unit); the
-## context computes the displaced destination and applies any collision rules.
-func push_unit(_target: Variant, _amount: int, _from: Variant) -> void:
-	push_error("BattleContext.push_unit() not implemented")
 
 
 ## Draw `n` cards for the active side. (effect.type == "draw")

@@ -25,8 +25,6 @@ const EFFECT_TYPES: Array[StringName] = [
 	&"block",
 	&"heal",
 	&"apply_status",
-	&"move",
-	&"push",
 	&"draw",
 	&"gain_energy",
 ]
@@ -232,9 +230,6 @@ func _parse_target(value: Variant) -> TargetSpec:
 		return t
 	var d: Dictionary = value
 	t.target_type = _sn(d.get("target_type"), &"enemy")
-	t.range = _int(d.get("range"), 1)
-	t.shape = _sn(d.get("shape"), &"single")
-	t.radius = _int(d.get("radius"), 0)
 	return t
 
 
@@ -262,8 +257,8 @@ func _parse_effects(value: Variant, source: String, label: String) -> Array[Effe
 		e.amount = _int(d.get("amount"), 0)
 		e.status = _sn(d.get("status"), &"")
 		e.stacks = _int(d.get("stacks"), 0)
-		if d.has("target_override") and d["target_override"] != null:
-			e.target_override = _parse_target(d["target_override"])
+		# Positionless (ADR-0013): per-effect target_override was removed; every
+		# effect applies to its card/intent's resolved target set.
 		if d.has("params") and typeof(d["params"]) == TYPE_DICTIONARY:
 			e.params = d["params"]
 		out.append(e)
@@ -312,14 +307,12 @@ func _parse_character(d: Dictionary, source: String) -> Dictionary:
 	ok = _require(d, "id", source, "character") and ok
 	ok = _require(d, "display_name", source, "character") and ok
 	ok = _require(d, "max_hp", source, "character") and ok
-	ok = _require(d, "move_range", source, "character") and ok
 	if not ok:
 		return {}
 	var ch := CharacterData.new()
 	ch.id = _sn(d.get("id"))
 	ch.display_name = _str(d.get("display_name"))
 	ch.max_hp = _int(d.get("max_hp"), 30)
-	ch.move_range = _int(d.get("move_range"), 3)
 	ch.speed = _int(d.get("speed"), 10)
 	if d.has("innate_actions"):
 		ch.innate_actions = _sn_array(d.get("innate_actions"))
@@ -334,7 +327,6 @@ func _parse_enemy(d: Dictionary, source: String) -> Dictionary:
 	ok = _require(d, "id", source, "enemy") and ok
 	ok = _require(d, "display_name", source, "enemy") and ok
 	ok = _require(d, "max_hp", source, "enemy") and ok
-	ok = _require(d, "move_range", source, "enemy") and ok
 	ok = _require(d, "intents", source, "enemy") and ok
 	if not ok:
 		return {}
@@ -342,7 +334,6 @@ func _parse_enemy(d: Dictionary, source: String) -> Dictionary:
 	en.id = _sn(d.get("id"))
 	en.display_name = _str(d.get("display_name"))
 	en.max_hp = _int(d.get("max_hp"), 20)
-	en.move_range = _int(d.get("move_range"), 2)
 	en.speed = _int(d.get("speed"), 8)
 	en.intent_pattern = _sn(d.get("intent_pattern"), &"random_weighted")
 	en.intents = _parse_intents(d.get("intents"), source, en.id)
@@ -379,49 +370,17 @@ func _parse_encounter(d: Dictionary, source: String) -> Dictionary:
 	var ok := true
 	ok = _require(d, "id", source, "encounter") and ok
 	ok = _require(d, "display_name", source, "encounter") and ok
-	ok = _require(d, "grid_size", source, "encounter") and ok
-	ok = _require(d, "player_spawns", source, "encounter") and ok
-	ok = _require(d, "enemy_spawns", source, "encounter") and ok
+	ok = _require(d, "enemies", source, "encounter") and ok
 	if not ok:
 		return {}
 	var enc := EncounterData.new()
 	enc.id = _sn(d.get("id"))
 	enc.display_name = _str(d.get("display_name"))
-	enc.grid_size = _vector2i(d.get("grid_size"))
 	enc.win_condition = _sn(d.get("win_condition"), &"defeat_all")
 	enc.win_param = _int(d.get("win_param"), 0)
 	enc.rewards = _sn_array(d.get("rewards"))
-
-	var player_spawns: Array[Vector2i] = []
-	if typeof(d.get("player_spawns")) == TYPE_ARRAY:
-		for p in d["player_spawns"]:
-			player_spawns.append(_vector2i(p))
-	enc.player_spawns = player_spawns
-
-	var spawns: Array[Dictionary] = []
-	if typeof(d.get("enemy_spawns")) == TYPE_ARRAY:
-		for raw in d["enemy_spawns"]:
-			if typeof(raw) != TYPE_DICTIONARY:
-				_result.add_error("encounter '%s' in %s has a non-object enemy spawn" % [enc.id, source])
-				continue
-			var sd: Dictionary = raw
-			if not _require(sd, "enemy", source, "encounter '%s' spawn" % enc.id):
-				continue
-			spawns.append({
-				"enemy": _sn(sd.get("enemy")),
-				"pos": _vector2i(sd.get("pos")),
-			})
-	enc.enemy_spawns = spawns
-
-	var terrain: Array[Dictionary] = []
-	if typeof(d.get("terrain")) == TYPE_ARRAY:
-		for raw in d["terrain"]:
-			if typeof(raw) == TYPE_DICTIONARY:
-				terrain.append({
-					"pos": _vector2i(raw.get("pos")),
-					"terrain": _sn(raw.get("terrain"), &"plains"),
-				})
-	enc.terrain = terrain
+	# Positionless (ADR-0013): an encounter is a flat roster of enemy ids.
+	enc.enemies = _sn_array(d.get("enemies"))
 
 	return {"id": enc.id, "value": enc}
 
@@ -481,11 +440,10 @@ func _validate_references() -> void:
 		for it in en.intents:
 			_validate_effect_statuses(it.effects, "enemy '%s' intent '%s'" % [en.id, it.id])
 
-	# encounter.enemy_spawns.enemy -> an enemy id
+	# encounter.enemies -> enemy ids
 	for id in encounters:
 		var enc: EncounterData = encounters[id]
-		for spawn in enc.enemy_spawns:
-			var enemy_id: StringName = spawn.get("enemy", &"")
+		for enemy_id in enc.enemies:
 			if not enemies.has(enemy_id):
 				_result.add_error(
 					"encounter '%s' spawns unknown enemy '%s'" % [enc.id, enemy_id]

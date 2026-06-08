@@ -7,8 +7,13 @@
   "keywords": [],
   "innate": true,
   "rarity": "common",
-  "target": { "target_type": "self", "range": 0, "shape": "single" },
+  "target": {
+    "target_type": "self"
+  },
   "effects": [
-    { "type": "block", "amount": 5 }
+    {
+      "type": "block",
+      "amount": 5
+    }
   ]
 }

@@ -1,11 +1,9 @@
 {
   "id": "enc_combat_01",
   "display_name": "Patrol Skirmish",
-  "grid_size": [6, 6],
-  "player_spawns": [[1, 2], [1, 3]],
-  "enemy_spawns": [
-    { "enemy": "grunt", "pos": [4, 1] },
-    { "enemy": "grunt", "pos": [4, 4] }
-  ],
-  "win_condition": "defeat_all"
+  "win_condition": "defeat_all",
+  "enemies": [
+    "grunt",
+    "grunt"
+  ]
 }

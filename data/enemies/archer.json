@@ -2,26 +2,39 @@
   "id": "archer",
   "display_name": "Archer",
   "max_hp": 16,
-  "move_range": 3,
   "speed": 12,
   "intent_pattern": "random_weighted",
   "intents": [
     {
       "id": "archer_shot",
       "telegraph": "attack",
-      "target": { "target_type": "enemy", "range": 4, "shape": "single" },
+      "target": {
+        "target_type": "enemy"
+      },
       "effects": [
-        { "type": "damage", "amount": 5 }
+        {
+          "type": "damage",
+          "amount": 5
+        }
       ],
       "weight": 3
     },
     {
       "id": "archer_crippling_shot",
       "telegraph": "debuff",
-      "target": { "target_type": "enemy", "range": 4, "shape": "single" },
+      "target": {
+        "target_type": "enemy"
+      },
       "effects": [
-        { "type": "damage", "amount": 2 },
-        { "type": "apply_status", "status": "weak", "stacks": 1 }
+        {
+          "type": "damage",
+          "amount": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 1
+        }
       ],
       "weight": 2
     }

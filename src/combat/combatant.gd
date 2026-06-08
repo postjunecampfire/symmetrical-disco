@@ -3,9 +3,13 @@ extends RefCounted
 ## Runtime state for ONE unit in a battle (task P1·04). This is the mutable,
 ## per-battle counterpart to the authored data Resource (CharacterData /
 ## EnemyData, data-schemas.md §4/§5): the Resource is the immutable definition,
-## this is the live unit that takes damage, holds block, accrues statuses, and
-## stands on a tile. Many Combatants can share one data Resource (e.g. three
-## copies of the same grunt) without mutating it.
+## this is the live unit that takes damage, holds block, and accrues statuses.
+## Many Combatants can share one data Resource (e.g. three copies of the same
+## grunt) without mutating it.
+##
+## Positionless (ADR-0013): a unit has no tile or movement — it is a bag of
+## hp/block/statuses fighting for a team. Targeting is by kind (TargetSpec), not
+## location.
 ##
 ## Statuses are stored as a flat dictionary `status_id (StringName) -> stacks
 ## (int)`. BattleState owns the BEHAVIOUR keyed by id (poison damages, stun
@@ -13,8 +17,7 @@ extends RefCounted
 ## first-class field (not a status entry) because incoming damage consumes it
 ## every hit, while StatusData drives how/whether it decays per turn.
 
-## Team a unit fights for. Strict two-side prototype (data-schemas.md §12 turn
-## order resolved as player-phase / enemy-phase).
+## Team a unit fights for. Strict two-side prototype.
 enum Team { PLAYER, ENEMY }
 
 ## Stable display name for logs/UI, copied from the source data on construction.
@@ -33,15 +36,8 @@ var block: int = 0
 ## reads/ticks this; the Combatant just stores it.
 var statuses: Dictionary = {}
 
-## Grid position (tile coord). BattleState keeps this in sync with the GridModel
-## occupant registry when the unit moves.
-var grid_position: Vector2i = Vector2i.ZERO
-
 ## Which side this unit fights for.
 var team: Team = Team.PLAYER
-
-## Tiles this unit may move per move action (from the source data's move_range).
-var move_range: int = 0
 
 ## Link back to the authored definition (CharacterData or EnemyData). Kept as the
 ## seam to source values (speed, intents, innate_actions, …) without copying them
@@ -49,29 +45,25 @@ var move_range: int = 0
 var source_data: Resource = null
 
 
-## Build a player combatant from CharacterData, spawned at `spawn`.
-static func from_character(data: CharacterData, spawn: Vector2i) -> Combatant:
+## Build a player combatant from CharacterData.
+static func from_character(data: CharacterData) -> Combatant:
 	var c := Combatant.new()
 	c.source_data = data
 	c.team = Team.PLAYER
 	c.display_name = data.display_name
 	c.max_hp = data.max_hp
 	c.hp = data.max_hp
-	c.move_range = data.move_range
-	c.grid_position = spawn
 	return c
 
 
-## Build an enemy combatant from EnemyData, spawned at `spawn`.
-static func from_enemy(data: EnemyData, spawn: Vector2i) -> Combatant:
+## Build an enemy combatant from EnemyData.
+static func from_enemy(data: EnemyData) -> Combatant:
 	var c := Combatant.new()
 	c.source_data = data
 	c.team = Team.ENEMY
 	c.display_name = data.display_name
 	c.max_hp = data.max_hp
 	c.hp = data.max_hp
-	c.move_range = data.move_range
-	c.grid_position = spawn
 	return c
 
 

@@ -3,22 +3,36 @@
     "id": "grunt",
     "display_name": "Grunt",
     "max_hp": 20,
-    "move_range": 2,
     "speed": 8,
     "intent_pattern": "random_weighted",
     "intents": [
       {
         "id": "grunt_swing",
         "telegraph": "attack",
-        "target": { "target_type": "enemy", "range": 1 },
-        "effects": [ { "type": "damage", "amount": 5 } ],
+        "target": {
+          "target_type": "enemy"
+        },
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 5
+          }
+        ],
         "weight": 2
       },
       {
         "id": "grunt_poison",
         "telegraph": "debuff",
-        "target": { "target_type": "enemy", "range": 1 },
-        "effects": [ { "type": "apply_status", "status": "poison", "stacks": 2 } ],
+        "target": {
+          "target_type": "enemy"
+        },
+        "effects": [
+          {
+            "type": "apply_status",
+            "status": "poison",
+            "stacks": 2
+          }
+        ],
         "weight": 1
       }
     ]

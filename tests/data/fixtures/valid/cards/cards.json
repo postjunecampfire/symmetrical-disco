@@ -5,20 +5,38 @@
     "character_tag": "neutral",
     "innate": true,
     "energy_cost": 1,
-    "target": { "target_type": "enemy", "range": 1 },
-    "effects": [ { "type": "damage", "amount": 4 } ]
+    "target": {
+      "target_type": "enemy"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "amount": 4
+      }
+    ]
   },
   {
     "id": "shield_bash",
     "display_name": "Shield Bash",
     "character_tag": "vanguard",
     "energy_cost": 1,
-    "keywords": ["exhaust"],
+    "keywords": [
+      "exhaust"
+    ],
     "rarity": "common",
-    "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+    "target": {
+      "target_type": "enemy"
+    },
     "effects": [
-      { "type": "damage", "amount": 6 },
-      { "type": "apply_status", "status": "stun", "stacks": 1 }
+      {
+        "type": "damage",
+        "amount": 6
+      },
+      {
+        "type": "apply_status",
+        "status": "stun",
+        "stacks": 1
+      }
     ]
   }
 ]

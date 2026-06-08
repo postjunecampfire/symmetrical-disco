@@ -1,14 +1,25 @@
 {
   "id": "frost_nova",
   "display_name": "Frost Nova",
-  "description": "Deal 4 damage and apply 1 Weak to all enemies in a 1-tile radius. Exhaust.",
+  "description": "Deal 4 damage and apply 1 Weak to all enemies. Exhaust.",
   "character_tag": "mage",
   "energy_cost": 2,
-  "keywords": ["exhaust"],
+  "keywords": [
+    "exhaust"
+  ],
   "rarity": "uncommon",
-  "target": { "target_type": "tile", "range": 3, "shape": "area", "radius": 1 },
+  "target": {
+    "target_type": "all_enemies"
+  },
   "effects": [
-    { "type": "damage", "amount": 4 },
-    { "type": "apply_status", "status": "weak", "stacks": 1 }
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
   ]
 }

@@ -1,12 +1,10 @@
 {
   "id": "enc_boss_01",
   "display_name": "The Iron Warden",
-  "grid_size": [8, 8],
-  "player_spawns": [[1, 3], [1, 4]],
-  "enemy_spawns": [
-    { "enemy": "iron_warden", "pos": [6, 4] },
-    { "enemy": "archer", "pos": [7, 1] },
-    { "enemy": "archer", "pos": [7, 7] }
-  ],
-  "win_condition": "defeat_all"
+  "win_condition": "defeat_all",
+  "enemies": [
+    "iron_warden",
+    "archer",
+    "archer"
+  ]
 }

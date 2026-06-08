@@ -7,8 +7,13 @@
   "keywords": [],
   "innate": true,
   "rarity": "common",
-  "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+  "target": {
+    "target_type": "enemy"
+  },
   "effects": [
-    { "type": "damage", "amount": 4 }
+    {
+      "type": "damage",
+      "amount": 4
+    }
   ]
 }

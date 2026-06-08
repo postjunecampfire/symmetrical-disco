@@ -4,10 +4,17 @@
   "description": "Deal 5 damage at range. Return this card to your hand.",
   "character_tag": "mage",
   "energy_cost": 1,
-  "keywords": ["return"],
+  "keywords": [
+    "return"
+  ],
   "rarity": "common",
-  "target": { "target_type": "enemy", "range": 4, "shape": "single" },
+  "target": {
+    "target_type": "enemy"
+  },
   "effects": [
-    { "type": "damage", "amount": 5 }
+    {
+      "type": "damage",
+      "amount": 5
+    }
   ]
 }

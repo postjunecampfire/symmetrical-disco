@@ -2,25 +2,34 @@
   "id": "grunt",
   "display_name": "Grunt",
   "max_hp": 22,
-  "move_range": 2,
   "speed": 8,
   "intent_pattern": "random_weighted",
   "intents": [
     {
       "id": "grunt_slash",
       "telegraph": "attack",
-      "target": { "target_type": "enemy", "range": 1, "shape": "single" },
+      "target": {
+        "target_type": "enemy"
+      },
       "effects": [
-        { "type": "damage", "amount": 7 }
+        {
+          "type": "damage",
+          "amount": 7
+        }
       ],
       "weight": 3
     },
     {
       "id": "grunt_guard",
       "telegraph": "block",
-      "target": { "target_type": "self", "range": 0, "shape": "single" },
+      "target": {
+        "target_type": "self"
+      },
       "effects": [
-        { "type": "block", "amount": 6 }
+        {
+          "type": "block",
+          "amount": 6
+        }
       ],
       "weight": 1
     }

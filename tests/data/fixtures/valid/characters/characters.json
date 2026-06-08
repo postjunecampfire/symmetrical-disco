@@ -3,10 +3,15 @@
     "id": "vanguard",
     "display_name": "Vanguard",
     "max_hp": 30,
-    "move_range": 3,
     "speed": 10,
-    "innate_actions": ["strike"],
-    "starting_deck": ["shield_bash"],
-    "tags": ["melee"]
+    "innate_actions": [
+      "strike"
+    ],
+    "starting_deck": [
+      "shield_bash"
+    ],
+    "tags": [
+      "melee"
+    ]
   }
 ]

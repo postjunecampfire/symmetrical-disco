@@ -2,17 +2,19 @@
   "id": "vanguard",
   "display_name": "Vanguard",
   "max_hp": 34,
-  "move_range": 3,
   "speed": 9,
-  "innate_actions": ["strike", "defend"],
+  "innate_actions": [
+    "strike",
+    "defend"
+  ],
   "starting_deck": [
     "shield_bash",
     "bulwark",
-    "cleaving_blow",
     "rallying_shout",
-    "field_dressing",
-    "reposition"
+    "field_dressing"
   ],
-  "tags": ["melee"],
+  "tags": [
+    "melee"
+  ],
   "sprite": "res://assets/characters/vanguard.png"
 }
