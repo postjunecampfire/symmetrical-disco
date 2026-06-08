@@ -37,7 +37,8 @@ func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
 # --- Run lifecycle ----------------------------------------------------------
 
 ## Begin a run: full HP for each party member, run deck = union of starting decks
-## (tracked for future drafting; combat currently uses the assembled starting deck).
+## (plus each race's custom card). This run deck drives the combat deck (P2·06), so
+## race custom cards and later drafted rewards appear in fights.
 ## `races` (optional) maps a party character id to a race id (ADR-0015); race CON
 ## raises that member's starting/max HP, and the race's custom card joins the run deck.
 func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> void:
@@ -70,8 +71,11 @@ func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int =
 		return BattleState.Outcome.LOSS
 
 	var carried: Dictionary = _carried_for_next_fight()
+	# Combat deck is built from the accumulated run deck (P2·06): race custom cards
+	# and drafted rewards in RunState.run_deck now appear in the fight, not just the
+	# class starting decks. The assembler falls back to starting decks if it is empty.
 	var battle: EncounterBattle = _assembler.build(
-		encounter, db, run.party, run.seed, carried, _party_races
+		encounter, db, run.party, run.seed, carried, _party_races, run.run_deck
 	)
 	var card_play: CardPlay = CardPlay.new(battle)
 

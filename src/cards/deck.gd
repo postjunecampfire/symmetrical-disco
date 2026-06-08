@@ -66,21 +66,38 @@ func set_seed(rng_seed: int) -> void:
 ## `draw_pile` UNSHUFFLED (assembly order); call `shuffle_draw_pile()` or
 ## `start_battle()` to randomise. All other piles are cleared.
 func assemble(party: Array[CharacterData], card_lookup: Dictionary) -> void:
+	var card_ids: Array[StringName] = []
+	for character in party:
+		if character == null:
+			continue
+		for card_id in character.starting_deck:
+			card_ids.append(card_id)
+	assemble_from_card_ids(card_ids, card_lookup)
+
+
+## Build the shared draw pile from an EXPLICIT list of card ids (the run deck:
+## starting-deck cards plus race custom cards and drafted rewards — P2·06 /
+## ADR-0015). This is the seam that lets a run's accumulated deck — not just each
+## class's starting deck — drive a fight, so race/reward cards actually appear.
+##
+## Same rules as `assemble`: innate actions are EXCLUDED (ADR-0005) and unknown
+## ids are skipped (id validity is the loader's job). Duplicate ids produce
+## duplicate cards (each resolves to the same shared CardData instance, matching
+## how starting decks with repeats already behave). Resulting `draw_pile` is
+## UNSHUFFLED; all other piles are cleared.
+func assemble_from_card_ids(card_ids: Array[StringName], card_lookup: Dictionary) -> void:
 	draw_pile.clear()
 	hand.clear()
 	discard_pile.clear()
 	exhaust_pile.clear()
 
-	for character in party:
-		if character == null:
+	for card_id in card_ids:
+		if not card_lookup.has(card_id):
 			continue
-		for card_id in character.starting_deck:
-			if not card_lookup.has(card_id):
-				continue
-			var card: CardData = card_lookup[card_id]
-			if card == null or card.innate:
-				continue  # Innate actions never enter the deck (ADR-0005).
-			draw_pile.append(card)
+		var card: CardData = card_lookup[card_id]
+		if card == null or card.innate:
+			continue  # Innate actions never enter the deck (ADR-0005).
+		draw_pile.append(card)
 
 
 ## Convenience entry point for the start of a battle: shuffle the assembled draw

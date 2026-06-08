@@ -33,13 +33,20 @@ extends RefCounted
 ## `carried_hp` (character_id -> hp) lets the run layer (ADR-0012 §8) spawn party
 ## members at their carried-over HP instead of full; a downed unit's revive value
 ## is resolved by the caller before this. Omitted/empty -> everyone spawns full.
+## `run_deck` (optional, P2·06 / ADR-0015): when non-empty, the shared combat deck
+## is assembled from these card ids — the run's accumulated deck (starting cards +
+## race custom cards + drafted rewards) — instead of the party starting decks, so
+## race/reward cards actually appear in fights. Omitted/empty -> fall back to the
+## party starting decks (original behaviour). Race STAT mods apply regardless (via
+## `party_races`); this wires only the CARDS.
 func build(
 	encounter: EncounterData,
 	db: ContentDatabase,
 	party_ids: Array[StringName],
 	rng_seed: int = 0,
 	carried_hp: Dictionary = {},
-	party_races: Dictionary = {}
+	party_races: Dictionary = {},
+	run_deck: Array[StringName] = []
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
@@ -48,7 +55,10 @@ func build(
 	var party: Array[CharacterData] = _resolve_party(db, party_ids)
 
 	var deck: Deck = Deck.new(config, rng_seed)
-	deck.assemble(party, db.cards)
+	if run_deck.is_empty():
+		deck.assemble(party, db.cards)
+	else:
+		deck.assemble_from_card_ids(run_deck, db.cards)
 
 	var ai: EnemyAI = EnemyAI.new(rng_seed)
 	var battle: EncounterBattle = EncounterBattle.new(config, deck, db.statuses, ai)

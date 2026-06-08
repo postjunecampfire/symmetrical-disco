@@ -108,6 +108,52 @@ func test_assembly_skips_unknown_ids() -> void:
 	assert_eq(deck.draw_pile[0].id, &"known")
 
 
+# --- assemble_from_card_ids: the run-deck seam (P2·06 / ADR-0015) -----------
+
+func test_assemble_from_card_ids_builds_pile_from_explicit_ids() -> void:
+	# The run deck drives the fight: a race custom card / drafted reward that is
+	# NOT in any starting deck still appears when passed as an explicit id.
+	var c_sig := _card("shield_bash", "fighter")
+	var c_custom := _card("orcish_rage", "orc")
+	var lookup := _lookup([c_sig, c_custom])
+
+	var deck: Deck = DeckScript.new(_config())
+	deck.assemble_from_card_ids([&"shield_bash", &"orcish_rage"] as Array[StringName], lookup)
+
+	var ids := _ids(deck.draw_pile)
+	assert_eq(deck.draw_pile.size(), 2, "Both run-deck cards enter the pile.")
+	assert_true(ids.has(&"orcish_rage"), "A custom/reward card not in any starting deck appears.")
+	assert_true(ids.has(&"shield_bash"), "The starting-deck card is still present.")
+
+
+func test_assemble_from_card_ids_excludes_innate_and_unknown() -> void:
+	var c_strike := _card("strike", "neutral", true)  # innate -> excluded
+	var c_keep := _card("keep", "neutral")
+	var lookup := _lookup([c_strike, c_keep])
+
+	var deck: Deck = DeckScript.new(_config())
+	deck.assemble_from_card_ids(
+		[&"strike", &"keep", &"missing"] as Array[StringName], lookup
+	)
+
+	assert_eq(deck.draw_pile.size(), 1, "Innate and unknown ids are skipped.")
+	assert_eq(deck.draw_pile[0].id, &"keep", "Only the valid non-innate card remains.")
+
+
+func test_assemble_from_card_ids_keeps_duplicates() -> void:
+	# Duplicate ids -> duplicate cards (matches how starting decks with repeats
+	# behave); each resolves to the same shared CardData instance.
+	var c := _card("strike_dup")
+	var lookup := _lookup([c])
+
+	var deck: Deck = DeckScript.new(_config())
+	deck.assemble_from_card_ids(
+		[&"strike_dup", &"strike_dup", &"strike_dup"] as Array[StringName], lookup
+	)
+
+	assert_eq(deck.draw_pile.size(), 3, "Each duplicate id yields a card in the pile.")
+
+
 func test_assembly_clears_other_piles() -> void:
 	var deck: Deck = DeckScript.new(_config())
 	deck.hand.append(_card("leftover"))

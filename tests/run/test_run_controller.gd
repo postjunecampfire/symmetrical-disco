@@ -132,6 +132,57 @@ func test_race_selection_applies_in_run() -> void:
 	assert_eq(fighter.max_hp, 34 + 4, "Orc +2 CON -> +4 max HP applied")
 
 
+# --- run_deck -> combat deck injection (P2·06) ------------------------------
+
+func test_run_deck_cards_appear_in_combat() -> void:
+	# An Orc Fighter's custom card (orcish_rage) lives in run_deck but in NO
+	# starting deck. With run_deck driving combat (P2·06) it must show up in the
+	# fight's shared deck. Capture the live battle through the policy.
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 5, {&"fighter": &"orc"})
+	assert_true(rc.run.run_deck.has(&"orcish_rage"), "precondition: custom card is in the run deck")
+
+	var captured: Array = []
+	var capture := func(b: Variant, _cp: Variant) -> void: captured.append(b)
+	rc.resolve_combat(&"enc_combat_01", capture)
+
+	assert_false(captured.is_empty(), "policy saw the battle")
+	var battle: Variant = captured[0]
+	assert_true(
+		_deck_has_card(battle.deck, &"orcish_rage"),
+		"the run-deck custom card appears in the assembled combat deck"
+	)
+
+
+func test_assembler_falls_back_to_starting_decks_when_run_deck_empty() -> void:
+	# With an empty run_deck the assembler must reproduce the original behaviour:
+	# the deck is the party's starting decks, so a custom-only card is absent.
+	var battle := EncounterAssemblerScript.new().build(
+		_db.get_encounter(&"enc_combat_01"), _db,
+		[&"fighter"] as Array[StringName], 5, {}, {}, [] as Array[StringName]
+	)
+	assert_false(
+		_deck_has_card(battle.deck, &"orcish_rage"),
+		"no race/reward cards leak in when run_deck is empty (starting decks only)"
+	)
+	assert_gt(_deck_card_count(battle.deck), 0, "the starting-deck fallback still builds a deck")
+
+
+## True if any zone of `deck` holds a card with `card_id` (a card lives in exactly
+## one zone, so the union across zones is the whole deck).
+func _deck_has_card(deck: Variant, card_id: StringName) -> bool:
+	for zone in [deck.draw_pile, deck.hand, deck.discard_pile, deck.exhaust_pile]:
+		for card in zone:
+			if card.id == card_id:
+				return true
+	return false
+
+
+## Total cards across all zones of `deck`.
+func _deck_card_count(deck: Variant) -> int:
+	return deck.draw_pile.size() + deck.hand.size() + deck.discard_pile.size() + deck.exhaust_pile.size()
+
+
 # --- Run-level telemetry (P2·11) --------------------------------------------
 
 ## A TelemetryLogger spy that records calls instead of writing to disk.
