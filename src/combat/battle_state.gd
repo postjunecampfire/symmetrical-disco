@@ -32,6 +32,14 @@ const STATUS_BLOCK: StringName = &"block"
 const STATUS_STUN: StringName = &"stun"
 const STATUS_STRENGTH: StringName = &"strength"
 const STATUS_WEAK: StringName = &"weak"
+## Enemy debuff-slot statuses (P2·12 follow-up / enemy kit redesign): Vulnerable
+## raises damage the target TAKES from attacks; Frail reduces block the target
+## GAINS. Both `duration`-stacking and decay one stack per turn (like Weak).
+const STATUS_VULNERABLE: StringName = &"vulnerable"
+const STATUS_FRAIL: StringName = &"frail"
+## Multipliers for the two new debuffs (behaviour in code, the FLAG in data, like Weak).
+const VULNERABLE_MULT: float = 1.5  # +50% damage taken
+const FRAIL_MULT: float = 0.5       # -50% block gained
 
 ## Effect types that act globally on the acting side rather than on a target
 ## (so they are applied once per card/intent, not once per resolved target).
@@ -214,6 +222,12 @@ func add_block(target: Variant, amount: int) -> void:
 	var unit: Combatant = _resolve_unit(target)
 	if unit == null or amount <= 0:
 		return
+	# Frail: the block-limiting debuff reduces block GAINED (floored), at the single
+	# point all block is granted, so it applies to every source symmetrically.
+	if unit.has_status(STATUS_FRAIL):
+		amount = int(floor(float(amount) * FRAIL_MULT))
+	if amount <= 0:
+		return
 	unit.block += amount
 	unit.set_status(STATUS_BLOCK, unit.block)
 
@@ -289,10 +303,15 @@ func modified_block(source: Variant, amount: int, use_dex: bool = true) -> int:
 
 
 ## Deal damage FROM `attacker` to `target`, applying strength/weak first, then the
-## defensive block/hp routing of deal_damage. This is the source-aware entry the
-## bare deal_damage cannot express; AI and apply_effects use it for `damage`.
+## target's Vulnerable (an ATTACK-only amplifier — bare deal_damage / poison stays
+## unaffected), then the defensive block/hp routing of deal_damage. This is the
+## source-aware entry the bare deal_damage cannot express; AI and apply_effects use
+## it for `damage`.
 func deal_damage_from(attacker: Combatant, target: Combatant, amount: int) -> void:
-	deal_damage(target, modified_damage(attacker, amount))
+	var dmg: int = modified_damage(attacker, amount)
+	if target != null and target.has_status(STATUS_VULNERABLE):
+		dmg = int(floor(float(dmg) * VULNERABLE_MULT))
+	deal_damage(target, dmg)
 
 
 # ============================================================================
@@ -400,11 +419,16 @@ func _tick_unit_statuses(unit: Combatant) -> void:
 		unit.block = 0
 		unit.set_status(STATUS_BLOCK, 0)
 
-	# Strength / weak: decay one stack per turn iff their StatusData says so.
+	# Strength / weak / vulnerable / frail: decay one stack per turn iff their
+	# StatusData says so (duration-style debuffs that last 1-2 turns).
 	if _status_decays(STATUS_STRENGTH):
 		unit.add_status_stacks(STATUS_STRENGTH, -1)
 	if _status_decays(STATUS_WEAK):
 		unit.add_status_stacks(STATUS_WEAK, -1)
+	if _status_decays(STATUS_VULNERABLE):
+		unit.add_status_stacks(STATUS_VULNERABLE, -1)
+	if _status_decays(STATUS_FRAIL):
+		unit.add_status_stacks(STATUS_FRAIL, -1)
 
 	# Stun is intentionally NOT decayed here. It is consumed at the moment the unit
 	# would act (`_is_stunned_and_consume`), so a stun applied before a unit's turn

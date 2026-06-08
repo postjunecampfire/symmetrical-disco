@@ -1,0 +1,6 @@
+{
+  "id": "frail",
+  "display_name": "Frail",
+  "stacking": "duration",
+  "decays_each_turn": true
+}

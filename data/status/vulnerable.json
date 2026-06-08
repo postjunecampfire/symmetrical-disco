@@ -1,0 +1,6 @@
+{
+  "id": "vulnerable",
+  "display_name": "Vulnerable",
+  "stacking": "duration",
+  "decays_each_turn": true
+}
