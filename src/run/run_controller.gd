@@ -25,8 +25,6 @@ var telemetry: TelemetryLogger
 var run: RunState
 
 var _assembler: EncounterAssembler = EncounterAssembler.new()
-## character_id -> race_id chosen at run start (ADR-0015). Applied each fight.
-var _party_races: Dictionary = {}
 ## Leveling engine (ADR-0015 / P3·05): XP -> levels -> player-allocated points.
 var _leveling: Leveling
 ## Event-node resolver (run-structure.md §6 / P2·08): applies choice outcomes.
@@ -57,7 +55,7 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 	run.party_hp = {}
 	run.downed = []
 	run.run_deck = []
-	_party_races = races.duplicate()
+	run.party_races = races.duplicate()
 	run.party_level = {}
 	run.party_xp = {}
 	run.unspent_points = {}
@@ -90,15 +88,15 @@ func begin_combat(encounter_id: StringName) -> EncounterBattle:
 	# and drafted rewards in RunState.run_deck now appear in the fight, not just the
 	# class starting decks. The assembler falls back to starting decks if it is empty.
 	return _assembler.build(
-		encounter, db, run.party, run.seed, carried, _party_races, run.run_deck,
+		encounter, db, run.party, run.seed, carried, run.party_races, run.run_deck,
 		run.allocated_stats, _active_relics()
 	)
 
 
 ## Resolve the run's relic ids (RunState.relics) to RelicData via the db, skipping
 ## any that don't resolve. The list the assembler/RelicEngine apply each fight.
-func _active_relics() -> Array:
-	var out: Array = []
+func _active_relics() -> Array[RelicData]:
+	var out: Array[RelicData] = []
 	for rid in run.relics:
 		var relic: RelicData = db.get_relic(rid)
 		if relic != null:
@@ -289,8 +287,9 @@ func _write_back_hp(battle: BattleState, outcome: int) -> void:
 		for cid in run.party:
 			if run.downed.has(cid):
 				continue
-			var ch: CharacterData = db.get_character(cid)
-			var max_hp: int = ch.max_hp if ch != null else 0
+			# Cap at EFFECTIVE max (base + race + allocated + passive relics), so a
+			# high-CON / max_hp_up build can actually heal into its headroom (review #1).
+			var max_hp: int = PartyStats.effective_max_hp(db, run, cid)
 			run.party_hp[cid] = min(max_hp, int(run.party_hp.get(cid, 0)) + heal)
 
 

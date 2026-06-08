@@ -27,8 +27,8 @@ func _relic(trigger: StringName, effect: StringName, amount: int) -> RelicData:
 	return r
 
 
-## A real assembled fight (no relics) to apply engine hooks against.
-func _battle(relics: Array = []) -> EncounterBattle:
+## A real assembled fight (relics optional) to apply engine hooks against.
+func _battle(relics: Array[RelicData] = []) -> EncounterBattle:
 	return EncounterAssemblerScript.new().build(
 		_db.get_encounter(&"enc_combat_01"), _db,
 		[&"fighter", &"mage"] as Array[StringName], 1, {}, {},
@@ -85,20 +85,20 @@ func test_mismatched_trigger_is_ignored() -> void:
 # --- Integration: assembler + EncounterBattle wiring ------------------------
 
 func test_assembler_applies_combat_start_relics() -> void:
-	var battle := _battle([_relic(&"combat_start", &"gain_block", 4)])
+	var battle := _battle([_relic(&"combat_start", &"gain_block", 4)] as Array[RelicData])
 	for unit in battle.living_players():
 		assert_eq(unit.block, 4, "assembler applied a combat_start relic at build")
 
 
 func test_encounter_battle_applies_turn_start_relics_each_turn() -> void:
-	var battle := _battle([_relic(&"turn_start", &"gain_energy", 2)])
+	var battle := _battle([_relic(&"turn_start", &"gain_energy", 2)] as Array[RelicData])
 	var base: int = _db.get_battle_config().energy_per_turn
 	battle.start_player_turn()
 	assert_eq(battle.energy, base + 2, "turn_start relic fires on top of the base energy refill")
 
 
 func test_passive_relic_raises_max_hp_via_assembler() -> void:
-	var battle := _battle([_relic(&"passive", &"max_hp_up", 6)])
+	var battle := _battle([_relic(&"passive", &"max_hp_up", 6)] as Array[RelicData])
 	var fighter: Combatant = null
 	for unit in battle.living_players():
 		var d := unit.source_data as CharacterData

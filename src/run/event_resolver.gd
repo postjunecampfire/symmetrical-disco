@@ -82,7 +82,7 @@ func _heal(run: RunState, amount: int) -> void:
 		var cur: int = int(run.party_hp.get(cid, 0))
 		if cur <= 0:
 			continue
-		var cap: int = maxi(_base_max(cid), cur)
+		var cap: int = maxi(PartyStats.effective_max_hp(_db, run, cid), cur)
 		run.party_hp[cid] = mini(cap, cur + amount)
 
 
@@ -97,11 +97,3 @@ func _damage_party(run: RunState, amount: int) -> void:
 		run.party_hp[cid] = next_hp
 		if next_hp <= 0 and not run.downed.has(cid):
 			run.downed.append(cid)
-
-
-## A character's base (class-derived) max HP, used as the heal cap. 0 if unknown.
-func _base_max(cid: StringName) -> int:
-	if _db == null:
-		return 0
-	var ch: CharacterData = _db.get_character(cid)
-	return ch.max_hp if ch != null else 0

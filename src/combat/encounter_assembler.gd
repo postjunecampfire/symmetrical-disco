@@ -1,8 +1,5 @@
 class_name EncounterAssembler
 extends RefCounted
-
-## Applies relic effects (P2·12) at assembly (passive + combat_start).
-var _relic_engine: RelicEngine = RelicEngine.new()
 ## Turns authored content (an EncounterData + the loaded ContentDatabase + a chosen
 ## party) into a ready-to-run battle (task P1·09 integration). This is the seam
 ## that binds the data layer (ContentDatabase, P1·11) to the runtime combat spine
@@ -26,6 +23,9 @@ var _relic_engine: RelicEngine = RelicEngine.new()
 ##   3. Player Combatants via from_character for each resolved party member; enemy
 ##      Combatants via from_enemy for each id in `encounter.enemies`, all
 ##      registered through add_combatant.
+
+## Applies relic effects (P2·12) at assembly (passive + combat_start).
+var _relic_engine: RelicEngine = RelicEngine.new()
 
 
 ## Assemble a runnable EncounterBattle for `encounter`, drawing all content from
@@ -60,7 +60,7 @@ func build(
 	party_races: Dictionary = {},
 	run_deck: Array[StringName] = [],
 	allocated_stats: Dictionary = {},
-	relics: Array = []
+	relics: Array[RelicData] = []
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:

@@ -21,6 +21,10 @@ const DEFAULT_SAVE_PATH: String = "user://saves/run.json"
 @export var party_hp: Dictionary = {}
 ## Character ids currently downed (revive next encounter at low HP).
 @export var downed: Array[StringName] = []
+## character_id -> race_id chosen at run start (ADR-0015). Persisted so a resumed
+## run reapplies race mods (and so effective max-HP can be derived from RunState
+## alone).
+@export var party_races: Dictionary = {}
 ## Card ids in the run deck (starting decks + drafted cards).
 @export var run_deck: Array[StringName] = []
 ## Relic ids acquired this run (§7).
@@ -107,6 +111,7 @@ func to_dict() -> Dictionary:
 		"map": map_out,
 		"position": String(position),
 		"cleared": _sn_array_to_strings(cleared),
+		"party_races": _sn_dict_to_strings(party_races),
 		"party_level": _int_dict_to_strings(party_level),
 		"party_xp": _int_dict_to_strings(party_xp),
 		"unspent_points": _int_dict_to_strings(unspent_points),
@@ -139,6 +144,7 @@ static func from_dict(d: Dictionary) -> RunState:
 		var map_dict: Dictionary = map_v
 		if not map_dict.is_empty():
 			state.map = MapGraph.from_dict(map_dict)
+	state.party_races = _strings_to_sn_dict(d.get("party_races", {}))
 	state.party_level = _strings_to_int_dict(d.get("party_level", {}))
 	state.party_xp = _strings_to_int_dict(d.get("party_xp", {}))
 	state.unspent_points = _strings_to_int_dict(d.get("unspent_points", {}))
@@ -163,6 +169,24 @@ static func _strings_to_sn_array(v: Variant) -> Array[StringName]:
 		var arr: Array = v
 		for item: Variant in arr:
 			out.append(StringName(String(item)))
+	return out
+
+
+## {StringName -> StringName} -> {String -> String} (for JSON).
+func _sn_dict_to_strings(src: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key: Variant in src.keys():
+		out[String(key)] = String(src[key])
+	return out
+
+
+## A JSON object of {String -> String} -> {StringName -> StringName}.
+static func _strings_to_sn_dict(v: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if v is Dictionary:
+		var d: Dictionary = v
+		for key: Variant in d.keys():
+			out[StringName(String(key))] = StringName(String(d[key]))
 	return out
 
 

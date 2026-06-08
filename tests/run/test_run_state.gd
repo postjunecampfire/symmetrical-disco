@@ -63,7 +63,8 @@ func _make_run() -> RunState:
 	state.map = _make_map()
 	state.position = &"n_rest"
 	state.cleared = [&"n_start"] as Array[StringName]
-	# Leveling state (ADR-0015 / P3·05).
+	# Race selection (ADR-0015) + leveling state (P3·05).
+	state.party_races = {&"knight": &"orc", &"mage": &"elf"}
 	state.party_level = {&"knight": 3, &"mage": 1}
 	state.party_xp = {&"knight": 17, &"mage": 5}
 	state.unspent_points = {&"knight": 2, &"mage": 0}
@@ -104,6 +105,10 @@ func test_save_and_load_round_trips_every_field() -> void:
 	assert_eq(loaded.party_hp.size(), 2, "party_hp has both entries")
 	assert_eq(int(loaded.party_hp[&"knight"]), 28, "knight hp round-trips")
 	assert_eq(int(loaded.party_hp[&"mage"]), 15, "mage hp round-trips")
+
+	# Race selection round-trips (StringName -> StringName).
+	assert_eq(loaded.party_races[&"knight"], &"orc", "party_races round-trips")
+	assert_eq(loaded.party_races[&"mage"], &"elf", "party_races round-trips (both)")
 
 	# Leveling dictionaries (ADR-0015 / P3·05): keys StringName, values int / nested.
 	assert_eq(int(loaded.party_level[&"knight"]), 3, "party_level round-trips")

@@ -236,6 +236,27 @@ func test_allocate_stat_point_through_controller() -> void:
 	assert_false(rc.allocate_stat_point(&"fighter", &"str"), "cannot spend with none left")
 
 
+# --- Effective max-HP heal cap (review fix #1) -------------------------------
+
+func test_post_combat_heal_fills_to_effective_max_not_base() -> void:
+	# An Orc fighter's effective max is 38 (base 34 + 2 CON × 2). A post-combat heal
+	# must be able to fill into that headroom, not clamp back to the class base 34.
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1, {&"fighter": &"orc"})
+	var battle := EncounterAssemblerScript.new().build(
+		_db.get_encounter(&"enc_combat_01"), _db,
+		[&"fighter"] as Array[StringName], 1, {}, {&"fighter": &"orc"}
+	)
+	var fighter := battle.living_players()[0]
+	fighter.hp = 36  # wounded, but above the base max of 34
+	rc._write_back_hp(battle, BattleState.Outcome.WIN)
+	var heal: int = _db.get_battle_config().post_combat_heal
+	assert_eq(
+		int(rc.run.party_hp[&"fighter"]), min(38, 36 + heal),
+		"heal caps at the race-boosted effective max (38), not base 34"
+	)
+
+
 # --- Relics (P2·12) ---------------------------------------------------------
 
 func test_grant_relic_adds_and_dedupes() -> void:

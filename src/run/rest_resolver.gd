@@ -30,7 +30,7 @@ func heal(run: RunState) -> void:
 		var cur: int = int(run.party_hp.get(cid, 0))
 		if cur <= 0:
 			continue
-		var cap: int = maxi(_base_max(cid), cur)
+		var cap: int = maxi(PartyStats.effective_max_hp(_db, run, cid), cur)
 		run.party_hp[cid] = mini(cap, cur + amount)
 
 
@@ -57,10 +57,3 @@ func _rest_heal() -> int:
 		return 0
 	var cfg: BattleConfig = _db.get_battle_config()
 	return cfg.rest_heal if cfg != null else 0
-
-
-func _base_max(cid: StringName) -> int:
-	if _db == null:
-		return 0
-	var ch: CharacterData = _db.get_character(cid)
-	return ch.max_hp if ch != null else 0

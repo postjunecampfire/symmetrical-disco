@@ -22,7 +22,7 @@ var enemy_ai: EnemyAI = null
 ## Active run relics (RelicData, P2·12). The assembler applies their combat_start
 ## and passive effects once at build; this subclass applies their turn_start
 ## effects at each player turn via the override below. Empty in a plain battle.
-var relics: Array = []
+var relics: Array[RelicData] = []
 var _relic_engine: RelicEngine = RelicEngine.new()
 
 
