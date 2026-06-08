@@ -17,10 +17,22 @@ extends Control
 const DATA_DIR := "res://data"
 const ENCOUNTER_ID: StringName = &"skirmish_01"
 
+## Emitted once when the fight ends (WIN/LOSS) and the player clicks Continue. The
+## run layer (MapView) listens to carry HP/XP back via RunController.finish_combat.
+signal combat_finished(outcome: int)
+
 ## Party + race selections. Set by the creation screen before the node enters the
 ## tree; the defaults let battle_view run standalone (e.g. straight from main.tscn).
 var party: Array[StringName] = [&"fighter", &"mage"]
 var party_races: Dictionary = {}
+
+## Run-layer injection (P2·10): when set before _ready, BattleView drives THIS
+## pre-assembled battle (built by RunController.begin_combat with carried HP, run
+## deck, races and allocated stats) instead of self-assembling a one-off skirmish.
+## `injected_db` is the run's loaded ContentDatabase. Standalone (both null) keeps
+## the original behaviour so battle_view still runs straight from main.tscn.
+var injected_battle: EncounterBattle = null
+var injected_db: ContentDatabase = null
 
 const COL_BG := Color(0.12, 0.13, 0.17)
 const COL_PANEL := Color(0.18, 0.20, 0.26)
@@ -50,6 +62,8 @@ var _hand_box: HBoxContainer
 var _innate_box: HBoxContainer
 var _header: Label
 var _banner: Label
+var _continue_btn: Button
+var _outcome_value: int = BattleState.Outcome.ONGOING
 
 
 func _ready() -> void:
@@ -63,6 +77,15 @@ func _ready() -> void:
 # --- Setup ------------------------------------------------------------------
 
 func _load_and_assemble() -> void:
+	# Run-layer path (P2·10): drive the injected, pre-assembled battle.
+	if injected_battle != null:
+		_db = injected_db if injected_db != null else ContentDatabase.new()
+		_battle = injected_battle
+		_card_play = CardPlay.new(_battle)
+		var players: Array[Combatant] = _battle.living_players()
+		_selected_actor = players[0] if not players.is_empty() else null
+		return
+
 	_db = ContentDatabase.new()
 	var result: ContentDatabase.LoadResult = _db.load_from_dir(DATA_DIR)
 	if not result.ok:
@@ -152,6 +175,14 @@ func _build_layout() -> void:
 	_banner.add_theme_font_size_override("font_size", 16)
 	_banner.add_theme_color_override("font_color", COL_ACCENT)
 	controls.add_child(_banner)
+
+	# Shown only when the fight ends; hands control back to the run layer (P2·10).
+	_continue_btn = Button.new()
+	_continue_btn.text = "Continue"
+	_continue_btn.custom_minimum_size = Vector2(120, 36)
+	_continue_btn.visible = false
+	_continue_btn.pressed.connect(_on_continue)
+	controls.add_child(_continue_btn)
 
 
 func _titled_column(parent: Control, title: String) -> VBoxContainer:
@@ -413,7 +444,17 @@ func _check_outcome() -> bool:
 		_finished = true
 		_banner.text = "DEFEAT"
 		_status_text = "Your party was wiped."
+	if _finished:
+		_outcome_value = outcome
+		if _continue_btn != null:
+			_continue_btn.visible = true
 	return _finished
+
+
+## Player acknowledged the result: hand control back to the run layer. In
+## standalone mode (no listener) the button simply does nothing further.
+func _on_continue() -> void:
+	combat_finished.emit(_outcome_value)
 
 
 func _status_summary(unit: Combatant) -> String:

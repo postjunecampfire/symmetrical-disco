@@ -161,6 +161,18 @@ func test_dangling_upgrade_of_fails_loudly() -> void:
 	)
 
 
+# --- Validation: dangling encounter_pool reference (P2·09/P2·10) ---
+func test_dangling_encounter_pool_fails_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("dangling_pool"))
+
+	assert_false(result.ok, "an encounter_pool id with no encounter must fail the load")
+	assert_true(
+		_any_contains(result.errors, "encounter_pool"),
+		"error should name the encounter_pool problem: %s" % str(result.errors)
+	)
+
+
 # --- Helper ---
 func _any_contains(errors: PackedStringArray, needle: String) -> bool:
 	for e in errors:

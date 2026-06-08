@@ -4,3 +4,4 @@
 
 # Local playtest telemetry dumps (copied from user:// for analysis)
 /telemetry_dump/
+.DS_Store

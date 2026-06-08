@@ -52,6 +52,10 @@ var enemies: Dictionary = {}
 var encounters: Dictionary = {}
 var races: Dictionary = {}
 var events: Dictionary = {}
+## node_type (StringName) -> Array[StringName] of encounter ids (run-structure.md
+## §9 / P2·09): which encounters feed which node types when a MapNode has no
+## explicit payload. Loaded from data/encounter_pool.json.
+var encounter_pool: Dictionary = {}
 var battle_config: BattleConfig
 
 var _result: LoadResult
@@ -86,6 +90,16 @@ func get_event(id: StringName) -> EventData:
 	return events.get(id, null)
 
 
+## Encounter ids that feed `node_type` (combat/elite/boss). Empty if none defined.
+func get_encounters_for_type(node_type: StringName) -> Array[StringName]:
+	var out: Array[StringName] = []
+	var v: Variant = encounter_pool.get(node_type, [])
+	if v is Array:
+		for item: Variant in v:
+			out.append(StringName(String(item)))
+	return out
+
+
 ## The upgraded variant of card `base_id` — the card whose `upgrade_of` points at
 ## it (run-structure.md §5, rest upgrade). Returns null if no upgrade exists. If
 ## several cards claim the same base (authoring error), returns the first by id
@@ -114,6 +128,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	encounters.clear()
 	races.clear()
 	events.clear()
+	encounter_pool.clear()
 	battle_config = null
 
 	# Order matters for reference validation: load referenced entities before
@@ -126,6 +141,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("encounters"), _parse_encounter, encounters, "encounter")
 	_load_category(data_dir.path_join("races"), _parse_race, races, "race")
 	_load_category(data_dir.path_join("events"), _parse_event, events, "event")
+	_load_encounter_pool(data_dir.path_join("encounter_pool.json"))
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_derive_character_hp()
 
@@ -499,6 +515,29 @@ func _parse_encounter(d: Dictionary, source: String) -> Dictionary:
 	return {"id": enc.id, "value": enc}
 
 
+# Encounter pool (run-structure.md §9 / P2·09): a single object mapping node-type
+# keys (combat/elite/boss) to arrays of encounter ids. `id`/`display_name` strings
+# are metadata and ignored; any key whose value is an array is read as a type list.
+# Optional file: a missing pool just leaves the map to rely on node payloads.
+func _load_encounter_pool(path: String) -> void:
+	encounter_pool = {}
+	if not FileAccess.file_exists(path):
+		return
+	var entries := _read_json_array(path)
+	if entries.is_empty():
+		return
+	var d: Variant = entries[0]
+	if typeof(d) != TYPE_DICTIONARY:
+		_result.add_error("encounter_pool.json top-level must be an object: %s" % path)
+		return
+	var dict: Dictionary = d
+	for key: Variant in dict.keys():
+		var value: Variant = dict[key]
+		if typeof(value) != TYPE_ARRAY:
+			continue  # id / display_name metadata, etc.
+		encounter_pool[StringName(String(key))] = _sn_array(value)
+
+
 func _load_battle_config(path: String) -> void:
 	if not FileAccess.file_exists(path):
 		# Fall back to schema defaults rather than failing; the file is optional
@@ -604,6 +643,16 @@ func _validate_references() -> void:
 			_result.add_error(
 				"race '%s' references unknown custom_card '%s'" % [race.id, race.custom_card]
 			)
+
+	# encounter_pool: every listed id must be a defined encounter.
+	for node_type: Variant in encounter_pool.keys():
+		var ids: Variant = encounter_pool[node_type]
+		if ids is Array:
+			for enc_id: Variant in ids:
+				if not encounters.has(StringName(String(enc_id))):
+					_result.add_error(
+						"encounter_pool '%s' references unknown encounter '%s'" % [node_type, enc_id]
+					)
 
 	# event outcomes: add_card/remove_card -> card ids. (add_relic references the
 	# relic set, which is deferred — P2·12 — so relic ids are not validated yet.)

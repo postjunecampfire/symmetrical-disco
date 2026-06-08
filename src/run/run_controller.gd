@@ -76,32 +76,31 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 		_leveling.init_character(run, cid)
 
 
-## Resolve one combat encounter with `policy`, carrying HP in and writing it back
-## out. Returns the BattleState.Outcome (WIN / LOSS). `max_turns` caps runaway
-## fights (a stalemate counts as a loss for the run's purposes via the caller).
-func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int = 80) -> int:
+## Assemble (but do NOT run) the battle for `encounter_id`, applying the run's
+## carried HP, race mods, run deck (P2·06) and allocated stats (P3·05). Returns a
+## ready EncounterBattle the caller drives — synchronously via a policy
+## (`resolve_combat`) or turn-by-turn from the UI (MapView/BattleView) — then hands
+## back to `finish_combat`. Returns null if the encounter id is unknown.
+func begin_combat(encounter_id: StringName) -> EncounterBattle:
 	var encounter: EncounterData = db.get_encounter(encounter_id)
 	if encounter == null:
-		return BattleState.Outcome.LOSS
-
+		return null
 	var carried: Dictionary = _carried_for_next_fight()
 	# Combat deck is built from the accumulated run deck (P2·06): race custom cards
 	# and drafted rewards in RunState.run_deck now appear in the fight, not just the
 	# class starting decks. The assembler falls back to starting decks if it is empty.
-	var battle: EncounterBattle = _assembler.build(
+	return _assembler.build(
 		encounter, db, run.party, run.seed, carried, _party_races, run.run_deck,
 		run.allocated_stats
 	)
-	var card_play: CardPlay = CardPlay.new(battle)
 
-	var turns: int = 0
-	while battle.check_outcome() == BattleState.Outcome.ONGOING and turns < max_turns:
-		battle.start_player_turn()
-		_telegraph_enemies(battle)
-		policy.call(battle, card_play)
-		battle.end_player_turn()
-		turns += 1
 
+## Settle a finished `battle`: write each player's HP back to the run, mark downed,
+## and on a WIN heal survivors + award combat XP (P3·05). Logs a `combat_result`
+## telemetry event. Returns the final outcome. `turns` is for telemetry only. Call
+## once after the battle has reached WIN/LOSS (the UI calls this when combat ends;
+## `resolve_combat` calls it after its auto-run loop).
+func finish_combat(encounter_id: StringName, battle: BattleState, turns: int = 0) -> int:
 	var outcome: int = battle.check_outcome()
 	_write_back_hp(battle, outcome)
 	if outcome == BattleState.Outcome.WIN:
@@ -116,6 +115,27 @@ func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int =
 			"downed": _ids(run.downed),
 		})
 	return outcome
+
+
+## Resolve one combat encounter with `policy`, carrying HP in and writing it back
+## out. Returns the BattleState.Outcome (WIN / LOSS). `max_turns` caps runaway
+## fights (a stalemate counts as a loss for the run's purposes via the caller).
+## Composition of begin_combat + an auto-run loop + finish_combat.
+func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int = 80) -> int:
+	var battle: EncounterBattle = begin_combat(encounter_id)
+	if battle == null:
+		return BattleState.Outcome.LOSS
+	var card_play: CardPlay = CardPlay.new(battle)
+
+	var turns: int = 0
+	while battle.check_outcome() == BattleState.Outcome.ONGOING and turns < max_turns:
+		battle.start_player_turn()
+		_telegraph_enemies(battle)
+		policy.call(battle, card_play)
+		battle.end_player_turn()
+		turns += 1
+
+	return finish_combat(encounter_id, battle, turns)
 
 
 ## Resolve an ordered list of combat encounters as one act. Stops at the first

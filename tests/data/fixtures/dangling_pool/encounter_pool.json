@@ -1,0 +1,7 @@
+{
+  "id": "bad_pool",
+  "display_name": "Pool with a missing encounter",
+  "combat": [
+    "ghost_encounter"
+  ]
+}

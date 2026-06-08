@@ -161,7 +161,9 @@ func _style(btn: Button, selected: bool) -> void:
 
 
 func _on_begin() -> void:
-	var view := BattleView.new()
+	# Launch the full run (P2·10): the map screen drives combat/rest/event nodes
+	# through the run layer, carrying HP / deck / XP across the act.
+	var view := MapView.new()
 	view.party = [_class[0], _class[1]] as Array[StringName]
 	view.party_races = {_class[0]: _race[0], _class[1]: _race[1]}
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
