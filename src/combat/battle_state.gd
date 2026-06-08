@@ -267,10 +267,13 @@ func add_energy(n: int) -> void:
 ## the single place offensive modifiers live so card play and enemy intents route
 ## through the same math. Enemies have no attack stat (attack_power == 0), so their
 ## intent damage stays as authored. Never returns below 0.
-func modified_damage(attacker: Combatant, amount: int) -> int:
+## `use_attack_stat` is false for neutral (flat) cards (ADR-0016) so they never
+## scale with the actor's sheet; the Strength status still applies either way.
+func modified_damage(attacker: Combatant, amount: int, use_attack_stat: bool = true) -> int:
 	if attacker == null:
 		return max(0, amount)
-	var out: int = amount + attacker.attack_power() + attacker.status_stacks(STATUS_STRENGTH)
+	var bonus: int = attacker.attack_power() if use_attack_stat else 0
+	var out: int = amount + bonus + attacker.status_stacks(STATUS_STRENGTH)
 	if attacker.has_status(STATUS_WEAK):
 		# Weak: -25% outgoing (floored). Behaviour in code, the FLAG in data.
 		out = int(floor(float(out) * 0.75))
@@ -278,9 +281,10 @@ func modified_damage(attacker: Combatant, amount: int) -> int:
 
 
 ## Compute the DEX-modified block `source` grants for a base `amount` (ADR-0014:
-## DEX -> block). Enemies have dexterity 0, so their block intents stay flat.
-func modified_block(source: Variant, amount: int) -> int:
-	var dex: int = (source as Combatant).dexterity if source is Combatant else 0
+## DEX -> block). Enemies have dexterity 0; `use_dex` is false for neutral (flat)
+## cards (ADR-0016).
+func modified_block(source: Variant, amount: int, use_dex: bool = true) -> int:
+	var dex: int = (source as Combatant).dexterity if (use_dex and source is Combatant) else 0
 	return max(0, amount + dex)
 
 
@@ -301,7 +305,9 @@ func deal_damage_from(attacker: Combatant, target: Combatant, amount: int) -> vo
 ## Targeted effects apply to each unit in the set; GLOBAL_EFFECTS (draw,
 ## gain_energy) apply ONCE regardless of set size. For `damage`, the attacker's
 ## strength/weak is folded in before dispatch (the BattleContext seam is source-less).
-func apply_effects(source: Combatant, target: Variant, effects: Array) -> void:
+## `scale_with_stats` folds the source's attack stat (damage) and DEX (block) in;
+## pass false for neutral flat cards (ADR-0016). The Strength status still applies.
+func apply_effects(source: Combatant, target: Variant, effects: Array, scale_with_stats: bool = true) -> void:
 	var targets: Array = target if target is Array else [target]
 	for effect in effects:
 		if not (effect is Effect):
@@ -313,11 +319,11 @@ func apply_effects(source: Combatant, target: Variant, effects: Array) -> void:
 		for t in targets:
 			if e.type == &"damage":
 				var modified := e.duplicate() as Effect
-				modified.amount = modified_damage(source, e.amount)
+				modified.amount = modified_damage(source, e.amount, scale_with_stats)
 				_resolver.resolve(modified, source, t, self)
 			elif e.type == &"block":
 				var mb := e.duplicate() as Effect
-				mb.amount = modified_block(source, e.amount)
+				mb.amount = modified_block(source, e.amount, scale_with_stats)
 				_resolver.resolve(mb, source, t, self)
 			else:
 				_resolver.resolve(e, source, t, self)

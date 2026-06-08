@@ -366,3 +366,39 @@ func test_reject_card_not_in_hand() -> void:
 	assert_false(result.ok, "A card not in hand cannot be played.")
 	assert_eq(foe.hp, 20, "No effect applied.")
 	assert_eq(battle.energy, 3, "No energy spent.")
+
+
+# --- Neutral-flat vs. owned-scaling (ADR-0016) ------------------------------
+
+func test_neutral_card_does_not_scale_with_stats() -> void:
+	var battle := _battle(3)
+	var hero := _player(battle, _char_data("hero"))
+	hero.strength = 6
+	hero.attack_stat = &"str"
+	var foe := _enemy(battle, 20)
+
+	var neutral := _card("plain_hit", "neutral", 1, _spec(&"enemy"), [_effect(&"damage", 5)])
+	battle.deck.hand.append(neutral)
+
+	var play: CardPlay = CardPlayScript.new(battle)
+	var result := play.play_card(hero, neutral, foe)
+
+	assert_true(result.ok, result.reason)
+	assert_eq(foe.hp, 15, "neutral card is FLAT (5), not 5 + STR")
+
+
+func test_owned_card_scales_with_stats() -> void:
+	var battle := _battle(3)
+	var hero := _player(battle, _char_data("hero"))
+	hero.strength = 6
+	hero.attack_stat = &"str"
+	var foe := _enemy(battle, 30)
+
+	var owned := _card("hero_smash", "hero", 1, _spec(&"enemy"), [_effect(&"damage", 5)])
+	battle.deck.hand.append(owned)
+
+	var play: CardPlay = CardPlayScript.new(battle)
+	var result := play.play_card(hero, owned, foe)
+
+	assert_true(result.ok, result.reason)
+	assert_eq(foe.hp, 19, "owned card scales: 5 + STR 6 = 11")

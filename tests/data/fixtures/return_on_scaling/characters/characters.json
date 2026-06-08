@@ -1,0 +1,13 @@
+[
+  {
+    "id": "hero",
+    "display_name": "Hero",
+    "constitution": 10,
+    "attack_stat": "str",
+    "strength": 3,
+    "dexterity": 1,
+    "intelligence": 0,
+    "innate_actions": [],
+    "starting_deck": []
+  }
+]

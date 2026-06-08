@@ -30,13 +30,13 @@ repositioning concepts will return as positionless-native cards later.
 | `shield_bash` | vanguard | 1 | exhaust | no | enemy | 6 damage + 1 stun |
 | `bulwark` | vanguard | 1 | — | no | self | 8 block + 1 strength |
 | `rallying_shout` | vanguard | 1 | — | no | self | 4 block + draw 1 |
-| `arcane_bolt` | mage | 1 | return | no | enemy | 5 damage |
+| `arcane_bolt` | mage | 1 | — | no | enemy | 5 damage |
 | `venom_dart` | mage | 1 | — | no | enemy | 3 damage + 4 poison |
 | `frost_nova` | mage | 2 | exhaust | no | all_enemies | 4 damage + 1 weak (AoE) |
 | `mana_surge` | mage | 0 | exhaust | no | self | +2 energy + draw 2 |
 | `field_dressing` | neutral | 1 | — | no | ally | heal 6 |
 
-Keyword coverage: `exhaust` ×3 (`shield_bash`, `frost_nova`, `mana_surge`); `return` ×1 (`arcane_bolt`).
+Keyword coverage: `exhaust` ×3 (`shield_bash`, `frost_nova`, `mana_surge`). `return` is reserved for low/no-damage utility — banned on owned (stat-scaling) damage cards (ADR-0017), so no current card uses it.
 
 ## Characters (`characters/`)
 CharacterData per §4. Both share innate actions `["strike","defend"]`.

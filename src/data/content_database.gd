@@ -438,6 +438,17 @@ func _validate_references() -> void:
 				"card '%s' references unknown character_tag '%s'" % [card.id, card.character_tag]
 			)
 		_validate_effect_statuses(card.effects, "card '%s'" % card.id)
+		# ADR-0017: `return` is banned on a card that deals stat-scaling damage
+		# (an owned, i.e. non-neutral, damage card). It would let a cheap nuke
+		# skip the deck-cooldown cycle entirely. `return` stays legal on neutral
+		# (flat) cards and non-damage utility.
+		if card.keywords.has(&"return") and card.character_tag != NEUTRAL_TAG:
+			for e in card.effects:
+				if e is Effect and e.type == &"damage":
+					_result.add_error(
+						"card '%s' has `return` on stat-scaling damage (banned, ADR-0017)" % card.id
+					)
+					break
 
 	# character.starting_deck / innate_actions -> card ids
 	for id in characters:

@@ -125,6 +125,18 @@ func test_dangling_reference_fails_loudly() -> void:
 	)
 
 
+# --- Validation: `return` on a stat-scaling damage card (ADR-0017) ---
+func test_return_on_scaling_damage_fails_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("return_on_scaling"))
+
+	assert_false(result.ok, "`return` on an owned (scaling) damage card must fail the load")
+	assert_true(
+		_any_contains(result.errors, "return"),
+		"error should name the banned `return` rule: %s" % str(result.errors)
+	)
+
+
 # --- Helper ---
 func _any_contains(errors: PackedStringArray, needle: String) -> bool:
 	for e in errors:

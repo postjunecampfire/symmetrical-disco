@@ -1,12 +1,10 @@
 {
   "id": "arcane_bolt",
   "display_name": "Arcane Bolt",
-  "description": "Deal 5 damage at range. Return this card to your hand.",
+  "description": "Deal 5 damage.",
   "character_tag": "mage",
   "energy_cost": 1,
-  "keywords": [
-    "return"
-  ],
+  "keywords": [],
   "rarity": "common",
   "target": {
     "target_type": "enemy"

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "bad_bolt",
+    "display_name": "Bad Bolt",
+    "character_tag": "hero",
+    "energy_cost": 1,
+    "keywords": [
+      "return"
+    ],
+    "target": {
+      "target_type": "enemy"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "amount": 5
+      }
+    ]
+  }
+]

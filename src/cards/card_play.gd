@@ -197,4 +197,7 @@ func _type_error(target_type: StringName, why: String) -> PlayResult:
 func _spend_and_resolve(unit: Combatant, card: CardData, target: Variant) -> void:
 	battle.energy -= card.energy_cost
 	var targets: Array[Combatant] = battle.resolve_targets(card.target, unit, target)
-	battle.apply_effects(unit, targets, card.effects)
+	# Owned cards and innate actions scale with the actor's sheet (ADR-0014);
+	# neutral deck cards are flat (ADR-0016) to avoid per-actor routing math.
+	var scale: bool = card.innate or card.character_tag != TAG_NEUTRAL
+	battle.apply_effects(unit, targets, card.effects, scale)
