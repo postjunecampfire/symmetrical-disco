@@ -32,6 +32,17 @@ const DEFAULT_SAVE_PATH: String = "user://saves/run.json"
 ## Resolved node ids.
 @export var cleared: Array[StringName] = []
 
+# --- Leveling (ADR-0015, P3·05) ---------------------------------------------
+## character_id -> current level (1-based). Absent key == level 1.
+@export var party_level: Dictionary = {}
+## character_id -> XP accumulated toward the NEXT level (resets each level-up).
+@export var party_xp: Dictionary = {}
+## character_id -> unspent stat points available to allocate.
+@export var unspent_points: Dictionary = {}
+## character_id -> {"str","dex","con","int"} points the player has allocated.
+## These apply on top of class + race each fight (ADR-0015).
+@export var allocated_stats: Dictionary = {}
+
 
 # --- Persistence ---
 
@@ -96,6 +107,10 @@ func to_dict() -> Dictionary:
 		"map": map_out,
 		"position": String(position),
 		"cleared": _sn_array_to_strings(cleared),
+		"party_level": _int_dict_to_strings(party_level),
+		"party_xp": _int_dict_to_strings(party_xp),
+		"unspent_points": _int_dict_to_strings(unspent_points),
+		"allocated_stats": _alloc_dict_to_strings(allocated_stats),
 	}
 
 
@@ -124,6 +139,10 @@ static func from_dict(d: Dictionary) -> RunState:
 		var map_dict: Dictionary = map_v
 		if not map_dict.is_empty():
 			state.map = MapGraph.from_dict(map_dict)
+	state.party_level = _strings_to_int_dict(d.get("party_level", {}))
+	state.party_xp = _strings_to_int_dict(d.get("party_xp", {}))
+	state.unspent_points = _strings_to_int_dict(d.get("unspent_points", {}))
+	state.allocated_stats = _strings_to_alloc_dict(d.get("allocated_stats", {}))
 	return state
 
 
@@ -144,4 +163,52 @@ static func _strings_to_sn_array(v: Variant) -> Array[StringName]:
 		var arr: Array = v
 		for item: Variant in arr:
 			out.append(StringName(String(item)))
+	return out
+
+
+## {StringName -> int} -> {String -> int} (for JSON).
+func _int_dict_to_strings(src: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key: Variant in src.keys():
+		out[String(key)] = int(src[key])
+	return out
+
+
+## A JSON object of {String -> number} -> {StringName -> int}.
+static func _strings_to_int_dict(v: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if v is Dictionary:
+		var d: Dictionary = v
+		for key: Variant in d.keys():
+			out[StringName(String(key))] = int(d[key])
+	return out
+
+
+## {StringName -> {stat -> int}} -> {String -> {String -> int}} (for JSON).
+func _alloc_dict_to_strings(src: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key: Variant in src.keys():
+		var inner_v: Variant = src[key]
+		var inner_out: Dictionary = {}
+		if inner_v is Dictionary:
+			var inner: Dictionary = inner_v
+			for stat: Variant in inner.keys():
+				inner_out[String(stat)] = int(inner[stat])
+		out[String(key)] = inner_out
+	return out
+
+
+## A JSON object of {String -> {String -> number}} -> {StringName -> {StringName -> int}}.
+static func _strings_to_alloc_dict(v: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if v is Dictionary:
+		var d: Dictionary = v
+		for key: Variant in d.keys():
+			var inner_v: Variant = d[key]
+			var inner_out: Dictionary = {}
+			if inner_v is Dictionary:
+				var inner: Dictionary = inner_v
+				for stat: Variant in inner.keys():
+					inner_out[StringName(String(stat))] = int(inner[stat])
+			out[StringName(String(key))] = inner_out
 	return out

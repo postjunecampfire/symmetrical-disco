@@ -38,6 +38,10 @@ The persistent state of an in-progress run. Serializable to `user://` for mid-ru
 | `map` | MapGraph | The generated map (§3). |
 | `position` | StringName | Current node id. |
 | `cleared` | Array[StringName] | Resolved node ids. |
+| `party_level` | Dictionary | `character_id -> level` (1-based; absent == 1). Leveling, [ADR-0015](../decisions/0015-classes-races-leveling.md). |
+| `party_xp` | Dictionary | `character_id -> XP` toward the **next** level (resets on level-up). |
+| `unspent_points` | Dictionary | `character_id -> int` stat points available to allocate. |
+| `allocated_stats` | Dictionary | `character_id -> {str,dex,con,int}` points the player allocated. Applied on top of class + race each fight. |
 
 ```gdscript
 class_name RunState extends Resource
@@ -50,7 +54,14 @@ class_name RunState extends Resource
 @export var map: MapGraph
 @export var position: StringName = &""
 @export var cleared: Array[StringName] = []
+# Leveling (ADR-0015 / P3·05)
+@export var party_level: Dictionary = {}         # character_id -> int (>=1)
+@export var party_xp: Dictionary = {}            # character_id -> int (toward next level)
+@export var unspent_points: Dictionary = {}      # character_id -> int
+@export var allocated_stats: Dictionary = {}     # character_id -> {str,dex,con,int}
 ```
+
+**Leveling (P3·05, [ADR-0015](../decisions/0015-classes-races-leveling.md)).** Surviving party members earn `xp_per_combat` XP on a won combat. Crossing a threshold (linear curve `xp_curve_base + xp_curve_step·(L−1)`) levels the character and grants `stat_points_per_level` (default 3) points the **player** allocates across STR/DEX/CON/INT — growth is a choice, never fixed/random. Allocated points apply on top of class + race each fight (CON points also raise max HP); the `Leveling` engine (`src/run/leveling.gd`) holds the rules, `RunController` awards XP and exposes `allocate_stat_point(cid, stat)`. All numbers live on `BattleConfig`.
 
 **Save/resume:** serialize RunState to `user://saves/run.json` (or `.tres`); a run is resumable from the current `position`.
 

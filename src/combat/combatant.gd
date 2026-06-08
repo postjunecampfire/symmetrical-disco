@@ -140,3 +140,21 @@ func apply_race(race: RaceData, hp_per_con: int = 2) -> void:
 	var hp_gain: int = race.con_mod * hp_per_con
 	max_hp += hp_gain
 	hp += hp_gain
+
+
+## Apply player-allocated level-up stat points to this unit (ADR-0015, P3·05).
+## `alloc` maps a stat key (`str`/`dex`/`con`/`int`) to allocated points; CON also
+## raises derived max HP (and current hp) by `con_points * hp_per_con`, matching
+## how class CON and race CON derive HP. Missing/zero keys are no-ops. Applied on
+## top of the class base and any race mods, so call AFTER apply_race.
+func apply_stat_allocation(alloc: Dictionary, hp_per_con: int = 2) -> void:
+	if alloc == null or alloc.is_empty():
+		return
+	strength += int(alloc.get(&"str", 0))
+	dexterity += int(alloc.get(&"dex", 0))
+	intelligence += int(alloc.get(&"int", 0))
+	var con_points: int = int(alloc.get(&"con", 0))
+	constitution += con_points
+	var hp_gain: int = con_points * hp_per_con
+	max_hp += hp_gain
+	hp += hp_gain

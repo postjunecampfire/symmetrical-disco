@@ -13,3 +13,14 @@ extends Resource
 @export var revive_hp: int = 8
 ## Fixed HP restored to each surviving unit after a won combat (ADR-0011).
 @export var post_combat_heal: int = 5
+
+# --- Leveling (ADR-0015, P3·05) ---------------------------------------------
+## Stat points a character may allocate on each level-up (ADR-0015 default 3).
+@export var stat_points_per_level: int = 3
+## XP awarded to each surviving party member for winning a combat.
+@export var xp_per_combat: int = 10
+## XP required to advance from level 1 to level 2 (the curve's base step).
+@export var xp_curve_base: int = 30
+## Extra XP added to each successive level's requirement: the XP to go from
+## level L to L+1 is `xp_curve_base + xp_curve_step * (L - 1)` (a linear ramp).
+@export var xp_curve_step: int = 20

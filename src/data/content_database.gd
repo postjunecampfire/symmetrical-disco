@@ -440,6 +440,10 @@ func _load_battle_config(path: String) -> void:
 	bc.hp_per_con = _int(d.get("hp_per_con"), 2)
 	bc.revive_hp = _int(d.get("revive_hp"), 8)
 	bc.post_combat_heal = _int(d.get("post_combat_heal"), 5)
+	bc.stat_points_per_level = _int(d.get("stat_points_per_level"), 3)
+	bc.xp_per_combat = _int(d.get("xp_per_combat"), 10)
+	bc.xp_curve_base = _int(d.get("xp_curve_base"), 30)
+	bc.xp_curve_step = _int(d.get("xp_curve_step"), 20)
 	battle_config = bc
 
 

@@ -39,6 +39,10 @@ extends RefCounted
 ## race/reward cards actually appear in fights. Omitted/empty -> fall back to the
 ## party starting decks (original behaviour). Race STAT mods apply regardless (via
 ## `party_races`); this wires only the CARDS.
+## `allocated_stats` (optional, P3·05 / ADR-0015): character_id -> {str,dex,con,int}
+## player-allocated level-up points; applied on top of class + race so a levelled
+## character fights with its chosen growth (CON points also raise max HP). Applied
+## BEFORE carried HP so the carried value clamps to the grown max.
 func build(
 	encounter: EncounterData,
 	db: ContentDatabase,
@@ -46,7 +50,8 @@ func build(
 	rng_seed: int = 0,
 	carried_hp: Dictionary = {},
 	party_races: Dictionary = {},
-	run_deck: Array[StringName] = []
+	run_deck: Array[StringName] = [],
+	allocated_stats: Dictionary = {}
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
@@ -70,6 +75,10 @@ func build(
 	# so race CON raises max HP and carried HP then sets current HP correctly.
 	if not party_races.is_empty():
 		_apply_races(battle, party_races, db, config.hp_per_con)
+	# Player-allocated level-up points (P3·05) land on top of class + race, before
+	# carried HP, so CON points raise max HP and the carried value clamps to it.
+	if not allocated_stats.is_empty():
+		_apply_allocations(battle, allocated_stats, config.hp_per_con)
 	if not carried_hp.is_empty():
 		_apply_carried_hp(battle, carried_hp)
 	_spawn_enemies(battle, encounter, db)
@@ -91,6 +100,20 @@ func _apply_races(battle: BattleState, party_races: Dictionary, db: ContentDatab
 		var race: RaceData = db.get_race(race_id)
 		if race != null:
 			unit.apply_race(race, hp_per_con)
+
+
+## Apply each player's allocated level-up points (character_id -> {stat -> points})
+## on top of class + race (P3·05 / ADR-0015).
+func _apply_allocations(battle: BattleState, allocated_stats: Dictionary, hp_per_con: int) -> void:
+	for unit in battle.combatants:
+		if not unit.is_player():
+			continue
+		var data := unit.source_data as CharacterData
+		if data == null:
+			continue
+		var alloc_v: Variant = allocated_stats.get(data.id, {})
+		if alloc_v is Dictionary and not (alloc_v as Dictionary).is_empty():
+			unit.apply_stat_allocation(alloc_v, hp_per_con)
 
 
 ## Override each player's spawn HP from `carried_hp` (clamped to max_hp).

@@ -183,6 +183,59 @@ func _deck_card_count(deck: Variant) -> int:
 	return deck.draw_pile.size() + deck.hand.size() + deck.discard_pile.size() + deck.exhaust_pile.size()
 
 
+# --- Leveling (P3·05 / ADR-0015) --------------------------------------------
+
+func test_start_run_initialises_leveling_state() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	assert_eq(int(rc.run.party_level[&"fighter"]), 1, "fighter starts at level 1")
+	assert_eq(int(rc.run.party_xp[&"fighter"]), 0, "fighter starts at 0 XP")
+	assert_eq(rc.unspent_points(&"fighter"), 0, "no unspent points at run start")
+
+
+func test_winning_a_combat_awards_xp() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 7)
+	var greedy := func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
+	var outcome: int = rc.resolve_combat(&"enc_combat_01", greedy)
+	assert_eq(outcome, BattleState.Outcome.WIN, "precondition: greedy wins enc_combat_01")
+	var xp_per_combat: int = _db.get_battle_config().xp_per_combat
+	assert_eq(int(rc.run.party_xp[&"fighter"]), xp_per_combat, "a win awards the per-combat XP")
+	assert_eq(int(rc.run.party_xp[&"mage"]), xp_per_combat, "each surviving member earns XP")
+
+
+func test_allocated_stats_apply_in_fight() -> void:
+	# Player-allocated STR rides on top of the class base in the assembled fight.
+	var alloc := {&"fighter": {&"str": 3, &"dex": 0, &"con": 0, &"int": 0}}
+	var battle := EncounterAssemblerScript.new().build(
+		_db.get_encounter(&"enc_combat_01"), _db,
+		[&"fighter"] as Array[StringName], 1, {}, {}, [] as Array[StringName], alloc
+	)
+	var fighter := battle.living_players()[0]
+	assert_eq(fighter.strength, 6 + 3, "allocated STR adds on top of the Fighter class base (6)")
+
+
+func test_allocated_con_raises_max_hp_in_fight() -> void:
+	var alloc := {&"fighter": {&"str": 0, &"dex": 0, &"con": 2, &"int": 0}}
+	var battle := EncounterAssemblerScript.new().build(
+		_db.get_encounter(&"enc_combat_01"), _db,
+		[&"fighter"] as Array[StringName], 1, {}, {}, [] as Array[StringName], alloc
+	)
+	var fighter := battle.living_players()[0]
+	var per_con: int = _db.get_battle_config().hp_per_con
+	assert_eq(fighter.max_hp, 34 + 2 * per_con, "allocated CON raises derived max HP")
+
+
+func test_allocate_stat_point_through_controller() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	rc.run.unspent_points[&"fighter"] = 1  # simulate a level-up's pool
+	assert_true(rc.allocate_stat_point(&"fighter", &"str"), "spends the available point")
+	assert_eq(rc.unspent_points(&"fighter"), 0, "pool drained")
+	assert_eq(int(rc.run.allocated_stats[&"fighter"][&"str"]), 1, "STR allocation recorded")
+	assert_false(rc.allocate_stat_point(&"fighter", &"str"), "cannot spend with none left")
+
+
 # --- Run-level telemetry (P2·11) --------------------------------------------
 
 ## A TelemetryLogger spy that records calls instead of writing to disk.

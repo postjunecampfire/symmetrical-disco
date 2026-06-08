@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 147 passing.
+# Currently: 162 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -58,7 +58,16 @@ could self-test. A human/agent without that runs the headless line above as the 
    deck is empty). Race **custom cards** (and any future **drafted** cards) now
    appear in fights. 147 GUT green. *Note: needs `git push` from a machine with the
    repo's SSH key — committed locally, 1 ahead of origin.*
-2. **Leveling (P3·05):** XP + player-allocated stat points — not built.
+2. ~~**Leveling (P3·05):**~~ **DONE 2026-06-08.** XP from won combats levels each
+   surviving member on a linear curve; each level-up grants stat points the player
+   allocates across STR/DEX/CON/INT (default 3/level). Allocated points apply on
+   top of class + race each fight (CON also raises max HP). Engine in
+   `src/run/leveling.gd`; `RunController` awards XP + exposes
+   `allocate_stat_point(cid, stat)`; state persists in `RunState`. All knobs on
+   `BattleConfig` (`stat_points_per_level`, `xp_per_combat`, `xp_curve_base/step`).
+   *Still TODO: a level-up/allocation UI (part of the map/run UI, P2·10) — the
+   model + API are ready for a screen or auto-policy to call.* Class **promotion**
+   (P3·06) builds on this.
 3. **Run is single-fight in the UI.** Creation → one encounter. No map/run UI
    (P2·10), no node handlers (rest/event/relic — P2·07/08/12), no card-draft-in-UI.
 4. **Class promotion (P3·06)** and **exit-package meta (P3·08, ADR-0018)** — not built.
@@ -78,13 +87,15 @@ All the knobs are data (`data/battle_config.json`, `data/enemies/*`, `data/encou
 | Want to… | Do this |
 |----------|---------|
 | ~~Make builds matter (cards from races/rewards show up)~~ | ~~Wire `run_deck` → combat deck~~ **DONE (gap #1, 4cdbac0)** |
-| Make it feel like a *run*, not one fight | **Map/run UI (P2·10)** + run controller drives the UI |
+| ~~Deepen characters (XP + stat allocation)~~ | ~~Leveling (P3·05)~~ **DONE (gap #2)** — UI to allocate is part of P2·10 |
+| Make it feel like a *run*, not one fight | **Map/run UI (P2·10)** + run controller drives the UI (also surfaces level-ups) |
 | Make combat threatening (attrition real) | **Balance pass** — tune enemies/encounters/healing in data |
-| Deepen characters | **Leveling (P3·05)** then promotion (P3·06) |
+| Amplify identity further | **Class promotion (P3·06)** — builds on leveling |
 
 My recommendation for next session: **balance pass** (cheap, in data, makes
-playtesting meaningful) — now also worth re-running attrition WITH the run deck
-live — then the **map/run UI (P2·10)**, then **leveling (P3·05)**.
+playtesting meaningful) — now worth re-running attrition WITH the run deck +
+leveling live — then the **map/run UI (P2·10)** (which also gives level-ups and
+card drafts a home), then **class promotion (P3·06)**.
 
 ## 7. Gotchas / conventions
 
@@ -104,10 +115,10 @@ src/data/      content resources + ContentDatabase loader (cards, characters=cla
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
                EnemyAI, EncounterAssembler/Battle
 src/cards/     Deck, CardPlay
-src/run/       RunController, RunState, MapGraph/MapGenerator, CardReward
+src/run/       RunController, RunState, Leveling, MapGraph/MapGenerator, CardReward
 src/ui/        character_creation.gd → battle_view.gd (code-driven, asset-free)
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (147 passing)
+tests/         GUT suites mirroring src/  (162 passing)
 ```

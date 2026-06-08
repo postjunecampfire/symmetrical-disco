@@ -63,6 +63,14 @@ func _make_run() -> RunState:
 	state.map = _make_map()
 	state.position = &"n_rest"
 	state.cleared = [&"n_start"] as Array[StringName]
+	# Leveling state (ADR-0015 / P3·05).
+	state.party_level = {&"knight": 3, &"mage": 1}
+	state.party_xp = {&"knight": 17, &"mage": 5}
+	state.unspent_points = {&"knight": 2, &"mage": 0}
+	state.allocated_stats = {
+		&"knight": {&"str": 4, &"dex": 0, &"con": 2, &"int": 0},
+		&"mage": {&"str": 0, &"dex": 0, &"con": 0, &"int": 3},
+	}
 	return state
 
 
@@ -96,6 +104,15 @@ func test_save_and_load_round_trips_every_field() -> void:
 	assert_eq(loaded.party_hp.size(), 2, "party_hp has both entries")
 	assert_eq(int(loaded.party_hp[&"knight"]), 28, "knight hp round-trips")
 	assert_eq(int(loaded.party_hp[&"mage"]), 15, "mage hp round-trips")
+
+	# Leveling dictionaries (ADR-0015 / P3·05): keys StringName, values int / nested.
+	assert_eq(int(loaded.party_level[&"knight"]), 3, "party_level round-trips")
+	assert_eq(int(loaded.party_xp[&"knight"]), 17, "party_xp round-trips")
+	assert_eq(int(loaded.unspent_points[&"knight"]), 2, "unspent_points round-trips")
+	var knight_alloc: Dictionary = loaded.allocated_stats[&"knight"]
+	assert_eq(int(knight_alloc[&"str"]), 4, "allocated STR round-trips")
+	assert_eq(int(knight_alloc[&"con"]), 2, "allocated CON round-trips")
+	assert_eq(int(loaded.allocated_stats[&"mage"][&"int"]), 3, "allocated INT round-trips for mage")
 
 
 func test_map_graph_round_trips_nodes_edges_and_boss() -> void:

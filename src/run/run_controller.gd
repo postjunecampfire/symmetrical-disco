@@ -27,11 +27,14 @@ var run: RunState
 var _assembler: EncounterAssembler = EncounterAssembler.new()
 ## character_id -> race_id chosen at run start (ADR-0015). Applied each fight.
 var _party_races: Dictionary = {}
+## Leveling engine (ADR-0015 / P3·05): XP -> levels -> player-allocated points.
+var _leveling: Leveling
 
 
 func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
 	db = database
 	telemetry = logger
+	_leveling = Leveling.new(_config())
 
 
 # --- Run lifecycle ----------------------------------------------------------
@@ -49,6 +52,10 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 	run.downed = []
 	run.run_deck = []
 	_party_races = races.duplicate()
+	run.party_level = {}
+	run.party_xp = {}
+	run.unspent_points = {}
+	run.allocated_stats = {}
 	var per_con: int = _config().hp_per_con
 	for cid in party:
 		var ch: CharacterData = db.get_character(cid)
@@ -60,6 +67,7 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 				run.run_deck.append(card_id)
 		if race != null and race.custom_card != &"":
 			run.run_deck.append(race.custom_card)
+		_leveling.init_character(run, cid)
 
 
 ## Resolve one combat encounter with `policy`, carrying HP in and writing it back
@@ -75,7 +83,8 @@ func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int =
 	# and drafted rewards in RunState.run_deck now appear in the fight, not just the
 	# class starting decks. The assembler falls back to starting decks if it is empty.
 	var battle: EncounterBattle = _assembler.build(
-		encounter, db, run.party, run.seed, carried, _party_races, run.run_deck
+		encounter, db, run.party, run.seed, carried, _party_races, run.run_deck,
+		run.allocated_stats
 	)
 	var card_play: CardPlay = CardPlay.new(battle)
 
@@ -89,6 +98,8 @@ func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int =
 
 	var outcome: int = battle.check_outcome()
 	_write_back_hp(battle, outcome)
+	if outcome == BattleState.Outcome.WIN:
+		_award_combat_xp()
 
 	if telemetry != null:
 		telemetry.log_event(&"combat_result", {
@@ -164,6 +175,32 @@ func _write_back_hp(battle: BattleState, outcome: int) -> void:
 			var ch: CharacterData = db.get_character(cid)
 			var max_hp: int = ch.max_hp if ch != null else 0
 			run.party_hp[cid] = min(max_hp, int(run.party_hp.get(cid, 0)) + heal)
+
+
+# --- Leveling (ADR-0015 / P3·05) --------------------------------------------
+
+## Award the per-combat XP to each surviving (non-downed) party member after a
+## win, levelling them up and granting unspent stat points via the engine. Downed
+## members earn nothing this fight (they were defeated), matching post-combat heal.
+func _award_combat_xp() -> void:
+	var amount: int = _config().xp_per_combat
+	for cid in run.party:
+		if run.downed.has(cid):
+			continue
+		_leveling.grant_xp(run, cid, amount)
+
+
+## Spend one of `character_id`'s unspent stat points into `stat`
+## (`str`/`dex`/`con`/`int`). The choice persists in RunState.allocated_stats and
+## reaches the next fight via the assembler. Returns true if a point was spent.
+## This is the seam a creation/level-up UI (or an auto-policy) calls.
+func allocate_stat_point(character_id: StringName, stat: StringName) -> bool:
+	return _leveling.allocate_point(run, character_id, stat)
+
+
+## Unspent stat points `character_id` may still allocate (convenience for callers).
+func unspent_points(character_id: StringName) -> int:
+	return _leveling.unspent(run, character_id)
 
 
 # --- Helpers ----------------------------------------------------------------
