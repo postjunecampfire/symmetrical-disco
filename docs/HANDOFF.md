@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 237 passing.
+# Currently: 245 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -68,6 +68,13 @@ could self-test. A human/agent without that runs the headless line above as the 
   rebuilt to Basic (3–4 Weak / 2 Medium / 1 Strong), Hard (2 Strong / 1 Strong+2
   Medium), Boss (Very-Strong + 2–3 Weak minions). Design source:
   `enemy_design_review.xlsx` in the project folder.
+- **Class promotion** (P3·06, ADR-0015): at an act boundary an eligible character
+  (level ≥ `promotion_level`×N) picks 1 of 2 branches — Berserker/Guardian,
+  Assassin/Duelist, Pyromancer/Sage — folding a stat bump + signature card into the
+  run. `RunController.eligible_promotions/apply_promotion`; offered in `MapView` at
+  the boss. Dormant until a member reaches L20 (data knob).
+- **Save / resume** (P2·02): `MapView` checkpoints the run between nodes and clears
+  it on run end; `CharacterCreation` offers **Continue Run** from the saved slot.
 - **Telemetry** (`src/telemetry/`): combat/run events; used to produce the attrition read.
 
 ## 4. Known gaps / deferred (NOT yet done)
@@ -95,8 +102,16 @@ could self-test. A human/agent without that runs the headless line above as the 
    and event screens, in-UI level-up allocation, and a win/defeat end screen. All
    node *handlers* exist: combat (P2·06), event (P2·08), rest (P2·07).
    **Relics (P2·12) ✓ DONE 2026-06-08** — see "Relics" in §3.
-4. **Class promotion (P3·06)** and **exit-package meta (P3·08, ADR-0018)** — not built.
-5. **Save/resume** exists on `RunState` but isn't wired into the run loop.
+4. ~~**Class promotion (P3·06)**~~ **DONE 2026-06-08 (d58e3f5).** Pick-1-of-2 branch
+   per class at an act boundary, eligible at `BattleConfig.promotion_level * N`
+   (default 20, accrues). A promotion folds stat mods into `allocated_stats` + adds
+   a signature card to `run_deck` (no new wiring). **Dormant at default threshold**
+   until multi-act content reaches L20. **Exit-package meta (P3·08, ADR-0018)** — in
+   progress.
+5. ~~**Save/resume** … isn't wired.~~ **DONE 2026-06-08 (23dfe04).** `MapView`
+   checkpoints the run between nodes + clears on run end; `CharacterCreation` shows
+   **Continue Run** when a save exists. (Saves are between-node; a mid-combat quit
+   rewinds to the node start.)
 
 ## 5. The balance finding (important)
 
@@ -214,7 +229,7 @@ still-easy combat — tune together). Then **class promotion (P3·06)**.
 
 ```
 src/data/      content resources + ContentDatabase loader (cards, characters=classes,
-               enemies, encounters, races, events, relics, statuses, battle_config, encounter_pool)
+               enemies, encounters, races, events, relics, promotions, statuses, battle_config, encounter_pool)
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
                EnemyAI, EncounterAssembler/Battle, RelicEngine
 src/cards/     Deck, CardPlay
@@ -223,5 +238,5 @@ src/ui/        character_creation → map_view (run) → battle_view (code-drive
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (237 passing)
+tests/         GUT suites mirroring src/  (245 passing)
 ```
