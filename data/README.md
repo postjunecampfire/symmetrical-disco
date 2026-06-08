@@ -85,9 +85,20 @@ EncounterData per §6.
 - `skirmish_01` — "Ambush at the Ford", enemies: grunt, archer, brute (positionless),
   `win_condition: defeat_all`.
 
+## Events (`events/`)
+EventData (run-structure.md §6, P2·08) — a minimal event node: title/body + 2–3
+choices, each a label plus typed outcome deltas
+(`heal`/`damage_party`/`add_card`/`remove_card`/`add_relic`/`nothing`). Resolved
+by `EventResolver` against the RunState.
+
+- `evt_wandering_medic` — heal 8 / take a `field_dressing` card / walk away.
+- `evt_cursed_shrine` — take damage + a relic / trade a card for a heal / leave.
+
 ## Battle config (`battle_config.json`)
 BattleConfig per §7: `energy_per_turn: 3`, `draw_per_turn: 5`, `max_hand: 10`,
-`reshuffle_discard: true`.
+`reshuffle_discard: true`. Leveling knobs (ADR-0015 / P3·05):
+`stat_points_per_level: 3`, `xp_per_combat: 10`, `xp_curve_base: 30`,
+`xp_curve_step: 20`.
 
 ## Reference integrity
 - Every card `character_tag` is `neutral` or an existing character id (`vanguard`/`mage`).

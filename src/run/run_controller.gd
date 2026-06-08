@@ -29,12 +29,15 @@ var _assembler: EncounterAssembler = EncounterAssembler.new()
 var _party_races: Dictionary = {}
 ## Leveling engine (ADR-0015 / P3·05): XP -> levels -> player-allocated points.
 var _leveling: Leveling
+## Event-node resolver (run-structure.md §6 / P2·08): applies choice outcomes.
+var _event_resolver: EventResolver
 
 
 func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
 	db = database
 	telemetry = logger
 	_leveling = Leveling.new(_config())
+	_event_resolver = EventResolver.new(database)
 
 
 # --- Run lifecycle ----------------------------------------------------------
@@ -136,6 +139,28 @@ func run_act(encounter_sequence: Array, policy: Callable) -> Dictionary:
 	if telemetry != null:
 		telemetry.end_run(summary)
 	return summary
+
+
+# --- Event nodes (run-structure.md §6 / P2·08) ------------------------------
+
+## Resolve an event node: apply choice `choice_index` of event `event_id` to the
+## run (heal/damage/card/relic deltas). Returns true if the event + choice were
+## valid and applied. The choice index is supplied by a policy or UI — the same
+## injection pattern combat uses. Logs an `event_choice` telemetry event.
+func resolve_event(event_id: StringName, choice_index: int) -> bool:
+	var event: EventData = db.get_event(event_id)
+	if event == null:
+		return false
+	if not _event_resolver.apply_choice_index(run, event, choice_index):
+		return false
+	if telemetry != null:
+		telemetry.log_event(&"event_choice", {
+			"event": String(event_id),
+			"choice": choice_index,
+			"party_hp": _hp_snapshot(),
+			"deck_size": run.run_deck.size(),
+		})
+	return true
 
 
 # --- HP attrition (ADR-0011) ------------------------------------------------

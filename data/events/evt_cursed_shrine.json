@@ -1,0 +1,27 @@
+{
+  "id": "evt_cursed_shrine",
+  "title": "The Cursed Shrine",
+  "body": "A shrine hums with old power. Touching it always costs something.",
+  "choices": [
+    {
+      "label": "Seize its power",
+      "outcomes": [
+        { "kind": "damage_party", "amount": 5 },
+        { "kind": "add_relic", "id": "shrine_blessing" }
+      ]
+    },
+    {
+      "label": "Offer a bandage",
+      "outcomes": [
+        { "kind": "remove_card", "id": "field_dressing" },
+        { "kind": "heal", "amount": 6 }
+      ]
+    },
+    {
+      "label": "Step away",
+      "outcomes": [
+        { "kind": "nothing" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "evt_bad",
+  "title": "Broken Event",
+  "body": "An event whose outcome kind is not in the vocabulary.",
+  "choices": [
+    {
+      "label": "Do the impossible",
+      "outcomes": [
+        { "kind": "teleport_to_mars", "amount": 1 }
+      ]
+    }
+  ]
+}

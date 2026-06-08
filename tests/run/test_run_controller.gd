@@ -236,6 +236,25 @@ func test_allocate_stat_point_through_controller() -> void:
 	assert_false(rc.allocate_stat_point(&"fighter", &"str"), "cannot spend with none left")
 
 
+# --- Event nodes (P2·08) ----------------------------------------------------
+
+func test_resolve_event_applies_choice_to_run() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.run.party_hp[&"fighter"] = 10
+	rc.run.party_hp[&"mage"] = 12
+	# evt_wandering_medic choice 0 heals the party by 8.
+	assert_true(rc.resolve_event(&"evt_wandering_medic", 0), "valid event + choice resolves")
+	assert_eq(int(rc.run.party_hp[&"fighter"]), 18, "the chosen heal outcome applied")
+
+
+func test_resolve_event_rejects_unknown_event_or_choice() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	assert_false(rc.resolve_event(&"no_such_event", 0), "unknown event id rejected")
+	assert_false(rc.resolve_event(&"evt_wandering_medic", 99), "out-of-range choice rejected")
+
+
 # --- Run-level telemetry (P2·11) --------------------------------------------
 
 ## A TelemetryLogger spy that records calls instead of writing to disk.

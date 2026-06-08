@@ -1,0 +1,25 @@
+{
+  "id": "evt_wandering_medic",
+  "title": "A Wandering Medic",
+  "body": "A field medic shares the road for a while. She offers what little she carries before parting ways.",
+  "choices": [
+    {
+      "label": "Accept the salve",
+      "outcomes": [
+        { "kind": "heal", "amount": 8 }
+      ]
+    },
+    {
+      "label": "Take spare bandages",
+      "outcomes": [
+        { "kind": "add_card", "id": "field_dressing" }
+      ]
+    },
+    {
+      "label": "Wave her on",
+      "outcomes": [
+        { "kind": "nothing" }
+      ]
+    }
+  ]
+}

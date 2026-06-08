@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 162 passing.
+# Currently: 178 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -69,7 +69,12 @@ could self-test. A human/agent without that runs the headless line above as the 
    model + API are ready for a screen or auto-policy to call.* Class **promotion**
    (P3·06) builds on this.
 3. **Run is single-fight in the UI.** Creation → one encounter. No map/run UI
-   (P2·10), no node handlers (rest/event/relic — P2·07/08/12), no card-draft-in-UI.
+   (P2·10) or card-draft-in-UI yet. Node *handlers*: combat (P2·06) ✓,
+   **event (P2·08) ✓ DONE 2026-06-08** — `EventResolver` applies typed outcome
+   deltas (heal/damage_party/add_card/remove_card/add_relic/nothing) to RunState;
+   `RunController.resolve_event(id, choice_index)` is the entry point (policy/UI
+   picks the index, same pattern as combat); two authored events in `data/events/`.
+   Still open: rest (P2·07), relic (P2·12).
 4. **Class promotion (P3·06)** and **exit-package meta (P3·08, ADR-0018)** — not built.
 5. **Save/resume** exists on `RunState` but isn't wired into the run loop.
 
@@ -111,14 +116,14 @@ card drafts a home), then **class promotion (P3·06)**.
 
 ```
 src/data/      content resources + ContentDatabase loader (cards, characters=classes,
-               enemies, encounters, races, statuses, battle_config)
+               enemies, encounters, races, events, statuses, battle_config)
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
                EnemyAI, EncounterAssembler/Battle
 src/cards/     Deck, CardPlay
-src/run/       RunController, RunState, Leveling, MapGraph/MapGenerator, CardReward
+src/run/       RunController, RunState, Leveling, EventResolver, MapGraph/MapGenerator, CardReward
 src/ui/        character_creation.gd → battle_view.gd (code-driven, asset-free)
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (162 passing)
+tests/         GUT suites mirroring src/  (178 passing)
 ```

@@ -137,6 +137,18 @@ func test_return_on_scaling_damage_fails_loudly() -> void:
 	)
 
 
+# --- Validation: unknown event outcome kind (P2·08) ---
+func test_unknown_event_outcome_kind_fails_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("unknown_outcome_kind"))
+
+	assert_false(result.ok, "an unknown event outcome.kind must fail the load")
+	assert_true(
+		_any_contains(result.errors, "unknown outcome.kind"),
+		"error should name the unknown outcome kind: %s" % str(result.errors)
+	)
+
+
 # --- Helper ---
 func _any_contains(errors: PackedStringArray, needle: String) -> bool:
 	for e in errors:

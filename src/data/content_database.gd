@@ -51,6 +51,7 @@ var characters: Dictionary = {}
 var enemies: Dictionary = {}
 var encounters: Dictionary = {}
 var races: Dictionary = {}
+var events: Dictionary = {}
 var battle_config: BattleConfig
 
 var _result: LoadResult
@@ -81,6 +82,10 @@ func get_encounter(id: StringName) -> EncounterData:
 	return encounters.get(id, null)
 
 
+func get_event(id: StringName) -> EventData:
+	return events.get(id, null)
+
+
 func get_battle_config() -> BattleConfig:
 	return battle_config
 
@@ -94,6 +99,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	enemies.clear()
 	encounters.clear()
 	races.clear()
+	events.clear()
 	battle_config = null
 
 	# Order matters for reference validation: load referenced entities before
@@ -105,6 +111,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("cards"), _parse_card, cards, "card")
 	_load_category(data_dir.path_join("encounters"), _parse_encounter, encounters, "encounter")
 	_load_category(data_dir.path_join("races"), _parse_race, races, "race")
+	_load_category(data_dir.path_join("events"), _parse_event, events, "event")
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_derive_character_hp()
 
@@ -302,6 +309,67 @@ func _parse_race(d: Dictionary, source: String) -> Dictionary:
 	r.int_mod = _int(d.get("int_mod"), 0)
 	r.custom_card = _sn(d.get("custom_card"), &"")
 	return {"id": r.id, "value": r}
+
+
+# Event nodes (run-structure.md §6). An event has display text + 2..3 choices,
+# each choice a label + a list of typed outcome deltas. Outcome `kind` is
+# validated against EventResolver.KINDS here; card/relic id references are checked
+# in _validate_references so the source path can be reported precisely.
+func _parse_event(d: Dictionary, source: String) -> Dictionary:
+	var ok := true
+	ok = _require(d, "id", source, "event") and ok
+	ok = _require(d, "choices", source, "event") and ok
+	if not ok:
+		return {}
+	var ev := EventData.new()
+	ev.id = _sn(d.get("id"))
+	ev.title = _str(d.get("title"))
+	ev.body = _str(d.get("body"))
+	ev.choices = _parse_event_choices(d.get("choices"), source, ev.id)
+	return {"id": ev.id, "value": ev}
+
+
+func _parse_event_choices(value: Variant, source: String, event_id: StringName) -> Array[EventChoice]:
+	var out: Array[EventChoice] = []
+	if typeof(value) != TYPE_ARRAY:
+		_result.add_error("event '%s' in %s: choices must be an array" % [event_id, source])
+		return out
+	for raw in value:
+		if typeof(raw) != TYPE_DICTIONARY:
+			_result.add_error("event '%s' in %s has a non-object choice" % [event_id, source])
+			continue
+		var cd: Dictionary = raw
+		var choice := EventChoice.new()
+		choice.label = _str(cd.get("label"))
+		choice.outcomes = _parse_event_outcomes(cd.get("outcomes"), source, event_id)
+		out.append(choice)
+	return out
+
+
+func _parse_event_outcomes(value: Variant, source: String, event_id: StringName) -> Array[EventOutcome]:
+	var out: Array[EventOutcome] = []
+	if value == null:
+		return out
+	if typeof(value) != TYPE_ARRAY:
+		_result.add_error("event '%s' in %s: outcomes must be an array" % [event_id, source])
+		return out
+	for raw in value:
+		if typeof(raw) != TYPE_DICTIONARY:
+			_result.add_error("event '%s' in %s has a non-object outcome" % [event_id, source])
+			continue
+		var od: Dictionary = raw
+		var outcome := EventOutcome.new()
+		if not _require(od, "kind", source, "event '%s' outcome" % event_id):
+			continue
+		outcome.kind = _sn(od.get("kind"))
+		if not EventOutcome.KINDS.has(outcome.kind):
+			_result.add_error(
+				"event '%s' in %s uses unknown outcome.kind '%s'" % [event_id, source, outcome.kind]
+			)
+		outcome.amount = _int(od.get("amount"), 0)
+		outcome.id = _sn(od.get("id"), &"")
+		out.append(outcome)
+	return out
 
 
 func _parse_card(d: Dictionary, source: String) -> Dictionary:
@@ -516,6 +584,18 @@ func _validate_references() -> void:
 			_result.add_error(
 				"race '%s' references unknown custom_card '%s'" % [race.id, race.custom_card]
 			)
+
+	# event outcomes: add_card/remove_card -> card ids. (add_relic references the
+	# relic set, which is deferred — P2·12 — so relic ids are not validated yet.)
+	for id in events:
+		var ev: EventData = events[id]
+		for choice in ev.choices:
+			for outcome in choice.outcomes:
+				if outcome.kind == &"add_card" or outcome.kind == &"remove_card":
+					if outcome.id == &"" or not cards.has(outcome.id):
+						_result.add_error(
+							"event '%s' %s references unknown card '%s'" % [ev.id, outcome.kind, outcome.id]
+						)
 
 
 func _validate_effect_statuses(effects: Array[Effect], owner_label: String) -> void:
