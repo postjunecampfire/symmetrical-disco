@@ -1,0 +1,9 @@
+{
+  "id": "orc",
+  "display_name": "Orc",
+  "str_mod": 2,
+  "dex_mod": 0,
+  "con_mod": 2,
+  "int_mod": 0,
+  "custom_card": "orcish_rage"
+}

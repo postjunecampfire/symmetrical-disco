@@ -1,0 +1,19 @@
+{
+  "id": "orcish_rage",
+  "display_name": "Rage",
+  "description": "Gain 1 Strength.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 1
+    }
+  ]
+}

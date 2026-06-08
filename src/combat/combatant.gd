@@ -123,3 +123,18 @@ func attack_power() -> int:
 			return intelligence
 		_:
 			return 0
+
+
+## Apply a race's stat modifiers to this unit (ADR-0015). CON also raises derived
+## max HP by `con_mod * hp_per_con` (and current hp, so a fresh unit stays full).
+## The race's custom card is granted to the deck elsewhere (creation flow).
+func apply_race(race: RaceData, hp_per_con: int = 2) -> void:
+	if race == null:
+		return
+	strength += race.str_mod
+	dexterity += race.dex_mod
+	constitution += race.con_mod
+	intelligence += race.int_mod
+	var hp_gain: int = race.con_mod * hp_per_con
+	max_hp += hp_gain
+	hp += hp_gain

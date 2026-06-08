@@ -50,6 +50,7 @@ var cards: Dictionary = {}
 var characters: Dictionary = {}
 var enemies: Dictionary = {}
 var encounters: Dictionary = {}
+var races: Dictionary = {}
 var battle_config: BattleConfig
 
 var _result: LoadResult
@@ -72,6 +73,10 @@ func get_enemy(id: StringName) -> EnemyData:
 	return enemies.get(id, null)
 
 
+func get_race(id: StringName) -> RaceData:
+	return races.get(id, null)
+
+
 func get_encounter(id: StringName) -> EncounterData:
 	return encounters.get(id, null)
 
@@ -88,6 +93,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	characters.clear()
 	enemies.clear()
 	encounters.clear()
+	races.clear()
 	battle_config = null
 
 	# Order matters for reference validation: load referenced entities before
@@ -98,6 +104,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("enemies"), _parse_enemy, enemies, "enemy")
 	_load_category(data_dir.path_join("cards"), _parse_card, cards, "card")
 	_load_category(data_dir.path_join("encounters"), _parse_encounter, encounters, "encounter")
+	_load_category(data_dir.path_join("races"), _parse_race, races, "race")
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_derive_character_hp()
 
@@ -278,6 +285,23 @@ func _parse_status(d: Dictionary, source: String) -> Dictionary:
 	s.stacking = _sn(d.get("stacking"), &"intensity")
 	s.decays_each_turn = _bool(d.get("decays_each_turn"), true)
 	return {"id": s.id, "value": s}
+
+
+func _parse_race(d: Dictionary, source: String) -> Dictionary:
+	var ok := true
+	ok = _require(d, "id", source, "race") and ok
+	ok = _require(d, "display_name", source, "race") and ok
+	if not ok:
+		return {}
+	var r := RaceData.new()
+	r.id = _sn(d.get("id"))
+	r.display_name = _str(d.get("display_name"))
+	r.str_mod = _int(d.get("str_mod"), 0)
+	r.dex_mod = _int(d.get("dex_mod"), 0)
+	r.con_mod = _int(d.get("con_mod"), 0)
+	r.int_mod = _int(d.get("int_mod"), 0)
+	r.custom_card = _sn(d.get("custom_card"), &"")
+	return {"id": r.id, "value": r}
 
 
 func _parse_card(d: Dictionary, source: String) -> Dictionary:
@@ -478,6 +502,14 @@ func _validate_references() -> void:
 				_result.add_error(
 					"encounter '%s' spawns unknown enemy '%s'" % [enc.id, enemy_id]
 				)
+
+	# race.custom_card -> a card id
+	for id in races:
+		var race: RaceData = races[id]
+		if race.custom_card != &"" and not cards.has(race.custom_card):
+			_result.add_error(
+				"race '%s' references unknown custom_card '%s'" % [race.id, race.custom_card]
+			)
 
 
 func _validate_effect_statuses(effects: Array[Effect], owner_label: String) -> void:

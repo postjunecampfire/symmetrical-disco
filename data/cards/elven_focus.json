@@ -1,0 +1,20 @@
+{
+  "id": "elven_focus",
+  "display_name": "Focus",
+  "description": "Gain 1 energy. Exhaust.",
+  "character_tag": "neutral",
+  "energy_cost": 0,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 1
+    }
+  ]
+}

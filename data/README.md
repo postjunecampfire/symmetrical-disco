@@ -50,6 +50,16 @@ Stats (ADR-0014): STR/DEX/CON/INT + `attack_stat`. `max_hp` is derived (CON × `
 
 The assembled shared deck for the prototype party = union of both `starting_deck` lists.
 
+## Races (`races/`)
+RaceData (ADR-0015) — a small stat modifier + one custom (neutral) card, applied to a
+character at creation. **Placeholders — replace/extend freely.**
+
+| id | STR | DEX | CON | INT | custom_card |
+|----|-----|-----|-----|-----|-------------|
+| `human` | +1 | +1 | +1 | +1 | human_versatility (draw 1) |
+| `elf` | +0 | +2 | +0 | +2 | elven_focus (+1 energy, exhaust) |
+| `orc` | +2 | +0 | +2 | +0 | orcish_rage (+1 Strength) |
+
 ## Enemies (`enemies/`)
 EnemyData per §5, all `intent_pattern: random_weighted`.
 

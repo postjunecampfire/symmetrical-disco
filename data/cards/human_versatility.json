@@ -1,0 +1,18 @@
+{
+  "id": "human_versatility",
+  "display_name": "Versatility",
+  "description": "Draw 1 card.",
+  "character_tag": "neutral",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}
