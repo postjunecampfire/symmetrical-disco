@@ -281,6 +281,19 @@ func test_poison_damages_then_decrements_at_turn_start() -> void:
 	assert_eq(player.status_stacks(&"poison"), 2, "poison decremented by one")
 
 
+func test_poison_ignores_block_anti_turtle() -> void:
+	# Poison is the turtle tax: block does NOT absorb it (unlike attacks).
+	var state := _state()
+	var player := _add_player(state, 30)
+	_add_enemy(state, 30)
+	state.add_block(player, 10)
+	state.apply_status(player, &"poison", 4)
+
+	state.start_player_turn()  # poison ticks (ignoring block), then block resets
+
+	assert_eq(player.hp, 26, "poison hit hp directly for its 4 stacks, bypassing block")
+
+
 # --- block decays at owner's turn start -------------------------------------
 
 func test_block_absorbs_during_turn_then_resets_next_turn() -> void:

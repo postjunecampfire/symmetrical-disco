@@ -144,6 +144,22 @@ and let the **run structure** tax it (fewer rests, status bleed) — which the
 single-fight harness doesn't model. Owner's call. (Note: the harness turtle blocks
 *optimally* every turn — more than a real hand/energy usually allows.)
 
+**DECISION (2026-06-08): chose (d) + poison.** **Poison now IGNORES block** —
+poison ticks deal direct HP (`BattleState.deal_unblockable`), the one chip a turtle
+can't soak (and a real block-pierce tool for player poison builds too). The boss's
+hex now stacks Poison, and between-fight recovery was leaned down
+(`post_combat_heal` 5→4, `revive_hp` 8→6) so run-level attrition carries.
+**Final read (40 seeds):** greedy **80%** (8 deaths @ elite) · defensive **100%**
+(HP 30) · turtle **100%** (HP 43). Balanced play is now the safe sweet spot and
+greed is genuinely risky; the **idealised harness turtle still wins** — but that
+turtle blocks perfectly every turn (unreachable in real play), and poison-ignores-
+block means an *imperfect* real turtle bleeds. **Definitive:** you cannot make the
+perfect-block turtle lose via enemy content while block fully negates attacks —
+that needs a block-economy change (turn cap / scarcer block), a separate feel
+decision. Tuning knobs trade off (leaner heals over-punished greedy to 70% without
+moving turtle). The elite (Captain's Guard) may be over-punishing rushers (8/40) —
+soften if aggressive play should be more viable. All data-tunable.
+
 **(earlier finding) punishing turtle is also a BLOCK-DENIAL problem.**
 A dedicated turtle blocks ~2× per turn and out-sustains even ramped enemies in
 fights short enough to win; raising ramp amounts barely moved it (turtle 44→42).

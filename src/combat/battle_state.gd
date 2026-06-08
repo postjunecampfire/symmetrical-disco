@@ -215,6 +215,17 @@ func deal_damage(target: Variant, amount: int) -> void:
 		unit.hp = max(0, unit.hp - remaining)
 
 
+## Deal `amount` damage that IGNORES block, straight to hp — for poison and other
+## block-piercing effects. This is what lets a damage-over-time strategy tax a
+## turtle that would otherwise soak everything with block. Clamped at 0; the dead
+## are not hit.
+func deal_unblockable(target: Variant, amount: int) -> void:
+	var unit: Combatant = _resolve_unit(target)
+	if unit == null or amount <= 0 or not unit.is_alive():
+		return
+	unit.hp = max(0, unit.hp - amount)
+
+
 ## Grant `amount` block to `target`. Block accumulates; the `block` StatusData
 ## governs whether it decays at turn start (see `_tick_statuses`). Mirrored into
 ## the status dict so UI/status queries see a `block` entry too.
@@ -403,11 +414,11 @@ func _tick_statuses(team: int) -> void:
 
 ## Apply the start-of-turn status effects to a single unit.
 func _tick_unit_statuses(unit: Combatant) -> void:
-	# Poison: deal its stacks as damage (block can still absorb), then drop one
-	# stack. Magnitude == stack count; the -1 decay is the schema's per-turn tick.
+	# Poison: deal its stacks as damage that IGNORES block (anti-turtle: block can't
+	# soak a DoT), then drop one stack. Magnitude == stack count; the -1 is the decay.
 	var poison: int = unit.status_stacks(STATUS_POISON)
 	if poison > 0:
-		deal_damage(unit, poison)
+		deal_unblockable(unit, poison)
 		if _status_decays(STATUS_POISON):
 			unit.add_status_stacks(STATUS_POISON, -1)
 		if not unit.is_alive():
