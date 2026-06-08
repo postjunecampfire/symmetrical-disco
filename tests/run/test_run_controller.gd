@@ -109,6 +109,31 @@ func test_hp_attrition_across_two_fights() -> void:
 	assert_between(int(rc.run.party_hp[&"mage"]), 0, 24, "mage HP in range")
 
 
+# --- Run-level telemetry (P2·11) --------------------------------------------
+
+## A TelemetryLogger spy that records calls instead of writing to disk.
+class _SpyLogger extends TelemetryLogger:
+	var events: Array[StringName] = []
+	var ended: bool = false
+
+	func log_event(type: StringName, _data: Dictionary) -> void:
+		events.append(type)
+
+	func end_run(_summary: Dictionary) -> void:
+		ended = true
+
+
+func test_run_emits_run_level_telemetry() -> void:
+	var spy := _SpyLogger.new()
+	var rc := RunControllerScript.new(_db, spy)
+	rc.start_run([&"vanguard", &"mage"] as Array[StringName], 3)
+	var greedy := func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
+	rc.run_act([&"enc_combat_01"], greedy)
+
+	assert_true(spy.events.has(&"combat_result"), "logs a combat_result per fight")
+	assert_true(spy.ended, "ends the run through telemetry")
+
+
 # --- A simple greedy auto-play policy (max damage, no defense) ---------------
 
 func _greedy_turn(battle: Variant, cp: Variant) -> void:
