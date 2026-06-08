@@ -38,7 +38,8 @@ func build(
 	db: ContentDatabase,
 	party_ids: Array[StringName],
 	rng_seed: int = 0,
-	carried_hp: Dictionary = {}
+	carried_hp: Dictionary = {},
+	party_races: Dictionary = {}
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
@@ -55,11 +56,31 @@ func build(
 	battle.win_param = encounter.win_param
 
 	_spawn_players(battle, party)
+	# Race modifiers (ADR-0015) apply on top of the base class before carried HP,
+	# so race CON raises max HP and carried HP then sets current HP correctly.
+	if not party_races.is_empty():
+		_apply_races(battle, party_races, db, config.hp_per_con)
 	if not carried_hp.is_empty():
 		_apply_carried_hp(battle, carried_hp)
 	_spawn_enemies(battle, encounter, db)
 
 	return battle
+
+
+## Apply each player's chosen race (character_id -> race_id) on top of its class.
+func _apply_races(battle: BattleState, party_races: Dictionary, db: ContentDatabase, hp_per_con: int) -> void:
+	for unit in battle.combatants:
+		if not unit.is_player():
+			continue
+		var data := unit.source_data as CharacterData
+		if data == null:
+			continue
+		var race_id: StringName = party_races.get(data.id, &"")
+		if race_id == &"":
+			continue
+		var race: RaceData = db.get_race(race_id)
+		if race != null:
+			unit.apply_race(race, hp_per_con)
 
 
 ## Override each player's spawn HP from `carried_hp` (clamped to max_hp).

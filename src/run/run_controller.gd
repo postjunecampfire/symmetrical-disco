@@ -25,6 +25,8 @@ var telemetry: TelemetryLogger
 var run: RunState
 
 var _assembler: EncounterAssembler = EncounterAssembler.new()
+## character_id -> race_id chosen at run start (ADR-0015). Applied each fight.
+var _party_races: Dictionary = {}
 
 
 func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
@@ -36,19 +38,27 @@ func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
 
 ## Begin a run: full HP for each party member, run deck = union of starting decks
 ## (tracked for future drafting; combat currently uses the assembled starting deck).
-func start_run(party: Array[StringName], seed: int) -> void:
+## `races` (optional) maps a party character id to a race id (ADR-0015); race CON
+## raises that member's starting/max HP, and the race's custom card joins the run deck.
+func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> void:
 	run = RunState.new()
 	run.seed = seed
 	run.party = party.duplicate()
 	run.party_hp = {}
 	run.downed = []
 	run.run_deck = []
+	_party_races = races.duplicate()
+	var per_con: int = _config().hp_per_con
 	for cid in party:
 		var ch: CharacterData = db.get_character(cid)
-		run.party_hp[cid] = ch.max_hp if ch != null else 1
+		var base_max: int = ch.max_hp if ch != null else 1
+		var race: RaceData = db.get_race(races.get(cid, &""))
+		run.party_hp[cid] = base_max + (race.con_mod * per_con if race != null else 0)
 		if ch != null:
 			for card_id in ch.starting_deck:
 				run.run_deck.append(card_id)
+		if race != null and race.custom_card != &"":
+			run.run_deck.append(race.custom_card)
 
 
 ## Resolve one combat encounter with `policy`, carrying HP in and writing it back
@@ -60,7 +70,9 @@ func resolve_combat(encounter_id: StringName, policy: Callable, max_turns: int =
 		return BattleState.Outcome.LOSS
 
 	var carried: Dictionary = _carried_for_next_fight()
-	var battle: EncounterBattle = _assembler.build(encounter, db, run.party, run.seed, carried)
+	var battle: EncounterBattle = _assembler.build(
+		encounter, db, run.party, run.seed, carried, _party_races
+	)
 	var card_play: CardPlay = CardPlay.new(battle)
 
 	var turns: int = 0

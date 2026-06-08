@@ -109,6 +109,29 @@ func test_hp_attrition_across_two_fights() -> void:
 	assert_between(int(rc.run.party_hp[&"mage"]), 0, 24, "mage HP in range")
 
 
+# --- Class + race creation (ADR-0015) ---------------------------------------
+
+func test_race_selection_applies_in_run() -> void:
+	var rc := _controller()
+	# Fighter as an Orc (+2 STR, +2 CON), Mage as an Elf (+2 DEX, +2 INT).
+	var races := {&"fighter": &"orc", &"mage": &"elf"}
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1, races)
+
+	# Orc +2 CON -> +4 max HP (hp_per_con 2): fighter 34 -> 38. Elf has no CON.
+	assert_eq(rc.run.party_hp[&"fighter"], 38, "race CON bonus raises starting HP")
+	assert_eq(rc.run.party_hp[&"mage"], 24, "elf (no CON) leaves mage HP unchanged")
+	assert_true(rc.run.run_deck.has(&"orcish_rage"), "orc custom card joins the run deck")
+	assert_true(rc.run.run_deck.has(&"elven_focus"), "elf custom card joins the run deck")
+
+	# A spawned fighter combatant carries the Orc stat mods.
+	var battle := EncounterAssemblerScript.new().build(
+		_db.get_encounter(&"skirmish_01"), _db, [&"fighter"] as Array[StringName], 1, {}, races
+	)
+	var fighter := battle.living_players()[0]
+	assert_eq(fighter.strength, 6 + 2, "Orc +2 STR applied on top of the Fighter class")
+	assert_eq(fighter.max_hp, 34 + 4, "Orc +2 CON -> +4 max HP applied")
+
+
 # --- Run-level telemetry (P2·11) --------------------------------------------
 
 ## A TelemetryLogger spy that records calls instead of writing to disk.
