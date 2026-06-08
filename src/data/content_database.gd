@@ -53,6 +53,7 @@ var encounters: Dictionary = {}
 var races: Dictionary = {}
 var events: Dictionary = {}
 var relics: Dictionary = {}
+var promotions: Dictionary = {}
 ## node_type (StringName) -> Array[StringName] of encounter ids (run-structure.md
 ## §9 / P2·09): which encounters feed which node types when a MapNode has no
 ## explicit payload. Loaded from data/encounter_pool.json.
@@ -95,6 +96,22 @@ func get_relic(id: StringName) -> RelicData:
 	return relics.get(id, null)
 
 
+func get_promotion(id: StringName) -> PromotionData:
+	return promotions.get(id, null)
+
+
+## The promotion branches available to class `class_id` (sorted by id for a stable
+## choice order).
+func get_promotions_for_class(class_id: StringName) -> Array[PromotionData]:
+	var out: Array[PromotionData] = []
+	for key: Variant in promotions.keys():
+		var p: PromotionData = promotions[key]
+		if p != null and p.from_class == class_id:
+			out.append(p)
+	out.sort_custom(func(a: PromotionData, b: PromotionData) -> bool: return String(a.id) < String(b.id))
+	return out
+
+
 ## Encounter ids that feed `node_type` (combat/elite/boss). Empty if none defined.
 func get_encounters_for_type(node_type: StringName) -> Array[StringName]:
 	var out: Array[StringName] = []
@@ -134,6 +151,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	races.clear()
 	events.clear()
 	relics.clear()
+	promotions.clear()
 	encounter_pool.clear()
 	battle_config = null
 
@@ -148,6 +166,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("races"), _parse_race, races, "race")
 	_load_category(data_dir.path_join("events"), _parse_event, events, "event")
 	_load_category(data_dir.path_join("relics"), _parse_relic, relics, "relic")
+	_load_category(data_dir.path_join("promotions"), _parse_promotion, promotions, "promotion")
 	_load_encounter_pool(data_dir.path_join("encounter_pool.json"))
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_derive_character_hp()
@@ -432,6 +451,27 @@ func _parse_relic(d: Dictionary, source: String) -> Dictionary:
 	return {"id": r.id, "value": r}
 
 
+# Promotion branch (P3·06). Stat mods + a signature card; from_class/signature_card
+# references are checked in _validate_references.
+func _parse_promotion(d: Dictionary, source: String) -> Dictionary:
+	var ok := true
+	ok = _require(d, "id", source, "promotion") and ok
+	ok = _require(d, "display_name", source, "promotion") and ok
+	ok = _require(d, "from_class", source, "promotion") and ok
+	if not ok:
+		return {}
+	var p := PromotionData.new()
+	p.id = _sn(d.get("id"))
+	p.display_name = _str(d.get("display_name"))
+	p.from_class = _sn(d.get("from_class"))
+	p.str_mod = _int(d.get("str_mod"), 0)
+	p.dex_mod = _int(d.get("dex_mod"), 0)
+	p.con_mod = _int(d.get("con_mod"), 0)
+	p.int_mod = _int(d.get("int_mod"), 0)
+	p.signature_card = _sn(d.get("signature_card"), &"")
+	return {"id": p.id, "value": p}
+
+
 func _parse_card(d: Dictionary, source: String) -> Dictionary:
 	var ok := true
 	ok = _require(d, "id", source, "card") and ok
@@ -603,6 +643,7 @@ func _load_battle_config(path: String) -> void:
 	bc.xp_per_combat = _int(d.get("xp_per_combat"), 10)
 	bc.xp_curve_base = _int(d.get("xp_curve_base"), 30)
 	bc.xp_curve_step = _int(d.get("xp_curve_step"), 20)
+	bc.promotion_level = _int(d.get("promotion_level"), 20)
 	battle_config = bc
 
 
@@ -694,6 +735,18 @@ func _validate_references() -> void:
 					_result.add_error(
 						"encounter_pool '%s' references unknown encounter '%s'" % [node_type, enc_id]
 					)
+
+	# promotions: from_class -> a character id; signature_card -> a card id.
+	for id in promotions:
+		var promo: PromotionData = promotions[id]
+		if not characters.has(promo.from_class):
+			_result.add_error(
+				"promotion '%s' from_class references unknown character '%s'" % [promo.id, promo.from_class]
+			)
+		if promo.signature_card != &"" and not cards.has(promo.signature_card):
+			_result.add_error(
+				"promotion '%s' signature_card references unknown card '%s'" % [promo.id, promo.signature_card]
+			)
 
 	# event outcomes: add_card/remove_card -> card ids. (add_relic references the
 	# relic set, which is deferred — P2·12 — so relic ids are not validated yet.)

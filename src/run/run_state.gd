@@ -44,8 +44,12 @@ const DEFAULT_SAVE_PATH: String = "user://saves/run.json"
 ## character_id -> unspent stat points available to allocate.
 @export var unspent_points: Dictionary = {}
 ## character_id -> {"str","dex","con","int"} points the player has allocated.
-## These apply on top of class + race each fight (ADR-0015).
+## These apply on top of class + race each fight (ADR-0015). Class promotions
+## (P3·06) also fold their stat mods in here.
 @export var allocated_stats: Dictionary = {}
+## character_id -> Array[StringName] of promotion ids taken (P3·06). Drives accrual
+## (the Nth promotion needs level >= promotion_level * N).
+@export var party_promotions: Dictionary = {}
 
 
 # --- Persistence ---
@@ -116,6 +120,7 @@ func to_dict() -> Dictionary:
 		"party_xp": _int_dict_to_strings(party_xp),
 		"unspent_points": _int_dict_to_strings(unspent_points),
 		"allocated_stats": _alloc_dict_to_strings(allocated_stats),
+		"party_promotions": _sn_arrays_to_strings(party_promotions),
 	}
 
 
@@ -149,6 +154,7 @@ static func from_dict(d: Dictionary) -> RunState:
 	state.party_xp = _strings_to_int_dict(d.get("party_xp", {}))
 	state.unspent_points = _strings_to_int_dict(d.get("unspent_points", {}))
 	state.allocated_stats = _strings_to_alloc_dict(d.get("allocated_stats", {}))
+	state.party_promotions = _strings_to_sn_arrays(d.get("party_promotions", {}))
 	return state
 
 
@@ -187,6 +193,24 @@ static func _strings_to_sn_dict(v: Variant) -> Dictionary:
 		var d: Dictionary = v
 		for key: Variant in d.keys():
 			out[StringName(String(key))] = StringName(String(d[key]))
+	return out
+
+
+## {StringName -> Array[StringName]} -> {String -> Array[String]} (for JSON).
+func _sn_arrays_to_strings(src: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key: Variant in src.keys():
+		out[String(key)] = _sn_array_to_strings(src[key])
+	return out
+
+
+## A JSON object of {String -> Array[String]} -> {StringName -> Array[StringName]}.
+static func _strings_to_sn_arrays(v: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if v is Dictionary:
+		var d: Dictionary = v
+		for key: Variant in d.keys():
+			out[StringName(String(key))] = _strings_to_sn_array(d[key])
 	return out
 
 

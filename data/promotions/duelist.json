@@ -1,0 +1,10 @@
+{
+  "id": "duelist",
+  "display_name": "Duelist",
+  "from_class": "rogue",
+  "str_mod": 0,
+  "dex_mod": 2,
+  "con_mod": 1,
+  "int_mod": 0,
+  "signature_card": "duelist_riposte"
+}

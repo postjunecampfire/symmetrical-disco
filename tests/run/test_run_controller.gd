@@ -259,6 +259,55 @@ func test_post_combat_heal_fills_to_effective_max_not_base() -> void:
 	)
 
 
+# --- Class promotion (P3·06) ------------------------------------------------
+
+func test_promotion_eligible_only_at_threshold() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	assert_eq(rc.eligible_promotions(&"fighter").size(), 0, "not eligible at level 1")
+	rc.run.party_level[&"fighter"] = _db.get_battle_config().promotion_level  # hit the threshold
+	var offered := rc.eligible_promotions(&"fighter")
+	assert_eq(offered.size(), 2, "two branches offered at the promotion level")
+	var ids: Array[StringName] = []
+	for p in offered:
+		ids.append(p.id)
+	assert_true(ids.has(&"berserker") and ids.has(&"guardian"), "fighter's branches")
+
+
+func test_apply_promotion_folds_stats_and_card() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	rc.run.party_level[&"fighter"] = _db.get_battle_config().promotion_level
+	var deck_before: int = rc.run.run_deck.size()
+	assert_true(rc.apply_promotion(&"fighter", &"berserker"), "applies an eligible branch")
+	assert_eq(int(rc.run.allocated_stats[&"fighter"][&"str"]), 3, "Berserker folds +3 STR into allocations")
+	assert_eq(rc.run.run_deck.size(), deck_before + 1, "signature card added to the run deck")
+	assert_true(rc.run.run_deck.has(&"berserker_rampage"), "the right signature card")
+	assert_true(rc.run.party_promotions[&"fighter"].has(&"berserker"), "promotion recorded")
+
+
+func test_promotion_accrual_needs_higher_level_and_offers_other_branch() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	var lvl: int = _db.get_battle_config().promotion_level
+	rc.run.party_level[&"fighter"] = lvl
+	rc.apply_promotion(&"fighter", &"berserker")
+	assert_eq(rc.eligible_promotions(&"fighter").size(), 0, "no 2nd promotion until 2x the level")
+	rc.run.party_level[&"fighter"] = lvl * 2
+	var offered := rc.eligible_promotions(&"fighter")
+	assert_eq(offered.size(), 1, "the remaining branch is offered for the 2nd promotion")
+	assert_eq(offered[0].id, &"guardian", "berserker already taken -> guardian remains")
+
+
+func test_apply_promotion_rejects_wrong_class_or_ineligible() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	rc.run.party_level[&"fighter"] = _db.get_battle_config().promotion_level
+	assert_false(rc.apply_promotion(&"fighter", &"assassin"), "rogue branch rejected for a fighter")
+	rc.run.party_level[&"fighter"] = 1
+	assert_false(rc.apply_promotion(&"fighter", &"berserker"), "rejected below the threshold")
+
+
 # --- Relics (P2·12) ---------------------------------------------------------
 
 func test_grant_relic_adds_and_dedupes() -> void:

@@ -1,0 +1,18 @@
+{
+  "id": "guardian_aegis",
+  "display_name": "Aegis",
+  "description": "",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 16
+    }
+  ]
+}

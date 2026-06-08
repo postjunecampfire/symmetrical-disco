@@ -60,6 +60,7 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 	run.party_xp = {}
 	run.unspent_points = {}
 	run.allocated_stats = {}
+	run.party_promotions = {}
 	var per_con: int = _config().hp_per_con
 	for cid in party:
 		var ch: CharacterData = db.get_character(cid)
@@ -192,6 +193,56 @@ func resolve_event(event_id: StringName, choice_index: int) -> bool:
 			"party_hp": _hp_snapshot(),
 			"deck_size": run.run_deck.size(),
 		})
+	return true
+
+
+# --- Class promotion (P3·06 / ADR-0015) -------------------------------------
+
+## The promotion branches `cid` may currently pick (1 of 2 per class): non-empty
+## only once the character has reached the threshold for its NEXT promotion
+## (`promotion_level * (promotions_taken + 1)`). Already-taken branches are excluded
+## so accrual offers the remaining branch. A UI calls this at an act boundary.
+func eligible_promotions(cid: StringName) -> Array[PromotionData]:
+	var out: Array[PromotionData] = []
+	var taken: Array = run.party_promotions.get(cid, [])
+	if _leveling.level_of(run, cid) < _config().promotion_level * (taken.size() + 1):
+		return out
+	for p in db.get_promotions_for_class(cid):
+		if not taken.has(p.id):
+			out.append(p)
+	return out
+
+
+## Apply promotion `promotion_id` to `cid` (must be a currently-eligible branch of
+## that class). Folds the branch's stat mods into allocated_stats and appends its
+## signature card to the run deck — both flow through the assembler automatically —
+## and records it for accrual. Returns false if not eligible / wrong class. Logs a
+## `promotion` telemetry event.
+func apply_promotion(cid: StringName, promotion_id: StringName) -> bool:
+	var promo: PromotionData = db.get_promotion(promotion_id)
+	if promo == null or promo.from_class != cid:
+		return false
+	var offered: Dictionary = {}
+	for p in eligible_promotions(cid):
+		offered[p.id] = true
+	if not offered.has(promotion_id):
+		return false
+
+	if not run.allocated_stats.has(cid):
+		run.allocated_stats[cid] = {&"str": 0, &"dex": 0, &"con": 0, &"int": 0}
+	var a: Dictionary = run.allocated_stats[cid]
+	a[&"str"] = int(a.get(&"str", 0)) + promo.str_mod
+	a[&"dex"] = int(a.get(&"dex", 0)) + promo.dex_mod
+	a[&"con"] = int(a.get(&"con", 0)) + promo.con_mod
+	a[&"int"] = int(a.get(&"int", 0)) + promo.int_mod
+	if promo.signature_card != &"":
+		run.run_deck.append(promo.signature_card)
+	if not run.party_promotions.has(cid):
+		run.party_promotions[cid] = [] as Array[StringName]
+	run.party_promotions[cid].append(promotion_id)
+
+	if telemetry != null:
+		telemetry.log_event(&"promotion", {"character": String(cid), "promotion": String(promotion_id)})
 	return true
 
 

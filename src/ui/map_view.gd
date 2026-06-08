@@ -308,7 +308,8 @@ func _on_combat_finished(outcome: int, bv: BattleView) -> void:
 
 	_nav.complete_current()
 	if _nav.is_boss(node):
-		_show_run_end(true)
+		# Act boundary (P3·06): offer any eligible promotions, then end the run.
+		_offer_promotions_then_end()
 	elif node.node_type == &"elite":
 		# Elites grant a relic (run-structure.md §5) in addition to the card draft.
 		_grant_relic("elite")
@@ -466,6 +467,42 @@ func _on_alloc(cid: StringName, stat: StringName) -> void:
 
 
 # --- Run end ----------------------------------------------------------------
+
+# --- Class promotion at the act boundary (P3·06) ----------------------------
+
+## Offer a pick-1-of-2 promotion to the first eligible party member; chaining
+## handles the rest, then the run ends in victory. (Dormant until a member reaches
+## the promotion level — see BattleConfig.promotion_level.)
+func _offer_promotions_then_end() -> void:
+	for cid in _controller.run.party:
+		var branches: Array[PromotionData] = _controller.eligible_promotions(cid)
+		if not branches.is_empty():
+			_show_promotion(cid, branches)
+			return
+	_show_run_end(true)
+
+
+func _show_promotion(cid: StringName, branches: Array[PromotionData]) -> void:
+	var ch: CharacterData = _db.get_character(cid)
+	var who: String = ch.display_name if ch != null else String(cid)
+	var panel := _overlay_panel("%s may promote — choose a path" % who)
+	for promo in branches:
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(380, 40)
+		var bits: Array[String] = []
+		for pair in [["STR", promo.str_mod], ["DEX", promo.dex_mod], ["CON", promo.con_mod], ["INT", promo.int_mod]]:
+			if int(pair[1]) != 0:
+				bits.append("+%d %s" % [int(pair[1]), pair[0]])
+		b.text = "%s  (%s, card: %s)" % [promo.display_name, ", ".join(bits), promo.signature_card]
+		b.pressed.connect(_on_promotion_pick.bind(cid, promo.id))
+		panel.add_child(b)
+
+
+func _on_promotion_pick(cid: StringName, promotion_id: StringName) -> void:
+	_controller.apply_promotion(cid, promotion_id)
+	_close_overlay()
+	_offer_promotions_then_end()  # next eligible member, or run end
+
 
 func _show_run_end(victory: bool) -> void:
 	_clear_save()  # the run is over — don't offer to resume it

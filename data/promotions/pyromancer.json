@@ -1,0 +1,10 @@
+{
+  "id": "pyromancer",
+  "display_name": "Pyromancer",
+  "from_class": "mage",
+  "str_mod": 0,
+  "dex_mod": 0,
+  "con_mod": 0,
+  "int_mod": 3,
+  "signature_card": "pyromancer_firestorm"
+}

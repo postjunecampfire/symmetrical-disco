@@ -1,0 +1,10 @@
+{
+  "id": "assassin",
+  "display_name": "Assassin",
+  "from_class": "rogue",
+  "str_mod": 0,
+  "dex_mod": 3,
+  "con_mod": 0,
+  "int_mod": 0,
+  "signature_card": "assassin_ambush"
+}

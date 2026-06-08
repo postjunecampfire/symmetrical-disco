@@ -1,0 +1,22 @@
+{
+  "id": "sage_insight",
+  "display_name": "Insight",
+  "description": "",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 2
+    },
+    {
+      "type": "gain_energy",
+      "amount": 1
+    }
+  ]
+}

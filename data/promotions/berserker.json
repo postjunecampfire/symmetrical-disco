@@ -1,0 +1,10 @@
+{
+  "id": "berserker",
+  "display_name": "Berserker",
+  "from_class": "fighter",
+  "str_mod": 3,
+  "dex_mod": 0,
+  "con_mod": 0,
+  "int_mod": 0,
+  "signature_card": "berserker_rampage"
+}

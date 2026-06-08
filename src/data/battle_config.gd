@@ -27,3 +27,6 @@ extends Resource
 ## Extra XP added to each successive level's requirement: the XP to go from
 ## level L to L+1 is `xp_curve_base + xp_curve_step * (L - 1)` (a linear ramp).
 @export var xp_curve_step: int = 20
+## Levels per class promotion (P3·06): a character may take its Nth promotion once
+## it reaches `promotion_level * N`. Default 20 (≈2–3 acts to the first).
+@export var promotion_level: int = 20

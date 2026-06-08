@@ -1,0 +1,20 @@
+{
+  "id": "assassin_ambush",
+  "display_name": "Ambush",
+  "description": "",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 12
+    }
+  ]
+}

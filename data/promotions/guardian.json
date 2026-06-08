@@ -1,0 +1,10 @@
+{
+  "id": "guardian",
+  "display_name": "Guardian",
+  "from_class": "fighter",
+  "str_mod": 0,
+  "dex_mod": 0,
+  "con_mod": 3,
+  "int_mod": 0,
+  "signature_card": "guardian_aegis"
+}

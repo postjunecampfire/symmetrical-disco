@@ -10,5 +10,6 @@
   "stat_points_per_level": 3,
   "xp_per_combat": 10,
   "xp_curve_base": 30,
-  "xp_curve_step": 20
+  "xp_curve_step": 20,
+  "promotion_level": 20
 }

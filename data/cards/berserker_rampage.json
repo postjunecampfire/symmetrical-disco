@@ -1,0 +1,20 @@
+{
+  "id": "berserker_rampage",
+  "display_name": "Rampage",
+  "description": "",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 16
+    }
+  ]
+}

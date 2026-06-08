@@ -1,0 +1,20 @@
+{
+  "id": "pyromancer_firestorm",
+  "display_name": "Firestorm",
+  "description": "",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 8
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "sage",
+  "display_name": "Sage",
+  "from_class": "mage",
+  "str_mod": 0,
+  "dex_mod": 0,
+  "con_mod": 1,
+  "int_mod": 2,
+  "signature_card": "sage_insight"
+}
