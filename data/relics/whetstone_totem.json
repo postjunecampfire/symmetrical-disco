@@ -1,0 +1,9 @@
+{
+  "id": "whetstone_totem",
+  "display_name": "Whetstone Totem",
+  "description": "At the start of each combat, the party gains 1 Strength.",
+  "rarity": "uncommon",
+  "trigger": "combat_start",
+  "effect": "add_strength",
+  "amount": 1
+}

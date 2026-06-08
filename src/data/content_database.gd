@@ -52,6 +52,7 @@ var enemies: Dictionary = {}
 var encounters: Dictionary = {}
 var races: Dictionary = {}
 var events: Dictionary = {}
+var relics: Dictionary = {}
 ## node_type (StringName) -> Array[StringName] of encounter ids (run-structure.md
 ## §9 / P2·09): which encounters feed which node types when a MapNode has no
 ## explicit payload. Loaded from data/encounter_pool.json.
@@ -88,6 +89,10 @@ func get_encounter(id: StringName) -> EncounterData:
 
 func get_event(id: StringName) -> EventData:
 	return events.get(id, null)
+
+
+func get_relic(id: StringName) -> RelicData:
+	return relics.get(id, null)
 
 
 ## Encounter ids that feed `node_type` (combat/elite/boss). Empty if none defined.
@@ -128,6 +133,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	encounters.clear()
 	races.clear()
 	events.clear()
+	relics.clear()
 	encounter_pool.clear()
 	battle_config = null
 
@@ -141,6 +147,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("encounters"), _parse_encounter, encounters, "encounter")
 	_load_category(data_dir.path_join("races"), _parse_race, races, "race")
 	_load_category(data_dir.path_join("events"), _parse_event, events, "event")
+	_load_category(data_dir.path_join("relics"), _parse_relic, relics, "relic")
 	_load_encounter_pool(data_dir.path_join("encounter_pool.json"))
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_derive_character_hp()
@@ -400,6 +407,29 @@ func _parse_event_outcomes(value: Variant, source: String, event_id: StringName)
 		outcome.id = _sn(od.get("id"), &"")
 		out.append(outcome)
 	return out
+
+
+# Relic (run-structure.md §7 / P2·12): a trigger+effect+amount modifier. Unknown
+# trigger/effect values are flagged here so the bad file is named precisely.
+func _parse_relic(d: Dictionary, source: String) -> Dictionary:
+	var ok := true
+	ok = _require(d, "id", source, "relic") and ok
+	ok = _require(d, "display_name", source, "relic") and ok
+	if not ok:
+		return {}
+	var r := RelicData.new()
+	r.id = _sn(d.get("id"))
+	r.display_name = _str(d.get("display_name"))
+	r.description = _str(d.get("description"), "")
+	r.rarity = _sn(d.get("rarity"), &"common")
+	r.trigger = _sn(d.get("trigger"), &"combat_start")
+	r.effect = _sn(d.get("effect"), &"gain_block")
+	r.amount = _int(d.get("amount"), 0)
+	if not RelicData.TRIGGERS.has(r.trigger):
+		_result.add_error("relic '%s' in %s uses unknown trigger '%s'" % [r.id, source, r.trigger])
+	if not RelicData.EFFECTS.has(r.effect):
+		_result.add_error("relic '%s' in %s uses unknown effect '%s'" % [r.id, source, r.effect])
+	return {"id": r.id, "value": r}
 
 
 func _parse_card(d: Dictionary, source: String) -> Dictionary:

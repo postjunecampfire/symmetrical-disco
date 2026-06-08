@@ -1,0 +1,9 @@
+{
+  "id": "scouts_satchel",
+  "display_name": "Scout's Satchel",
+  "description": "Each turn, draw 1 extra card.",
+  "rarity": "uncommon",
+  "trigger": "turn_start",
+  "effect": "draw_extra",
+  "amount": 1
+}

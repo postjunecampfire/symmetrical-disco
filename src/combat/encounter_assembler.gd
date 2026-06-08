@@ -1,5 +1,8 @@
 class_name EncounterAssembler
 extends RefCounted
+
+## Applies relic effects (P2·12) at assembly (passive + combat_start).
+var _relic_engine: RelicEngine = RelicEngine.new()
 ## Turns authored content (an EncounterData + the loaded ContentDatabase + a chosen
 ## party) into a ready-to-run battle (task P1·09 integration). This is the seam
 ## that binds the data layer (ContentDatabase, P1·11) to the runtime combat spine
@@ -43,6 +46,11 @@ extends RefCounted
 ## player-allocated level-up points; applied on top of class + race so a levelled
 ## character fights with its chosen growth (CON points also raise max HP). Applied
 ## BEFORE carried HP so the carried value clamps to the grown max.
+## `relics` (optional, P2·12): RelicData the run carries. Their `passive` effects
+## (max_hp_up) apply before carried HP (so the carried value clamps to the raised
+## max) and their `combat_start` effects (block/strength) apply after HP is set;
+## `turn_start` relics fire each player turn via EncounterBattle. Stored on the
+## battle so the turn hook can read them.
 func build(
 	encounter: EncounterData,
 	db: ContentDatabase,
@@ -51,7 +59,8 @@ func build(
 	carried_hp: Dictionary = {},
 	party_races: Dictionary = {},
 	run_deck: Array[StringName] = [],
-	allocated_stats: Dictionary = {}
+	allocated_stats: Dictionary = {},
+	relics: Array = []
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
@@ -79,8 +88,15 @@ func build(
 	# carried HP, so CON points raise max HP and the carried value clamps to it.
 	if not allocated_stats.is_empty():
 		_apply_allocations(battle, allocated_stats, config.hp_per_con)
+	# Relics (P2·12): store on the battle (turn_start fires each turn), apply passive
+	# max-HP before carried HP, then combat_start buffs after HP is set.
+	battle.relics = relics
+	if not relics.is_empty():
+		_relic_engine.apply_passive(battle, relics)
 	if not carried_hp.is_empty():
 		_apply_carried_hp(battle, carried_hp)
+	if not relics.is_empty():
+		_relic_engine.apply_combat_start(battle, relics)
 	_spawn_enemies(battle, encounter, db)
 
 	return battle

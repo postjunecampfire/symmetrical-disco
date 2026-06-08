@@ -94,6 +94,21 @@ by `EventResolver` against the RunState.
 - `evt_wandering_medic` — heal 8 / take a `field_dressing` card / walk away.
 - `evt_cursed_shrine` — take damage + a relic / trade a card for a heal / leave.
 
+## Relics (`relics/`)
+RelicData (run-structure.md §7, P2·12) — light trigger+effect run modifiers applied
+by `RelicEngine`. Triggers: `combat_start` / `turn_start` / `passive` / `on_kill`.
+Effects: `gain_block`, `add_strength`, `max_hp_up`, `gain_energy`, `draw_extra`.
+Elites grant one; events may (`add_relic`).
+
+| id | rarity | trigger | effect |
+|----|--------|---------|--------|
+| `iron_brand` | common | combat_start | +6 block to party |
+| `shrine_blessing` | uncommon | combat_start | +4 block to party |
+| `whetstone_totem` | uncommon | combat_start | +1 Strength to party |
+| `scouts_satchel` | uncommon | turn_start | draw +1 |
+| `dynamo_core` | rare | turn_start | +1 energy |
+| `vital_idol` | boss | passive | +6 max HP each |
+
 ## Battle config (`battle_config.json`)
 BattleConfig per §7: `energy_per_turn: 3`, `draw_per_turn: 5`, `max_hand: 10`,
 `reshuffle_discard: true`, `rest_heal: 12` (rest-node heal, P2·07). Leveling knobs

@@ -1,0 +1,9 @@
+{
+  "id": "iron_brand",
+  "display_name": "Iron Brand",
+  "description": "At the start of each combat, the party gains 6 Block.",
+  "rarity": "common",
+  "trigger": "combat_start",
+  "effect": "gain_block",
+  "amount": 6
+}

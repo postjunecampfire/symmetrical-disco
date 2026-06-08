@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 202 passing.
+# Currently: 215 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -54,6 +54,11 @@ could self-test. A human/agent without that runs the headless line above as the 
   encounter sequence — survivors heal post-win, downed revive at low HP, TPK ends
   the run. Combat split into `begin_combat`/`finish_combat` so the UI drives turns
   interactively; `resolve_combat` composes them for the headless auto-runner.
+- **Relics** (ADR-0012, P2·12): light trigger+effect run modifiers (`RelicData`,
+  `data/relics/`). `RelicEngine` applies `combat_start` (block/strength) and
+  `passive` (max HP) at assembly and `turn_start` (energy/draw) each player turn —
+  additive hooks around `EncounterBattle`, no change to `BattleState`. Elites grant
+  one; events can too (`add_relic`). Held in `RunState.relics`.
 - **Telemetry** (`src/telemetry/`): combat/run events; used to produce the attrition read.
 
 ## 4. Known gaps / deferred (NOT yet done)
@@ -79,8 +84,8 @@ could self-test. A human/agent without that runs the headless line above as the 
    flows into a full branching run via `MapView`: generated map, node selection,
    interactive combat through the run layer, card-reward drafts, rest (heal/upgrade)
    and event screens, in-UI level-up allocation, and a win/defeat end screen. All
-   node *handlers* exist: combat (P2·06), event (P2·08), rest (P2·07). Still open:
-   **relic (P2·12)** node handler/engine (sequence after a balance pass).
+   node *handlers* exist: combat (P2·06), event (P2·08), rest (P2·07).
+   **Relics (P2·12) ✓ DONE 2026-06-08** — see "Relics" in §3.
 4. **Class promotion (P3·06)** and **exit-package meta (P3·08, ADR-0018)** — not built.
 5. **Save/resume** exists on `RunState` but isn't wired into the run loop.
 
@@ -100,14 +105,15 @@ All the knobs are data (`data/battle_config.json`, `data/enemies/*`, `data/encou
 | ~~Make builds matter (cards from races/rewards show up)~~ | ~~Wire `run_deck` → combat deck~~ **DONE (gap #1, 4cdbac0)** |
 | ~~Deepen characters (XP + stat allocation)~~ | ~~Leveling (P3·05)~~ **DONE (gap #2)** — UI to allocate is part of P2·10 |
 | ~~Make it feel like a *run*, not one fight~~ | ~~Map/run UI (P2·10)~~ **DONE** — creation → full run in `MapView` |
-| Make combat threatening (attrition real) | **Balance pass** — tune enemies/encounters/healing in data |
+| Make combat threatening (attrition real) | **Balance pass** — tune enemies/encounters/healing/relics in data |
 | Amplify identity further | **Class promotion (P3·06)** — builds on leveling |
-| Add run modifiers | **Relic system (P2·12)** — last node handler; sequence after balance |
+| ~~Add run modifiers~~ | ~~Relic system (P2·12)~~ **DONE** — `RelicEngine` + authored relics |
 
 My recommendation for next session: **balance pass** (cheap, in data, makes
 playtesting meaningful) — the whole loop is now playable end-to-end (map → fights
-→ rewards/rest/events → boss) with run decks + leveling live, so this is the moment
-to playtest and tune. Then **class promotion (P3·06)** and **relics (P2·12)**.
+→ rewards/rest/events/relics → boss) with run decks + leveling live, so this is the
+moment to playtest and tune (relics that boost the economy will amplify the
+still-easy combat — tune together). Then **class promotion (P3·06)**.
 
 ## 7. Gotchas / conventions
 
@@ -123,14 +129,14 @@ to playtest and tune. Then **class promotion (P3·06)** and **relics (P2·12)**.
 
 ```
 src/data/      content resources + ContentDatabase loader (cards, characters=classes,
-               enemies, encounters, races, events, statuses, battle_config, encounter_pool)
+               enemies, encounters, races, events, relics, statuses, battle_config, encounter_pool)
 src/combat/    BattleState (turns/energy/status/targeting), EffectResolver, Combatant,
-               EnemyAI, EncounterAssembler/Battle
+               EnemyAI, EncounterAssembler/Battle, RelicEngine
 src/cards/     Deck, CardPlay
 src/run/       RunController, RunState, RunNavigator, Leveling, EventResolver, RestResolver, MapGraph/MapGenerator, CardReward
 src/ui/        character_creation → map_view (run) → battle_view (code-driven, asset-free)
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (202 passing)
+tests/         GUT suites mirroring src/  (215 passing)
 ```

@@ -236,6 +236,37 @@ func test_allocate_stat_point_through_controller() -> void:
 	assert_false(rc.allocate_stat_point(&"fighter", &"str"), "cannot spend with none left")
 
 
+# --- Relics (P2·12) ---------------------------------------------------------
+
+func test_grant_relic_adds_and_dedupes() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	assert_true(rc.grant_relic(&"iron_brand", "elite"), "a real relic is granted")
+	assert_true(rc.run.relics.has(&"iron_brand"), "relic recorded on the run")
+	assert_false(rc.grant_relic(&"iron_brand"), "granting the same relic twice is a no-op")
+	assert_false(rc.grant_relic(&"no_such_relic"), "an unknown relic id is rejected")
+
+
+func test_granted_relic_applies_in_the_next_fight() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.grant_relic(&"iron_brand")  # +6 block at combat_start
+	var battle := rc.begin_combat(&"enc_combat_01")
+	assert_not_null(battle, "combat assembled")
+	for unit in battle.living_players():
+		assert_eq(unit.block, 6, "the owned relic's combat_start block applied in the fight")
+
+
+func test_available_relics_excludes_owned() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter"] as Array[StringName], 1)
+	var before: int = rc.available_relics().size()
+	assert_gt(before, 0, "some relics are available")
+	rc.grant_relic(&"iron_brand")
+	assert_false(rc.available_relics().has(&"iron_brand"), "an owned relic drops out of the pool")
+	assert_eq(rc.available_relics().size(), before - 1, "pool shrinks by one")
+
+
 # --- Rest nodes (P2·07) -----------------------------------------------------
 
 func test_resolve_rest_heal_restores_party() -> void:

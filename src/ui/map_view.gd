@@ -164,6 +164,16 @@ func _refresh_status() -> void:
 	deck.text = "Run deck: %d cards" % _controller.run.run_deck.size()
 	_party_box.add_child(deck)
 
+	if not _controller.run.relics.is_empty():
+		var names: Array[String] = []
+		for rid in _controller.run.relics:
+			var relic: RelicData = _db.get_relic(rid)
+			names.append(relic.display_name if relic != null else String(rid))
+		var relic_lab := Label.new()
+		relic_lab.add_theme_color_override("font_color", COL_ACCENT)
+		relic_lab.text = "Relics: %s" % ", ".join(names)
+		_party_box.add_child(relic_lab)
+
 
 func _refresh_map() -> void:
 	_clear(_map_box)
@@ -286,10 +296,28 @@ func _on_combat_finished(outcome: int, bv: BattleView) -> void:
 	_nav.complete_current()
 	if _nav.is_boss(node):
 		_show_run_end(true)
-	elif node.node_type == &"combat" or node.node_type == &"elite":
+	elif node.node_type == &"elite":
+		# Elites grant a relic (run-structure.md §5) in addition to the card draft.
+		_grant_relic("elite")
+		_show_reward()
+	elif node.node_type == &"combat":
 		_show_reward()
 	else:
 		_refresh()
+
+
+## Award a not-yet-owned relic (deterministic pick) and tell the player. No-op if
+## every relic is already owned.
+func _grant_relic(source: String) -> void:
+	var pool: Array[StringName] = _controller.available_relics()
+	if pool.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = run_seed ^ hash(_controller.run.cleared.size())
+	var rid: StringName = pool[rng.randi_range(0, pool.size() - 1)]
+	if _controller.grant_relic(rid, source):
+		var relic: RelicData = _db.get_relic(rid)
+		_status_label.text = "Relic acquired: %s — %s" % [relic.display_name, relic.description]
 
 
 # --- Card reward (after a won combat/elite) ----------------------------------

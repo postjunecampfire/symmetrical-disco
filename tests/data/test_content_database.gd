@@ -173,6 +173,18 @@ func test_dangling_encounter_pool_fails_loudly() -> void:
 	)
 
 
+# --- Validation: unknown relic trigger (P2·12) ---
+func test_unknown_relic_trigger_fails_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("bad_relic"))
+
+	assert_false(result.ok, "an unknown relic trigger must fail the load")
+	assert_true(
+		_any_contains(result.errors, "unknown trigger"),
+		"error should name the bad relic trigger: %s" % str(result.errors)
+	)
+
+
 # --- Helper ---
 func _any_contains(errors: PackedStringArray, needle: String) -> bool:
 	for e in errors:

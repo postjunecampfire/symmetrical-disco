@@ -19,6 +19,12 @@ extends BattleState
 ## Public so a caller (e.g. UI) can read telegraphs via `enemy_ai.get_telegraph`.
 var enemy_ai: EnemyAI = null
 
+## Active run relics (RelicData, P2·12). The assembler applies their combat_start
+## and passive effects once at build; this subclass applies their turn_start
+## effects at each player turn via the override below. Empty in a plain battle.
+var relics: Array = []
+var _relic_engine: RelicEngine = RelicEngine.new()
+
 
 ## Forwards all BattleState construction to the base, then leaves `enemy_ai` to be
 ## injected (the assembler sets it after construction so the base `_init`
@@ -46,3 +52,12 @@ func _take_enemy_action(enemy: Combatant) -> void:
 	if data == null:
 		return
 	enemy_ai.take_turn(self, enemy, data)
+
+
+## Begin a player turn, then apply any turn_start relic effects (gain_energy /
+## draw_extra, P2·12) on top of the base energy refill + draw. Additive — the base
+## turn logic is untouched.
+func start_player_turn() -> void:
+	super()
+	if not relics.is_empty():
+		_relic_engine.apply_turn_start(self, relics)

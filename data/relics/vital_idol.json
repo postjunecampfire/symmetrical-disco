@@ -1,0 +1,9 @@
+{
+  "id": "vital_idol",
+  "display_name": "Vital Idol",
+  "description": "Each party member has +6 maximum HP.",
+  "rarity": "boss",
+  "trigger": "passive",
+  "effect": "max_hp_up",
+  "amount": 6
+}

@@ -91,8 +91,19 @@ func begin_combat(encounter_id: StringName) -> EncounterBattle:
 	# class starting decks. The assembler falls back to starting decks if it is empty.
 	return _assembler.build(
 		encounter, db, run.party, run.seed, carried, _party_races, run.run_deck,
-		run.allocated_stats
+		run.allocated_stats, _active_relics()
 	)
+
+
+## Resolve the run's relic ids (RunState.relics) to RelicData via the db, skipping
+## any that don't resolve. The list the assembler/RelicEngine apply each fight.
+func _active_relics() -> Array:
+	var out: Array = []
+	for rid in run.relics:
+		var relic: RelicData = db.get_relic(rid)
+		if relic != null:
+			out.append(relic)
+	return out
 
 
 ## Settle a finished `battle`: write each player's HP back to the run, mark downed,
@@ -184,6 +195,34 @@ func resolve_event(event_id: StringName, choice_index: int) -> bool:
 			"deck_size": run.run_deck.size(),
 		})
 	return true
+
+
+# --- Relics (run-structure.md §7 / P2·12) -----------------------------------
+
+## Add `relic_id` to the run (elite/boss/event acquisition). Skips unknown ids and
+## duplicates. Its effects apply from the NEXT assembled combat onward (and, for
+## passive/combat_start, that fight's assembly). Logs a `relic_gained` event.
+func grant_relic(relic_id: StringName, source: String = "") -> bool:
+	if relic_id == &"" or db.get_relic(relic_id) == null:
+		return false
+	if run.relics.has(relic_id):
+		return false
+	run.relics.append(relic_id)
+	if telemetry != null:
+		telemetry.log_event(&"relic_gained", {"relic": String(relic_id), "source": source})
+	return true
+
+
+## Relic ids the run does not yet own (acquisition candidates), sorted for
+## deterministic selection by a caller.
+func available_relics() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for key: Variant in db.relics.keys():
+		var rid: StringName = StringName(String(key))
+		if not run.relics.has(rid):
+			out.append(rid)
+	out.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
+	return out
 
 
 # --- Rest nodes (run-structure.md §5 / P2·07) -------------------------------

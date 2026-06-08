@@ -1,0 +1,9 @@
+{
+  "id": "dynamo_core",
+  "display_name": "Dynamo Core",
+  "description": "Each turn, gain 1 extra energy.",
+  "rarity": "rare",
+  "trigger": "turn_start",
+  "effect": "gain_energy",
+  "amount": 1
+}

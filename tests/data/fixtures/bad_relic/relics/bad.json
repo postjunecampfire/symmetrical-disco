@@ -1,0 +1,7 @@
+{
+  "id": "bad_relic",
+  "display_name": "Bad Relic",
+  "trigger": "on_tuesday",
+  "effect": "gain_block",
+  "amount": 3
+}
