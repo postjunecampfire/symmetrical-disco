@@ -78,6 +78,7 @@ func build(
 	var battle: EncounterBattle = EncounterBattle.new(config, deck, db.statuses, ai)
 	battle.win_condition = encounter.win_condition
 	battle.win_param = encounter.win_param
+	battle.enemy_db = db.enemies  # lets summoners spawn minions mid-fight (P2·12 kit)
 
 	_spawn_players(battle, party)
 	# Race modifiers (ADR-0015) apply on top of the base class before carried HP,

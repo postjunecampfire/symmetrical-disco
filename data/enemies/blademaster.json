@@ -57,5 +57,8 @@
   "ramp_amount": 3,
   "ramp_every": 3,
   "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
   "sprite": "res://assets/enemies/blademaster.png"
 }

@@ -501,6 +501,9 @@ func _parse_enemy(d: Dictionary, source: String) -> Dictionary:
 	en.ramp_amount = _int(d.get("ramp_amount"), 0)
 	en.ramp_every = _int(d.get("ramp_every"), 0)
 	en.ramp_passive = _bool(d.get("ramp_passive"), false)
+	en.summon_id = _sn(d.get("summon_id"), &"")
+	en.summon_every = _int(d.get("summon_every"), 0)
+	en.summon_max = _int(d.get("summon_max"), 0)
 	return {"id": en.id, "value": en}
 
 
@@ -655,11 +658,15 @@ func _validate_references() -> void:
 					"character '%s' innate_actions references unknown card '%s'" % [ch.id, card_id]
 				)
 
-	# enemy intents' effects -> status ids
+	# enemy intents' effects -> status ids; summon_id -> an enemy id
 	for id in enemies:
 		var en: EnemyData = enemies[id]
 		for it in en.intents:
 			_validate_effect_statuses(it.effects, "enemy '%s' intent '%s'" % [en.id, it.id])
+		if en.summon_id != &"" and not enemies.has(en.summon_id):
+			_result.add_error(
+				"enemy '%s' summon_id references unknown enemy '%s'" % [en.id, en.summon_id]
+			)
 
 	# encounter.enemies -> enemy ids
 	for id in encounters:

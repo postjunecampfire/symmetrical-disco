@@ -43,6 +43,8 @@ var attack_stat: StringName = &""
 ## How many times this unit has taken an enemy-phase action (drives the scheduled
 ## ramp's cadence, EnemyData.ramp_every). Player units leave this at 0.
 var turns_taken: int = 0
+## How many minions this unit has summoned (capped by EnemyData.summon_max).
+var summons_done: int = 0
 
 ## Link back to the authored definition (CharacterData or EnemyData).
 var source_data: Resource = null

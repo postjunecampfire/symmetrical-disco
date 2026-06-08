@@ -49,8 +49,11 @@
       "weight": 1
     }
   ],
-  "ramp_amount": 3,
-  "ramp_every": 3,
+  "ramp_amount": 0,
+  "ramp_every": 0,
   "ramp_passive": false,
+  "summon_id": "gremlin",
+  "summon_every": 3,
+  "summon_max": 3,
   "sprite": "res://assets/enemies/warband_captain.png"
 }

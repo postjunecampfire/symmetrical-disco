@@ -23,3 +23,10 @@ extends Resource
 @export var ramp_amount: int = 0
 @export var ramp_every: int = 0
 @export var ramp_passive: bool = false
+
+## Mid-fight summon (enemy kit redesign): every `summon_every` turns this enemy
+## spawns a `summon_id` minion INSTEAD of acting, up to `summon_max` total. Dragging
+## a fight out means endless reinforcements — the anti-turtle lever. 0/"" = no summon.
+@export var summon_id: StringName = &""
+@export var summon_every: int = 0
+@export var summon_max: int = 0

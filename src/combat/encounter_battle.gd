@@ -25,6 +25,10 @@ var enemy_ai: EnemyAI = null
 var relics: Array[RelicData] = []
 var _relic_engine: RelicEngine = RelicEngine.new()
 
+## id -> EnemyData, so a summoner can spawn its minion mid-fight (set by the
+## assembler from the ContentDatabase). Empty -> summons are skipped.
+var enemy_db: Dictionary = {}
+
 
 ## Forwards all BattleState construction to the base, then leaves `enemy_ai` to be
 ## injected (the assembler sets it after construction so the base `_init`
@@ -51,11 +55,36 @@ func _take_enemy_action(enemy: Combatant) -> void:
 	var data: EnemyData = enemy.source_data as EnemyData
 	if data == null:
 		return
-	# Ramp (enemy kit redesign): a scheduled buff turn CONSUMES the action; a passive
-	# ramp is free and the enemy still attacks.
+	# A summon turn CONSUMES the action (reinforcements instead of attacking). Then
+	# ramp: a scheduled buff turn also consumes the action; a passive ramp is free and
+	# the enemy still attacks.
+	if _apply_enemy_summon(enemy, data):
+		return
 	if _apply_enemy_ramp(enemy, data):
 		return
 	enemy_ai.take_turn(self, enemy, data)
+
+
+## Spawn a minion if `enemy` is a summoner and this is a summon turn. Every
+## `summon_every` turns it summons one `summon_id` (resolved via `enemy_db`) into
+## the enemy team, up to `summon_max` total, INSTEAD of acting (returns true). The
+## new minion joins from the next enemy phase (the current phase iterates a snapshot
+## of living enemies). Dragging the fight out keeps the board growing — the
+## anti-turtle lever. False if not configured / not a summon turn / cap reached.
+func _apply_enemy_summon(enemy: Combatant, data: EnemyData) -> bool:
+	if data.summon_id == &"" or data.summon_every <= 0:
+		return false
+	enemy.turns_taken += 1
+	if enemy.turns_taken % data.summon_every != 0:
+		return false
+	if enemy.summons_done >= data.summon_max:
+		return false
+	var minion_data: Variant = enemy_db.get(data.summon_id, null)
+	if not (minion_data is EnemyData):
+		return false
+	add_combatant(Combatant.from_enemy(minion_data))
+	enemy.summons_done += 1
+	return true
 
 
 ## Apply `enemy`'s damage ramp for the turn it is about to take. Passive ramp grants

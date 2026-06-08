@@ -20,7 +20,7 @@ godot --path .            # or open project.godot in the editor and press Play
 
 # Run the whole test suite headless (the gate — must be green before any commit):
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
-# Currently: 232 passing.
+# Currently: 237 passing.
 
 # Push (remote + SSH already configured):
 git push
@@ -126,7 +126,25 @@ This replaced the old roll-based `buildup` intent (which cannibalised attacks).
 defensive 100% · turtle 100% (final HP greedy 28 < defensive 37 < turtle 42).
 **Greed is punished; turtling still isn't.**
 
-**FINDING — punishing turtle is a BLOCK-DENIAL problem, not a damage-amount one.**
+**Anti-turtle levers built (all tested, all data-tunable):** Frail/Vulnerable
+layered into the hard fights (Twin = Ogre+Coven Witch; Elite = Captain+Occultist+
+Ooze); the **Captain summons gremlin reinforcements** (`EnemyData.summon_id/
+summon_every/summon_max`, `EncounterBattle._apply_enemy_summon`). Result: greedy
+**90%** (4 deaths @ elite) — clearly punished — but **turtle stays 100%.**
+
+**ROOT FINDING — block economy dominates.** A maximal turtle blocks ~2×/turn
+(every turn, fully negating damage) AND kills ~1 enemy/turn — so it kills Frail
+appliers and summoned minions as fast as they arrive, and out-sustains ramp. No
+amount of debuff/ramp/summon tuning cracks a *perfect* turtle because block is
+free-enough and total. Cracking it is a **design decision about block**, not a
+number: options — (a) a soft per-fight **turn cap / escalating unblockable chip**;
+(b) **block-piercing** attacks on some enemies; (c) make block **scarcer** (higher
+energy cost / cap per turn); (d) accept that a perfect turtle is a valid slow line
+and let the **run structure** tax it (fewer rests, status bleed) — which the
+single-fight harness doesn't model. Owner's call. (Note: the harness turtle blocks
+*optimally* every turn — more than a real hand/energy usually allows.)
+
+**(earlier finding) punishing turtle is also a BLOCK-DENIAL problem.**
 A dedicated turtle blocks ~2× per turn and out-sustains even ramped enemies in
 fights short enough to win; raising ramp amounts barely moved it (turtle 44→42).
 The hard fights (brute+ogre, captain's guard) have **no Frail applier**, so the
@@ -189,5 +207,5 @@ src/ui/        character_creation → map_view (run) → battle_view (code-drive
 src/telemetry/ TelemetryLogger
 data/          all authored content (see data/README.md)
 docs/          concept-brief, decisions/ (ADRs), systems/ (schemas), progress/, this file
-tests/         GUT suites mirroring src/  (232 passing)
+tests/         GUT suites mirroring src/  (237 passing)
 ```
