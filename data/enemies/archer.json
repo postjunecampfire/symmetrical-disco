@@ -1,7 +1,7 @@
 {
   "id": "archer",
   "display_name": "Archer",
-  "max_hp": 16,
+  "max_hp": 22,
   "speed": 12,
   "intent_pattern": "random_weighted",
   "intents": [

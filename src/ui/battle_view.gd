@@ -34,6 +34,15 @@ var party_races: Dictionary = {}
 var injected_battle: EncounterBattle = null
 var injected_db: ContentDatabase = null
 
+## Optional run telemetry (injected by MapView alongside the battle). When set,
+## every successful card/innate play is logged as a `card_played` event. Null
+## (standalone battle_view) = no logging.
+var telemetry: TelemetryLogger = null
+
+## Player turns started this fight; reported to RunController.finish_combat so
+## combat_result telemetry carries a real turn count (was hardcoded 0 from the UI).
+var _turns: int = 0
+
 const COL_BG := Color(0.12, 0.13, 0.17)
 const COL_PANEL := Color(0.18, 0.20, 0.26)
 const COL_PANEL_SEL := Color(0.26, 0.34, 0.46)
@@ -101,6 +110,7 @@ func _load_and_assemble() -> void:
 
 
 func _begin_player_turn() -> void:
+	_turns += 1
 	_battle.start_player_turn()
 	# Telegraph each enemy's next action for display.
 	if _battle.enemy_ai != null:
@@ -405,8 +415,17 @@ func _resolve_play(actor: Combatant, card: CardData, innate: CardData, target: V
 	else:
 		result = _card_play.play_card(actor, card, target)
 	if result.ok:
-		var name := (innate if innate != null else card).display_name
-		_status_text = "%s played %s." % [actor.display_name, name]
+		var played: CardData = innate if innate != null else card
+		_status_text = "%s played %s." % [actor.display_name, played.display_name]
+		if telemetry != null:
+			var actor_data := actor.source_data as CharacterData
+			telemetry.log_event(&"card_played", {
+				"card": String(played.id),
+				"actor": String(actor_data.id) if actor_data != null else actor.display_name,
+				"innate": innate != null,
+				"turn": _turns,
+				"energy_left": _battle.energy,
+			})
 	else:
 		_status_text = result.reason
 	_clear_armed()
@@ -427,6 +446,11 @@ func _on_end_turn() -> void:
 
 
 # --- Helpers ----------------------------------------------------------------
+
+## Player turns started this fight (for run telemetry via finish_combat).
+func turns_taken() -> int:
+	return _turns
+
 
 ## The combatant who would play `card`: a tagged card -> its owner; a neutral
 ## card -> the currently selected actor. Null if no eligible, living actor.

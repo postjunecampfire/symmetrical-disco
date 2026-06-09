@@ -32,6 +32,12 @@ const TELEMETRY_DIR: String = "user://telemetry"
 ## The rolling cross-run summary file (one line per completed run).
 const SUMMARY_PATH: String = "user://telemetry/runs_summary.jsonl"
 
+## Where this logger actually writes. Defaults to TELEMETRY_DIR (user://) so
+## exported builds and the GUT suite are unchanged; the run UI overrides it to
+## `res://telemetry_dump` when running from the editor so playtest runs land in
+## the project folder (gitignored) for direct analysis — no copy step.
+var base_dir: String = TELEMETRY_DIR
+
 
 # --- Per-run state ----------------------------------------------------------
 
@@ -64,12 +70,12 @@ func start_run(meta: Dictionary) -> void:
 	_seq = 0
 	_run_path = ""
 
-	var mkdir_err: Error = DirAccess.make_dir_recursive_absolute(TELEMETRY_DIR)
+	var mkdir_err: Error = DirAccess.make_dir_recursive_absolute(base_dir)
 	if mkdir_err != OK and mkdir_err != ERR_ALREADY_EXISTS:
 		return  # cannot create the directory → degrade to no-op
 
 	var unix_seconds: int = int(Time.get_unix_time_from_system())
-	_run_path = "%s/run_%d.jsonl" % [TELEMETRY_DIR, unix_seconds]
+	_run_path = "%s/run_%d.jsonl" % [base_dir, unix_seconds]
 	_file = FileAccess.open(_run_path, FileAccess.WRITE)
 	if _file == null:
 		_run_path = ""
@@ -138,13 +144,14 @@ func _append_summary(summary: Dictionary) -> void:
 	for key in summary.keys():
 		line_obj[key] = summary[key]
 
+	var summary_path: String = base_dir.path_join("runs_summary.jsonl")
 	var file: FileAccess = null
-	if FileAccess.file_exists(SUMMARY_PATH):
-		file = FileAccess.open(SUMMARY_PATH, FileAccess.READ_WRITE)
+	if FileAccess.file_exists(summary_path):
+		file = FileAccess.open(summary_path, FileAccess.READ_WRITE)
 		if file != null:
 			file.seek_end()
 	else:
-		file = FileAccess.open(SUMMARY_PATH, FileAccess.WRITE)
+		file = FileAccess.open(summary_path, FileAccess.WRITE)
 	if file == null:
 		return
 	file.store_line(JSON.stringify(line_obj))

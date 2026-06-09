@@ -1,7 +1,7 @@
 {
   "id": "skirmisher",
   "display_name": "Skirmisher",
-  "max_hp": 14,
+  "max_hp": 20,
   "speed": 14,
   "intent_pattern": "random_weighted",
   "intents": [

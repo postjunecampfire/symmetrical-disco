@@ -1,7 +1,7 @@
 {
   "id": "gremlin",
   "display_name": "Gremlin",
-  "max_hp": 11,
+  "max_hp": 15,
   "speed": 13,
   "intent_pattern": "random_weighted",
   "intents": [

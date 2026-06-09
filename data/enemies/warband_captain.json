@@ -1,7 +1,7 @@
 {
   "id": "warband_captain",
   "display_name": "Warband Captain",
-  "max_hp": 46,
+  "max_hp": 64,
   "speed": 10,
   "intent_pattern": "random_weighted",
   "intents": [

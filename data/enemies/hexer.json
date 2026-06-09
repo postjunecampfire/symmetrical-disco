@@ -1,7 +1,7 @@
 {
   "id": "hexer",
   "display_name": "Hexer",
-  "max_hp": 18,
+  "max_hp": 25,
   "speed": 11,
   "intent_pattern": "random_weighted",
   "intents": [

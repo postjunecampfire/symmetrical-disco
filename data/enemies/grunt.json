@@ -1,7 +1,7 @@
 {
   "id": "grunt",
   "display_name": "Grunt",
-  "max_hp": 20,
+  "max_hp": 28,
   "speed": 8,
   "intent_pattern": "random_weighted",
   "intents": [

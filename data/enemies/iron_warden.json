@@ -1,7 +1,7 @@
 {
   "id": "iron_warden",
   "display_name": "The Iron Warden",
-  "max_hp": 95,
+  "max_hp": 152,
   "speed": 7,
   "intent_pattern": "sequence",
   "intents": [

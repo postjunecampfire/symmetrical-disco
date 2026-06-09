@@ -68,7 +68,13 @@ func _ready() -> void:
 		_status_label.text = "Content failed to load: %s" % str(result.errors)
 		return
 
-	_controller = RunController.new(_db)
+	var logger := TelemetryLogger.new()
+	if OS.has_feature("editor"):
+		# Running from source: write telemetry into the project folder (gitignored
+		# telemetry_dump/) so playtest runs are analyzable without copying out of
+		# user://. Exported builds keep the user:// default.
+		logger.base_dir = "res://telemetry_dump"
+	_controller = RunController.new(_db, logger)
 	_meta = MetaState.load_from()
 	_meta_progress = MetaProgress.new(_db, _meta)
 	if resume_state != null:
@@ -82,6 +88,21 @@ func _ready() -> void:
 		_controller.start_run(party, run_seed, party_races)
 		_controller.run.map = MapGenerator.new().generate(MapGenConfig.new(), run_seed)
 		_meta_progress.apply_boons(_controller.run)  # banked cross-run boons (P3·08)
+	# Open the run's telemetry file (interactive runs were previously unlogged —
+	# only the headless harness wired a logger). RunController's combat_result /
+	# event_choice / rest_choice / promotion events all flow into it from here on.
+	var party_ids: Array[String] = []
+	var hp_snapshot: Dictionary = {}
+	for cid: StringName in _controller.run.party:
+		party_ids.append(String(cid))
+		hp_snapshot[String(cid)] = int(_controller.run.party_hp.get(cid, 0))
+	_controller.telemetry.start_run({
+		"party": party_ids,
+		"seed": run_seed,
+		"resumed": resume_state != null,
+		"hp": hp_snapshot,
+	})
+
 	_nav = RunNavigator.new(_db, _controller.run)
 	_reward = CardReward.new(_db, {})
 
@@ -307,6 +328,7 @@ func _start_combat(node: MapNode) -> void:
 	var bv := BattleView.new()
 	bv.injected_battle = _active_battle
 	bv.injected_db = _db
+	bv.telemetry = _controller.telemetry  # log card_played events into the run file
 	bv.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bv.combat_finished.connect(_on_combat_finished.bind(bv))
 	_open_overlay(bv)
@@ -314,7 +336,7 @@ func _start_combat(node: MapNode) -> void:
 
 func _on_combat_finished(outcome: int, bv: BattleView) -> void:
 	# Settle HP/XP via the run layer, then advance or end the run.
-	_controller.finish_combat(_active_encounter, _active_battle)
+	_controller.finish_combat(_active_encounter, _active_battle, bv.turns_taken())
 	_close_overlay()
 	bv.queue_free()
 
@@ -551,6 +573,18 @@ func _on_promotion_pick(cid: StringName, promotion_id: StringName) -> void:
 
 
 func _show_run_end(victory: bool) -> void:
+	# Close out the telemetry run (writes run_end + a runs_summary.jsonl line).
+	# Safe if the logger is already inactive (end_run no-ops).
+	var ended: RunState = _controller.run
+	var hp_left: int = 0
+	for cid: StringName in ended.party:
+		hp_left += int(ended.party_hp.get(cid, 0))
+	_controller.telemetry.end_run({
+		"outcome": "WIN" if victory else "LOSS",
+		"nodes_cleared": ended.cleared.size(),
+		"party_hp_remaining": hp_left,
+		"run_deck_size": ended.run_deck.size(),
+	})
 	_clear_save()  # the run is over — don't offer to resume it
 	var panel := _overlay_panel("VICTORY — the act is cleared!" if victory else "DEFEAT — the party fell.")
 	var summary := Label.new()

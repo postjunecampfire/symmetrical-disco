@@ -112,6 +112,22 @@ func _active_relics() -> Array[RelicData]:
 ## `resolve_combat` calls it after its auto-run loop).
 func finish_combat(encounter_id: StringName, battle: BattleState, turns: int = 0) -> int:
 	var outcome: int = battle.check_outcome()
+	# Telemetry fidelity (balance pass): snapshot HP entering the fight (run.party_hp
+	# is not yet written back here) and at the final blow (battle units, BEFORE the
+	# post-combat heal), so combat_result shows TRUE damage taken — the post-heal
+	# party_hp snapshot masked up to post_combat_heal points of chip per fight.
+	var hp_before: Dictionary = _hp_snapshot()
+	var hp_end_of_fight: Dictionary = {}
+	var damage_taken: Dictionary = {}  # net of in-fight healing
+	for unit in battle.combatants:
+		if not unit.is_player():
+			continue
+		var data := unit.source_data as CharacterData
+		if data == null:
+			continue
+		var cid: String = String(data.id)
+		hp_end_of_fight[cid] = unit.hp
+		damage_taken[cid] = int(hp_before.get(cid, unit.hp)) - unit.hp
 	_write_back_hp(battle, outcome)
 	if outcome == BattleState.Outcome.WIN:
 		_award_combat_xp()
@@ -121,6 +137,9 @@ func finish_combat(encounter_id: StringName, battle: BattleState, turns: int = 0
 			"encounter": String(encounter_id),
 			"outcome": _outcome_name(outcome),
 			"turns": turns,
+			"hp_before": hp_before,
+			"hp_end_of_fight": hp_end_of_fight,
+			"damage_taken": damage_taken,
 			"party_hp": _hp_snapshot(),
 			"downed": _ids(run.downed),
 		})

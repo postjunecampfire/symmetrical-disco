@@ -1,7 +1,7 @@
 {
   "id": "ogre",
   "display_name": "Ogre",
-  "max_hp": 55,
+  "max_hp": 77,
   "speed": 6,
   "intent_pattern": "random_weighted",
   "intents": [
@@ -20,8 +20,8 @@
       "weight": 3
     }
   ],
-  "ramp_amount": 3,
-  "ramp_every": 3,
+  "ramp_amount": 2,
+  "ramp_every": 4,
   "ramp_passive": false,
   "summon_id": "",
   "summon_every": 0,

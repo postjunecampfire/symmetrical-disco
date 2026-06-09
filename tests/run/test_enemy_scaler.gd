@@ -48,11 +48,16 @@ func test_hp_and_damage_and_block_scale_by_the_same_factor() -> void:
 	var s := EnemyScaler.new()  # factor(level) == level
 	var footman := _db.get_enemy(&"footman")
 	assert_not_null(footman, "footman fixture present")
+	# Derive expectations from the loaded data (not hardcoded magnitudes) so
+	# balance passes on data/enemies/* can't break this structural invariant.
+	var base_hp: int = footman.max_hp
+	var base_dmg: int = _first_amount(footman, &"damage")
+	var base_block: int = _first_amount(footman, &"block")
 	var scaled := s.apply_to(footman, 10)  # factor 10
 
-	assert_eq(scaled.max_hp, 300, "30 HP x10")
-	assert_eq(_first_amount(scaled, &"damage"), 70, "slash 7 x10")
-	assert_eq(_first_amount(scaled, &"block"), 100, "guard block 10 x10")
+	assert_eq(scaled.max_hp, base_hp * 10, "HP x10")
+	assert_eq(_first_amount(scaled, &"damage"), base_dmg * 10, "damage x10")
+	assert_eq(_first_amount(scaled, &"block"), base_block * 10, "block x10")
 
 
 func test_status_stacks_are_not_scaled() -> void:
