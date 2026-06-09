@@ -23,3 +23,8 @@ extends Resource
 @export var guarantees: Dictionary = {
 	&"rest_before_boss": true,
 }
+## How hard to tilt node-type weights toward combat/elite in the last third of
+## rows (ADR-0019 late-row bias). An ordinal knob — "none"/"low"/"low_med"/"med"/
+## "med_high"/"high"/"very_high" — read by the per-act map generator (a later
+## task); the loader parses and stores it so the authored curve is preserved.
+@export var late_row_bias: StringName = &"none"

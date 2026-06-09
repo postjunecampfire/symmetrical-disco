@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class Progression Matrix — Unnamed Game</title>
+<style>
+  :root{
+    --bg:#0e1014; --panel:#161a21; --ink:#e8ecf2; --muted:#8b95a5;
+    --line:#2a313c; --grid:#1d232c; --gold:#e8c46a;
+    --fighter:#e0563b; --fighter-dim:#5a2c23;
+    --mage:#9b7cf0; --mage-dim:#332a55;
+    --rogue:#2fae7a; --rogue-dim:#1c4537;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  header{padding:28px 32px 8px}
+  h1{margin:0 0 4px;font-size:24px;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:14px;max-width:820px;line-height:1.5}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin:16px 32px 4px;font-size:13px;color:var(--muted)}
+  .legend b{color:var(--ink)}
+  .chip{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .hint{margin:6px 32px 0;font-size:12.5px;color:var(--muted)}
+  .trees{padding:8px 16px 60px}
+  .tree-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    margin:18px 16px;padding:6px 0 14px;overflow-x:auto}
+  .tree-title{display:flex;align-items:baseline;gap:12px;padding:14px 22px 2px;flex-wrap:wrap}
+  .tree-title h2{margin:0;font-size:18px}
+  .tree-title .stat{font-size:12px;font-weight:700;letter-spacing:.6px;padding:2px 9px;border-radius:20px}
+  .tree-title .tag{color:var(--muted);font-size:13px}
+  svg{display:block;min-width:1180px}
+  .band-act{fill:var(--ink);font-size:12px;font-weight:700}
+  .band-label{fill:var(--muted);font-size:11px;font-weight:600;letter-spacing:.5px}
+  .edge{fill:none;stroke:var(--line);stroke-width:2}
+  .node rect{cursor:pointer;transition:all .15s}
+  .node .nm{font-size:13px;font-weight:700;fill:var(--ink);pointer-events:none}
+  .node .rl{font-size:10.5px;fill:var(--muted);pointer-events:none}
+  .node .ult{font-size:10.5px;fill:var(--gold);font-weight:600;pointer-events:none}
+  .node.dim{opacity:.22}
+  .edge.dim{opacity:.12}
+  .edge.hot{stroke-width:3}
+  .node.hot rect{filter:drop-shadow(0 0 7px rgba(255,255,255,.25))}
+  .asc rect{fill:#1a1710;stroke:var(--gold);stroke-width:1.5}
+  .asc .at{fill:var(--gold);font-size:12px;font-weight:800;letter-spacing:.5px}
+  .asc .ad{fill:#c9bd9a;font-size:11.5px}
+  .reset{margin:10px 22px 0;font-size:12px;color:var(--muted);cursor:pointer;
+    display:inline-block;border:1px solid var(--line);border-radius:8px;padding:5px 11px}
+  .reset:hover{color:var(--ink);border-color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Class Progression Matrix</h1>
+  <div class="sub">Pick your class at <b>Act&nbsp;3</b>, then make a branching <b>choice of two</b> at <b>Acts&nbsp;6, 9 and 12</b> (1→2→4→8 capstones). <b>Act&nbsp;15</b> is universal <b style="color:var(--gold)">Ascension</b>: whatever capstone you reached becomes <i>Ascended&nbsp;X</i> — a flat power bump to every card in your deck plus that capstone's signature <b style="color:var(--gold)">Ult</b>. Before Act&nbsp;3 you're the race-only "normal person" (Journeyman / Acolyte / Pickpocket). Naming leans on <i>Fire Emblem: The Sacred Stones</i>; roles map to the game's mechanics (block = DEX, poison ignores block, Vulnerable/Frail, crits, summons).</div>
+</header>
+
+<div class="legend">
+  <span class="chip"><span class="dot" style="background:var(--fighter)"></span><b>Fighter</b> — STR · martial force</span>
+  <span class="chip"><span class="dot" style="background:var(--mage)"></span><b>Mage</b> — INT · arcane schools</span>
+  <span class="chip"><span class="dot" style="background:var(--rogue)"></span><b>Rogue</b> — DEX · finesse &amp; toxins</span>
+  <span class="chip"><span class="dot" style="background:var(--gold)"></span><b>Ult</b> — gained on Ascension (Act 15)</span>
+</div>
+<div class="hint">Click any class to light up its lineage. The four power step-changes land at Acts 6, 9, 12 and 15.</div>
+
+<div class="trees" id="trees"></div>
+
+<script>
+// tier index 0..3 = Acts 3,6,9,12 ; Act 15 = universal Ascension ribbon
+const ACTS = [
+  {act:"Act 3", label:"CLASS"},
+  {act:"Act 6", label:"ARCHETYPE — choose 1 of 2"},
+  {act:"Act 9", label:"SPECIALIZE — choose 1 of 2"},
+  {act:"Act 12", label:"CAPSTONE — choose 1 of 2"},
+];
+
+const LINES = [
+  {
+    key:"fighter", name:"Fighter Line", stat:"STR", tag:"Raw physical power — block, burst, and bodies in the way",
+    color:"var(--fighter)", dim:"var(--fighter-dim)",
+    root:
+    {nm:"Fighter", rl:"STR striker — chosen at Act 3", c:[
+      {nm:"Brigand", rl:"Aggression: raw offense", c:[
+        {nm:"Warrior", rl:"Sustained heavy hitter", c:[
+          {nm:"Warlord", rl:"Commander — party buffs", ult:"Banner of War"},
+          {nm:"Reaver", rl:"Relentless multi-hit", ult:"Endless Onslaught"},
+        ]},
+        {nm:"Berserker", rl:"Glass-cannon crits", c:[
+          {nm:"Ravager", rl:"Escalating crit ferocity", ult:"Bloodlust"},
+          {nm:"Bloodletter", rl:"Lifesteal + poison-on-hit", ult:"Exsanguinate"},
+        ]},
+      ]},
+      {nm:"Knight", rl:"Defense: armor & block", c:[
+        {nm:"Cavalier", rl:"Mobile mounted fighter", c:[
+          {nm:"Paladin", rl:"Balanced holy knight", ult:"Aegis of Dawn"},
+          {nm:"Great Knight", rl:"Heavy armored cavalry", ult:"Cavalry Charge"},
+        ]},
+        {nm:"General", rl:"Immovable wall", c:[
+          {nm:"Marshal", rl:"Team aura — shared block", ult:"Iron Wall"},
+          {nm:"Sentinel", rl:"Unbreakable solo tank", ult:"Last Bastion"},
+        ]},
+      ]},
+    ]}
+  },
+  {
+    key:"mage", name:"Mage Line", stat:"INT", tag:"Schools of magic — elements, the dead, and forbidden curses",
+    color:"var(--mage)", dim:"var(--mage-dim)",
+    root:
+    {nm:"Mage", rl:"Arcane caster — chosen at Act 3", c:[
+      {nm:"Elementalist", rl:"Raw forces of nature", c:[
+        {nm:"Pyromancer", rl:"Fire & burn DoT", c:[
+          {nm:"Conflagrator", rl:"Spreading inferno / DoT", ult:"Firestorm"},
+          {nm:"Magmancer", rl:"Eruption burst nuke", ult:"Eruption"},
+        ]},
+        {nm:"Cryomancer", rl:"Ice & storm control", c:[
+          {nm:"Frostbinder", rl:"Freeze-lock hard control", ult:"Absolute Zero"},
+          {nm:"Tempest Sage", rl:"Chain lightning multi-hit", ult:"Thunderstorm"},
+        ]},
+      ]},
+      {nm:"Sorcerer", rl:"Forbidden dark arts", c:[
+        {nm:"Necromancer", rl:"Summons the undead", c:[
+          {nm:"Lich", rl:"Immortal undead horde", ult:"Army of the Dead"},
+          {nm:"Soulreaver", rl:"Life-drain magic", ult:"Soul Harvest"},
+        ]},
+        {nm:"Warlock", rl:"Curses, blood, poison", c:[
+          {nm:"Plaguebringer", rl:"Poison — ignores block", ult:"Pandemic"},
+          {nm:"Hexblade", rl:"Curse-amplified strikes", ult:"Doom"},
+        ]},
+      ]},
+    ]}
+  },
+  {
+    key:"rogue", name:"Rogue Line", stat:"DEX", tag:"Finesse — the clean kill, the dodge, and the poisoned blade",
+    color:"var(--rogue)", dim:"var(--rogue-dim)",
+    root:
+    {nm:"Rogue", rl:"Finesse fighter — chosen at Act 3", c:[
+      {nm:"Assassin", rl:"Lethality: the kill", c:[
+        {nm:"Stalker", rl:"Stealth first-strike burst", c:[
+          {nm:"Nightblade", rl:"One-shot executioner", ult:"Death Mark"},
+          {nm:"Reaper", rl:"Crit-chain escalation", ult:"Thousand Cuts"},
+        ]},
+        {nm:"Duelist", rl:"Finesse parry-riposte", c:[
+          {nm:"Bladedancer", rl:"Counter / riposte king", ult:"Riposte Stance"},
+          {nm:"Phantom", rl:"Untouchable dodge-counter", ult:"Vanish"},
+        ]},
+      ]},
+      {nm:"Thief", rl:"Cunning: trickery & toxins", c:[
+        {nm:"Poisoner", rl:"Stacking toxins / DoT", c:[
+          {nm:"Venomancer", rl:"Block-ignoring poison", ult:"Toxic Bloom"},
+          {nm:"Apothecary", rl:"Debuff bombs & utility", ult:"Alchemical Bomb"},
+        ]},
+        {nm:"Shadow", rl:"Evasion & mobility", c:[
+          {nm:"Shade", rl:"Pure evasion / vanish", ult:"Smoke & Mirrors"},
+          {nm:"Windrunner", rl:"Multi-action mobility", ult:"Flurry"},
+        ]},
+      ]},
+    ]}
+  },
+];
+
+// ---- Layout ----
+const NW=140, NH=46, CAP_H=60, COLGAP=18, ROWGAP=92;
+const PADL=150, PADT=20, PADR=24, PADB=20;
+const ASC_GAP=22, ASC_H=66;
+
+let uid=0;
+function nodeH(d){ return d===3 ? CAP_H : NH; }
+function flatten(node, depth, parent){
+  node._id = ++uid; node._depth=depth; node._parent=parent;
+  if(node.c) node.c.forEach(ch=>flatten(ch, depth+1, node));
+}
+function assignX(node, ctx){
+  if(!node.c || node.c.length===0){ node._x = ctx.cursor; ctx.cursor += NW+COLGAP; return; }
+  node.c.forEach(ch=>assignX(ch, ctx));
+  node._x = (node.c[0]._x + node.c[node.c.length-1]._x)/2;
+}
+function collect(node, arr){ arr.push(node); if(node.c) node.c.forEach(ch=>collect(ch,arr)); }
+
+const parentOf={}, lineOfNode={};
+
+function renderLine(line){
+  flatten(line.root,0,null);
+  const ctx={cursor:0}; assignX(line.root, ctx);
+  const nodes=[]; collect(line.root, nodes);
+  const maxX = Math.max.apply(null, nodes.map(n=>n._x));
+  const width = PADL + maxX + NW + PADR;
+  const treeBottom = PADT + 3*ROWGAP + CAP_H;
+  const ascY = treeBottom + ASC_GAP;
+  const height = ascY + ASC_H + PADB;
+
+  let edges="", boxes="", bands="";
+  for(let r=0;r<4;r++){
+    const y = PADT + r*ROWGAP;
+    bands += `<line x1="${PADL-14}" y1="${y-12}" x2="${width-12}" y2="${y-12}" stroke="var(--grid)" stroke-width="1"/>`;
+    bands += `<text class="band-act" x="14" y="${y+18}">${ACTS[r].act}</text>`;
+    bands += `<text class="band-label" x="14" y="${y+33}">${ACTS[r].label}</text>`;
+  }
+  nodes.forEach(n=>{
+    if(n._parent){
+      const px=PADL+n._parent._x+NW/2, py=PADT+n._parent._depth*ROWGAP+nodeH(n._parent._depth);
+      const cx=PADL+n._x+NW/2, cy=PADT+n._depth*ROWGAP;
+      const my=(py+cy)/2;
+      edges += `<path class="edge" data-to="${n._id}" d="M${px},${py} C${px},${my} ${cx},${my} ${cx},${cy}"/>`;
+    }
+  });
+  nodes.forEach(n=>{
+    const x=PADL+n._x, y=PADT+n._depth*ROWGAP, h=nodeH(n._depth);
+    const fill = n._depth===0 ? line.dim : "var(--panel)";
+    let inner = `<text class="nm" x="${x+11}" y="${y+19}">${n.nm}</text>
+      <text class="rl" x="${x+11}" y="${y+34}">${trunc(n.rl)}</text>`;
+    if(n.ult){ inner += `<text class="ult" x="${x+11}" y="${y+51}">⚡ ${n.ult}</text>`; }
+    boxes += `<g class="node" data-id="${n._id}" data-line="${line.key}">
+      <rect x="${x}" y="${y}" width="${NW}" height="${h}" rx="9" fill="${fill}" stroke="${line.color}" stroke-width="1.5"></rect>
+      ${inner}</g>`;
+  });
+
+  // Ascension ribbon (Act 15)
+  const ribbon = `<g class="asc">
+    <rect x="${PADL-14}" y="${ascY}" width="${width-PADL-2}" height="${ASC_H}" rx="11"></rect>
+    <text class="at" x="${PADL+6}" y="${ascY+24}">ACT 15 · ASCENSION  —  any capstone → “Ascended ${capLabel(line)}”</text>
+    <text class="ad" x="${PADL+6}" y="${ascY+44}">+ flat power boost to every card in your deck (data knob)  ·  gain that capstone's signature ⚡ Ult</text>
+    <text class="band-act" x="14" y="${ascY+26}">Act 15</text>
+    <text class="band-label" x="14" y="${ascY+41}">ASCEND</text>
+  </g>`;
+
+  parentOf[0]=null; nodes.forEach(n=>{ parentOf[n._id]= n._parent?n._parent._id:null; lineOfNode[n._id]=line.key; });
+
+  return `<div class="tree-wrap">
+    <div class="tree-title">
+      <h2 style="color:${line.color}">${line.name}</h2>
+      <span class="stat" style="background:${line.dim};color:${line.color}">${line.stat}</span>
+      <span class="tag">${line.tag}</span>
+    </div>
+    <span class="reset" data-reset="${line.key}">↺ reset highlight</span>
+    <svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" data-line="${line.key}">
+      ${bands}${edges}${boxes}${ribbon}
+    </svg>
+  </div>`;
+}
+function capLabel(line){ return line.key==="mage" ? "Sage" : (line.key==="rogue" ? "Blade" : "Warlord"); }
+function trunc(s){ return s.length>28 ? s.slice(0,27)+"…" : s; }
+
+document.getElementById('trees').innerHTML = LINES.map(renderLine).join('');
+
+function clearLine(key){
+  document.querySelectorAll(`.node[data-line="${key}"]`).forEach(e=>e.classList.remove('dim','hot'));
+  document.querySelectorAll(`svg[data-line="${key}"] .edge`).forEach(e=>e.classList.remove('dim','hot'));
+}
+function highlight(id){
+  const key=lineOfNode[id];
+  const path=new Set(); let cur=id;
+  while(cur!=null){ path.add(cur); cur=parentOf[cur]; }
+  document.querySelectorAll(`.node[data-line="${key}"]`).forEach(e=>{
+    const nid=+e.dataset.id;
+    if(path.has(nid)){ e.classList.add('hot'); e.classList.remove('dim'); }
+    else { e.classList.add('dim'); e.classList.remove('hot'); }
+  });
+  document.querySelectorAll(`svg[data-line="${key}"] .edge`).forEach(e=>{
+    const to=+e.dataset.to;
+    if(path.has(to)){ e.classList.add('hot'); e.classList.remove('dim'); }
+    else { e.classList.add('dim'); e.classList.remove('hot'); }
+  });
+}
+document.querySelectorAll('.node').forEach(n=>{
+  n.addEventListener('click',()=>highlight(+n.dataset.id));
+});
+document.querySelectorAll('.reset').forEach(r=>{
+  r.addEventListener('click',()=>clearLine(r.dataset.reset));
+});
+</script>
+</body>
+</html>

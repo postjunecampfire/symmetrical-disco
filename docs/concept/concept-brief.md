@@ -1,6 +1,12 @@
 # Concept Brief — "Unnamed Game" (Working Title)
 
-*Document of record. Captures every design decision reached so far. This is the single source of truth before we scope the first build milestone.*
+*Document of record. Captures the original framing of the design.*
+
+> **⚠️ Predates the 2026-06-07+ pivot — the ADRs are binding where they differ.** Two pillars in this brief have since changed:
+> 1. **The tactical grid is cut.** Combat is now **positionless** (Slay-the-Spire-style, no tiles/movement/range/terrain/facing) — see [ADR-0013](../decisions/0013-positionless-combat-drop-grid.md). With the grid gone, the game's differentiator is the **stat/class/leveling RPG layer** (ADRs [0014](../decisions/0014-stat-driven-characters.md), [0015](../decisions/0015-classes-races-leveling.md), [0021](../decisions/0021-deferred-class-race-origin.md), [0022](../decisions/0022-class-progression-trees-ascension.md)), not positioning.
+> 2. **Party is fixed at 2 and recruited in-run.** The run is **solo in Act 1**, then offers an **RNG 1-of-3 race-only recruit at Act 2**; both characters pick their class together at Act 3 ([ADR-0024](../decisions/0024-act-structured-squad-recruitment.md)). Whether the two characters share one deck and energy pool or each carry their own is under revision ([ADR-0025](../decisions/0025-per-character-decks-and-hands.md), Proposed).
+>
+> Sections below describing grid/board positioning and run-start party loadout are superseded accordingly. See [`docs/decisions/`](../decisions/README.md) for the live record.
 
 ---
 
@@ -16,7 +22,7 @@ A **card-driven tactical roguelite**: Slay the Spire's run structure and deckbui
 
 1. **Playable first.** The goal is a game the designer actually wants to play. Content and feel beat engineering elegance. Let the engine carry the plumbing; spend effort on battles, characters, and the run.
 2. **Roguelite run structure.** Death leads to a full restart (Slay the Spire model), with save points between encounters. Run-scoped state (what you have this run) sits on top of meta-progression (what persists across deaths).
-3. **Tactical grid combat.** Fire Emblem–style positioning: small grids, terrain, range, facing. Encounters are tight and puzzle-sharp, not sprawling armies.
+3. ~~**Tactical grid combat.** Fire Emblem–style positioning: small grids, terrain, range, facing.~~ **Superseded ([ADR-0013](../decisions/0013-positionless-combat-drop-grid.md)): combat is positionless.** Encounters are tight, puzzle-sharp deckbuilding fights (Slay-the-Spire abstract — party vs. enemies, targets picked directly), not sprawling armies and not a spatial board.
 4. **Cards as the action system.** A shared deck drives what units can do each turn. Deckbuilding *is* the progression.
 5. **Character depth & creation.** A small roster of distinct, customizable characters; party composition shapes the run.
 6. **Bounded, deferred art.** Prototype with placeholder/free assets; commission custom art only after the loop is proven fun.
@@ -30,7 +36,7 @@ Each turn the player has **one shared hand and one shared energy pool**, regardl
 - **Shared deck, character-tagged cards.** The whole party draws from a single deck. Cards are tagged to a character (only the knight can play this; only the mage can play that), with some neutral cards anyone can use. This preserves Fire Emblem's "control a roster of distinct units" feel while keeping cognitive load at Slay the Spire's "one hand per turn" level. *(This is the load-bearing decision — it's why a multi-character card game stays manageable.)*
 - **Innate Strike / Defend.** Every character always has Strike and Defend available as innate actions — *not* cards in the deck. This solves the "dead hand" failure (drawing cards for a unit who's down or out of position), keeps the deck full of only interesting skills, and means the baseline floor scales automatically with party size.
 - **Drawn cards are the spikes.** Strike/Defend are the reliable, modest floor; drawn cards are the combos, utility, and burst that make a turn exciting. Balance contract: Strike/Defend still cost energy or a unit's action, so drawn cards are what let you exceed the baseline. Every draw should feel like an opportunity, not noise.
-- **Grid resolution.** Cards (and Strike/Defend) play out on a small grid where terrain, range, and positioning matter.
+- ~~**Grid resolution.** Cards (and Strike/Defend) play out on a small grid where terrain, range, and positioning matter.~~ **Superseded ([ADR-0013](../decisions/0013-positionless-combat-drop-grid.md)): positionless resolution.** Cards (and Strike/Defend) resolve against directly-selected targets; there is no spatial layer.
 
 ### The "draw = cooldown" model
 Drawing a card represents a skill **coming off cooldown** and becoming available again. This reframes standard card-cycling as a cooldown system and yields two useful properties:

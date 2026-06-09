@@ -14,6 +14,11 @@ extends Resource
 @export var next: Array[StringName] = []
 ## Optional: encounter id / event id (else chosen from a pool at resolve time).
 @export var payload: StringName = &""
+## Selective fog of war (ADR-0023): when true the node renders as "?" (Unknown)
+## until the player arrives/clears it — a deliberately "blind" encounter. The
+## generator hides events and a subset of mid-run combats; elites/rests/boss/start
+## stay visible. A relic or class boon may pre-reveal it (set hidden = false).
+@export var hidden: bool = false
 
 
 ## Plain-Dictionary form for JSON (StringName -> String).
@@ -27,6 +32,7 @@ func to_dict() -> Dictionary:
 		"row": row,
 		"next": next_out,
 		"payload": String(payload),
+		"hidden": hidden,
 	}
 
 
@@ -39,6 +45,7 @@ static func from_dict(d: Dictionary) -> MapNode:
 	var row_v: Variant = d.get("row", 0)
 	node.row = int(row_v)
 	node.payload = StringName(String(d.get("payload", "")))
+	node.hidden = bool(d.get("hidden", false))
 	var next_in: Array[StringName] = []
 	var next_v: Variant = d.get("next", [])
 	if next_v is Array:

@@ -123,6 +123,12 @@ func _build_layout() -> void:
 	var sep := HSeparator.new()
 	root.add_child(sep)
 
+	# Legend — "?" nodes are blind encounters revealed on arrival (ADR-0023).
+	var legend := Label.new()
+	legend.add_theme_color_override("font_color", COL_DIM)
+	legend.text = "Legend:   ? Unknown (blind)   ·   Combat   ·   Elite   ·   Rest   ·   BOSS"
+	root.add_child(legend)
+
 	# Scrollable map.
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -207,7 +213,9 @@ func _refresh_map() -> void:
 		reachable_ids[n.id] = true
 	_status_label.text = "Choose your next stop." if not reachable_ids.is_empty() else "No path forward."
 
-	# Group nodes by row, render top (row 0) to bottom (boss).
+	# Group nodes by row. Render BOTTOM-UP (ADR-0023): the highest row (boss) is
+	# drawn first so it sits at the top of the VBox, and row 0 (the start) is drawn
+	# last so it sits at the bottom — the player climbs up the page, StS-style.
 	var by_row: Dictionary = {}
 	var graph: MapGraph = _nav.map()
 	for key: Variant in graph.nodes.keys():
@@ -217,6 +225,7 @@ func _refresh_map() -> void:
 		by_row[node.row] = bucket
 	var rows: Array = by_row.keys()
 	rows.sort()
+	rows.reverse()  # highest row (boss) first → top; row 0 last → bottom
 
 	for row_v: Variant in rows:
 		var row_box := HBoxContainer.new()
@@ -233,7 +242,13 @@ func _node_button(node: MapNode, reachable: bool) -> Button:
 	var cleared: bool = _controller.run.cleared.has(node.id)
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(140, 52)
-	var label: String = TYPE_LABEL.get(node.node_type, String(node.node_type))
+	# Selective fog (ADR-0023): a hidden, not-yet-cleared node reads as "?" — its
+	# real type only shows once you've arrived (cleared) or a reveal sets hidden=false.
+	var label: String
+	if node.hidden and not cleared:
+		label = "?"
+	else:
+		label = TYPE_LABEL.get(node.node_type, String(node.node_type))
 	var mark: String = ""
 	if cleared:
 		mark = "  ✓"

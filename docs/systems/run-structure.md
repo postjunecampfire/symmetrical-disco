@@ -212,7 +212,7 @@ New event types for the existing `TelemetryLogger`:
 
 **In v1:** RunState + save/resume; branching single-act map + generation; run controller; combat/elite/rest/event/boss nodes; card-reward draft; rest (heal/upgrade); minimal events; **light relics**; an encounter pool (+elite, +boss); map/run UI; run-level telemetry.
 
-**Deferred:** shop & currency; cross-death meta-progression; multi-act maps; broad relic/event depth; advanced map structures.
+**Deferred:** shop & currency; cross-death meta-progression; ~~multi-act maps~~ (now adopted — the single-act scope is superseded by [ADR-0019](../decisions/0019-eighteen-act-dungeon-progression.md): an 18-act dungeon, structure & curve in [act-progression.md](act-progression.md)); broad relic/event depth; advanced map structures.
 
 ## 11. Open questions (tunable, set during balancing)
 

@@ -93,12 +93,33 @@ func generate(config: MapGenConfig, gen_seed: int) -> MapGraph:
 	_ensure_type_present(nodes, row_ids, rows, _REST, rest_before_boss, rng)
 	_ensure_type_present(nodes, row_ids, rows, _ELITE, rest_before_boss, rng)
 
+	# 4b) Selective fog (ADR-0023): mark some nodes as "blind" (render as "?").
+	_apply_fog(nodes, row_ids, rows, rng)
+
 	# 5) Assemble the graph.
 	graph.nodes = nodes
 	var start_ids: Array[StringName] = row_ids[0]
 	graph.start = start_ids
 	graph.boss = _BOSS_ID
 	return graph
+
+
+## Selective fog (ADR-0023): mark some nodes HIDDEN so they render as "?" until the
+## player arrives. Every `event` is hidden (the "?" surprises) and a deterministic
+## ~third of mid-run combats are hidden too, so "some encounters are blind." The
+## start row, boss, elites and rests stay visible. Determinism is preserved because
+## the same seeded RNG drives the per-combat coin flip.
+func _apply_fog(
+	nodes: Dictionary, row_ids: Array, rows: int, rng: RandomNumberGenerator
+) -> void:
+	for r in range(1, rows):
+		var ids_r: Array[StringName] = row_ids[r]
+		for id: StringName in ids_r:
+			var node: MapNode = nodes[id]
+			if node.node_type == _EVENT:
+				node.hidden = true
+			elif node.node_type == _COMBAT and rng.randf() < 0.34:
+				node.hidden = true
 
 
 ## Wire forward edges from `cur` row into `nxt` row. Guarantees every `cur` node

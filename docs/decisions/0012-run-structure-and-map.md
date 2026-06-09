@@ -1,6 +1,6 @@
 # ADR-0012: Run structure & map (v1)
 
-**Status:** Accepted
+**Status:** Accepted — single-act scope superseded by [ADR-0019](0019-eighteen-act-dungeon-progression.md) (18-act dungeon); map presentation & node-set superseded by [ADR-0023](0023-sts-style-map-run-structure.md) (bottom-up, fog-of-war, shop/treasure). Node model, rewards, rest/event/relic systems carry forward unchanged.
 **Date:** 2026-06-06
 **Deciders:** Michael (owner); Claude (build partner)
 

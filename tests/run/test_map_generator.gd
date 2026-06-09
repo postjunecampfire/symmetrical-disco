@@ -192,6 +192,28 @@ func test_same_seed_produces_identical_graph() -> void:
 		assert_eq(sa, sb, "seed %d: regeneration is byte-identical" % gen_seed)
 
 
+# --- Selective fog (ADR-0023) ---
+
+func test_fog_hides_events_and_spares_visible_types() -> void:
+	# Every event is a blind "?" node; elites/rests/boss/start-row are never hidden.
+	for gen_seed: int in _SEEDS:
+		var graph: MapGraph = _generate(gen_seed)
+		var start_ids: Dictionary = {}
+		for sid: StringName in graph.start:
+			start_ids[sid] = true
+		for key: Variant in graph.nodes.keys():
+			var node: MapNode = graph.nodes[key]
+			if node.node_type == &"event":
+				assert_true(node.hidden, "seed %d: event %s is hidden" % [gen_seed, String(node.id)])
+			if node.node_type == &"elite" or node.node_type == &"rest" or node.node_type == &"boss":
+				assert_false(
+					node.hidden,
+					"seed %d: %s node %s stays visible" % [gen_seed, String(node.node_type), String(node.id)]
+				)
+			if start_ids.has(node.id):
+				assert_false(node.hidden, "seed %d: start node %s is visible" % [gen_seed, String(node.id)])
+
+
 func test_different_seeds_usually_differ() -> void:
 	var signatures: Dictionary = {}
 	for gen_seed: int in _SEEDS:

@@ -60,6 +60,11 @@ var boons: Dictionary = {}
 ## explicit payload. Loaded from data/encounter_pool.json.
 var encounter_pool: Dictionary = {}
 var battle_config: BattleConfig
+## The 18-act dungeon curve (ADR-0019), loaded from data/acts/act_progression.json.
+## Null when no acts file is present (the loader treats it as optional content, so
+## fixture sets without a dungeon still load); §5 invariants are validated when it
+## IS present.
+var act_progression: ActProgression
 
 var _result: LoadResult
 
@@ -145,6 +150,18 @@ func get_battle_config() -> BattleConfig:
 	return battle_config
 
 
+## The loaded 18-act dungeon curve, or null if no acts file was present.
+func get_act_progression() -> ActProgression:
+	return act_progression
+
+
+## The ActConfig for act `n` (1..18), or null if absent / no progression loaded.
+func get_act(n: int) -> ActConfig:
+	if act_progression == null:
+		return null
+	return act_progression.act_at(n)
+
+
 ## Load every content category from a /data-style directory. Returns a LoadResult.
 func load_from_dir(data_dir: String) -> LoadResult:
 	_result = LoadResult.new()
@@ -160,6 +177,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	boons.clear()
 	encounter_pool.clear()
 	battle_config = null
+	act_progression = null
 
 	# Order matters for reference validation: load referenced entities before
 	# the ones that reference them where practical, but we validate references
@@ -176,6 +194,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("boons"), _parse_boon, boons, "boon")
 	_load_encounter_pool(data_dir.path_join("encounter_pool.json"))
 	_load_battle_config(data_dir.path_join("battle_config.json"))
+	_load_act_progression(data_dir.path_join("acts").path_join("act_progression.json"))
 	_derive_character_hp()
 
 	_validate_references()
@@ -285,6 +304,12 @@ func _bool(value: Variant, fallback: bool) -> bool:
 	if value == null:
 		return fallback
 	return bool(value)
+
+
+func _float(value: Variant, fallback: float) -> float:
+	if value == null:
+		return fallback
+	return float(value)
 
 
 func _sn_array(value: Variant) -> Array[StringName]:
@@ -669,7 +694,91 @@ func _load_battle_config(path: String) -> void:
 	bc.xp_curve_step = _int(d.get("xp_curve_step"), 20)
 	bc.promotion_level = _int(d.get("promotion_level"), 20)
 	bc.meta_cash_out_acts = _int(d.get("meta_cash_out_acts"), 9)
+	bc.enemy_scale_baseline_level = _int(d.get("enemy_scale_baseline_level"), 1)
+	bc.enemy_scale_exponent = _float(d.get("enemy_scale_exponent"), 1.0)
 	battle_config = bc
+
+
+## Load the 18-act dungeon curve (ADR-0019). OPTIONAL like the other single-file
+## content: a missing acts file leaves act_progression null without error (fixture
+## sets and the early prototype have no dungeon). When the file IS present it is
+## parsed into typed ActConfig/MapGenConfig resources and its §5 invariants
+## (ActProgression.validation_errors) are collected into the LoadResult.
+func _load_act_progression(path: String) -> void:
+	if not FileAccess.file_exists(path):
+		return
+	var entries := _read_json_array(path)
+	if entries.is_empty():
+		return
+	var d: Variant = entries[0]
+	if typeof(d) != TYPE_DICTIONARY:
+		_result.add_error("act_progression.json top-level must be an object: %s" % path)
+		return
+	var dict: Dictionary = d
+	var prog := ActProgression.new()
+	var raw_acts: Variant = dict.get("acts")
+	if typeof(raw_acts) != TYPE_ARRAY:
+		_result.add_error("act_progression.json must have an 'acts' array: %s" % path)
+		return
+	var list: Array[ActConfig] = []
+	for raw in raw_acts:
+		if typeof(raw) != TYPE_DICTIONARY:
+			_result.add_error("act_progression.json has a non-object act entry: %s" % path)
+			continue
+		var act_dict: Dictionary = raw
+		list.append(_parse_act_config(act_dict, path))
+	prog.acts = list
+	act_progression = prog
+	# §5 invariants: collect every problem so a bad curve fails the load loudly.
+	for msg in ActProgression.validation_errors(prog):
+		_result.add_error("act_progression: %s (%s)" % [msg, path])
+
+
+## Parse one act entry into a typed ActConfig (act-progression.md §5). Missing
+## numeric fields fall back to 0 so the §5 validation — not the parser — is the
+## single place that judges a malformed curve.
+func _parse_act_config(d: Dictionary, source: String) -> ActConfig:
+	var a := ActConfig.new()
+	_require(d, "act", source, "act")
+	a.act = _int(d.get("act"), 0)
+	a.tier = _int(d.get("tier"), 0)
+	a.boss_level = _int(d.get("boss_level"), 0)
+	a.trash_level = _int(d.get("trash_level"), 0)
+	a.elite_level = _int(d.get("elite_level"), 0)
+	a.boss_payload = _sn(d.get("boss_payload"), &"")
+	a.map = _parse_map_gen_config(d.get("map"))
+	return a
+
+
+## Parse a map block into a MapGenConfig (run-structure.md §4 + ADR-0019 late-row
+## bias). A null/absent block yields a default-constructed config so a partially
+## authored act still produces a usable shell; the rest_before_boss guarantee is
+## checked by §5 validation, not here.
+func _parse_map_gen_config(value: Variant) -> MapGenConfig:
+	var m := MapGenConfig.new()
+	if typeof(value) != TYPE_DICTIONARY:
+		return m
+	var d: Dictionary = value
+	m.rows = _int(d.get("rows"), m.rows)
+	m.width_min = _int(d.get("width_min"), m.width_min)
+	m.width_max = _int(d.get("width_max"), m.width_max)
+	m.branchiness = _float(d.get("branchiness"), m.branchiness)
+	m.late_row_bias = _sn(d.get("late_row_bias"), m.late_row_bias)
+	var raw_weights: Variant = d.get("type_weights")
+	if typeof(raw_weights) == TYPE_DICTIONARY:
+		var weights_src: Dictionary = raw_weights
+		var tw: Dictionary = {}
+		for key: Variant in weights_src.keys():
+			tw[StringName(String(key))] = _int(weights_src[key], 0)
+		m.type_weights = tw
+	var raw_guarantees: Variant = d.get("guarantees")
+	if typeof(raw_guarantees) == TYPE_DICTIONARY:
+		var guarantees_src: Dictionary = raw_guarantees
+		var g: Dictionary = {}
+		for key: Variant in guarantees_src.keys():
+			g[StringName(String(key))] = guarantees_src[key]
+		m.guarantees = g
+	return m
 
 
 ## Derive every character's max_hp from CON (ADR-0014: CON -> max HP) using the

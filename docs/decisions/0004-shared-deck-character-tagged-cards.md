@@ -1,6 +1,6 @@
 # ADR-0004: Shared deck with character-tagged cards
 
-**Status:** Accepted — *party sizing (2–3) is superseded by [ADR-0016](0016-party-size-two-owner-tagged-cards.md) (fixed at 2); the shared-deck + character-tagged-cards model stands and is reaffirmed there.*
+**Status:** Superseded — *party sizing (2–3) superseded by [ADR-0016](0016-party-size-two-owner-tagged-cards.md) (fixed at 2); the **shared deck** is superseded by [ADR-0026](0026-derived-decks-from-skill-loadouts.md) (per-character derived decks). Character/owner-tagging carries forward as skill ownership.*
 **Date:** 2026-06-05
 **Deciders:** Michael (owner); Claude (build partner)
 

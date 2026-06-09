@@ -1,6 +1,6 @@
 # ADR-0015: Classes, races & stat-point leveling
 
-**Status:** Accepted
+**Status:** Accepted (the *class-as-base-template* model is superseded by [ADR-0021](0021-deferred-class-race-origin.md): race becomes the base template and class is chosen mid-run at Act 3. Stat-point leveling and the class/race concepts here carry forward.)
 **Date:** 2026-06-07
 **Deciders:** Michael (owner); Claude (build partner)
 **Relates to:** [ADR-0014](0014-stat-driven-characters.md) (stats), [ADR-0016](0016-party-size-two-owner-tagged-cards.md) (party of 2).

@@ -1,9 +1,9 @@
 # ADR-0017: Keep cards over cooldowns; base-3 shared energy; restricted `return`
 
-**Status:** Accepted
+**Status:** Accepted — *the **shared** energy pool is superseded by [ADR-0025](0025-per-character-decks-and-hands.md) (energy is now per character); the base-3 amount, the relic/boon increase model, and the `return` restriction all carry forward unchanged.*
 **Date:** 2026-06-07
 **Deciders:** Michael (owner); Claude (build partner)
-**Relates to:** [ADR-0004](0004-shared-deck-character-tagged-cards.md), [ADR-0006](0006-draw-as-cooldown-model.md) (draw = cooldown), [ADR-0005](0005-innate-strike-defend.md). Resolves the energy-economy open question from the concept brief.
+**Relates to:** [ADR-0004](0004-shared-deck-character-tagged-cards.md), [ADR-0006](0006-draw-as-cooldown-model.md) (draw = cooldown), [ADR-0005](0005-innate-strike-defend.md), [ADR-0025](0025-per-character-decks-and-hands.md) (per-character energy). Resolves the energy-economy open question from the concept brief.
 
 ## Context
 

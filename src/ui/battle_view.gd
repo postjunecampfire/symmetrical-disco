@@ -271,6 +271,12 @@ func _unit_panel(unit: Combatant, is_enemy: bool, selected: bool) -> Button:
 			var intent := _intent_summary(unit)
 			if intent != "":
 				second.append("Intent: " + intent)
+	else:
+		# Telegraph how much damage is aimed at THIS ally this turn, so blocking is
+		# a legible choice (the core balance lever — HANDOFF §5).
+		var incoming := _incoming_damage(unit)
+		if incoming > 0:
+			second.append("◀ Incoming %d" % incoming)
 	if not second.is_empty():
 		parts.append("   ".join(second))
 	btn.text = "\n".join(parts)
@@ -485,7 +491,59 @@ func _intent_summary(enemy: Combatant) -> String:
 		if e is Effect and (e.type == &"damage" or e.type == &"block"):
 			amount = e.amount
 			break
-	return "%s %d" % [icon, amount] if amount > 0 else icon
+	var base: String = "%s %d" % [icon, amount] if amount > 0 else icon
+	# Surface WHO the intent hits. _choose_target sets target to the enemy itself
+	# for self/buff intents and to a player for offensive ones, so a target that
+	# isn't the caster means an attack aimed at that ally (or "all" for AoE).
+	if tel.target != null and tel.target != enemy:
+		if _intent_target_kind(tel.intent) == &"all_enemies":
+			base += " → all"
+		else:
+			base += " → %s" % tel.target.display_name
+	return base
+
+
+## The TargetSpec kind of an intent (from the ENEMY's perspective, where
+## "all_enemies" means all players). Defaults to single-target "enemy".
+func _intent_target_kind(intent: IntentData) -> StringName:
+	if intent == null or intent.target == null:
+		return &"enemy"
+	return intent.target.target_type
+
+
+## Total damage telegraphed at `ally` this turn, summed across living enemies.
+## Single-target attacks count only against their chosen victim; AoE (all_enemies)
+## counts against every ally. Ramp/summon turns (which replace the attack) and
+## non-damage intents (block/buff/debuff) contribute nothing.
+func _incoming_damage(ally: Combatant) -> int:
+	if _battle.enemy_ai == null:
+		return 0
+	var total := 0
+	for enemy in _battle.living_enemies():
+		var special := _battle.upcoming_special(enemy)
+		if special == &"summon" or special == &"empower":
+			continue
+		var tel: EnemyAI.Telegraph = _battle.enemy_ai.get_telegraph(enemy)
+		if tel == null or tel.intent == null:
+			continue
+		var dmg := _intent_damage(tel.intent)
+		if dmg <= 0:
+			continue
+		if _intent_target_kind(tel.intent) == &"all_enemies":
+			total += dmg
+		elif tel.target == ally:
+			total += dmg
+	return total
+
+
+## Sum of an intent's raw damage-effect amounts (pre-Strength/Vulnerable, matching
+## the telegraphed intent number).
+func _intent_damage(intent: IntentData) -> int:
+	var total := 0
+	for e in intent.effects:
+		if e is Effect and e.type == &"damage":
+			total += e.amount
+	return total
 
 
 func _card_effects_summary(card: CardData) -> String:

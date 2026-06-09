@@ -8,6 +8,9 @@ extends SceneTree
 ## stat each auto-spends on level-up) differs:
 ##   greedy     — all offense, never blocks; allocates level points to STR.
 ##   defensive  — blocks once per turn, then attacks; allocates points to CON.
+##   turtle     — blocks every turn, chips with leftover energy; allocates to CON.
+##   dex-turtle — same turtle policy, but allocates to DEX. With innate Defend =
+##                pure DEX, this is the worst-case double-dipping block build.
 ##
 ## Both carry HP across fights (ADR-0011) and earn XP/relics identically, so the
 ## win-rate and final-HP gap isolates the policy. Reports win %, avg nodes cleared,
@@ -50,7 +53,11 @@ func _initialize() -> void:
 	var greedy: Dictionary = _run_cohort("greedy", seeds)
 	var defensive: Dictionary = _run_cohort("defensive", seeds)
 	var turtle: Dictionary = _run_cohort("turtle", seeds)
-	_print_report([greedy, defensive, turtle], seeds)
+	# dex-turtle: same block-everything policy, but pumps DEX on level-up. With
+	# innate Defend = pure DEX (block amount 0 + DEX), this is the worst-case
+	# "double-dipping" turtle the pure-DEX change is meant to stress-test.
+	var dex_turtle: Dictionary = _run_cohort("dex-turtle", seeds)
+	_print_report([greedy, defensive, turtle, dex_turtle], seeds)
 	quit()
 
 
@@ -69,7 +76,7 @@ func _run_cohort(mode: String, seeds: int) -> Dictionary:
 		match mode:
 			"greedy":
 				policy = func(b: Variant, cp: Variant) -> void: _greedy_turn(b, cp)
-			"turtle":
+			"turtle", "dex-turtle":
 				policy = func(b: Variant, cp: Variant) -> void: _turtle_turn(b, cp)
 			_:
 				policy = func(b: Variant, cp: Variant) -> void: _defensive_turn(b, cp)
@@ -102,7 +109,14 @@ func _run_cohort(mode: String, seeds: int) -> Dictionary:
 ## Spend every unspent level point: greedy pumps STR (more damage), defensive pumps
 ## CON (more HP) — so the builds diverge the way the policies imply.
 func _auto_allocate(rc: RunController, mode: String) -> void:
-	var stat: StringName = &"str" if mode == "greedy" else &"con"
+	var stat: StringName
+	match mode:
+		"greedy":
+			stat = &"str"      # more damage
+		"dex-turtle":
+			stat = &"dex"      # more block (and, for dex-attackers, more damage)
+		_:
+			stat = &"con"      # more HP (defensive + plain turtle)
 	for cid in rc.run.party:
 		while rc.unspent_points(cid) > 0:
 			if not rc.allocate_stat_point(cid, stat):
@@ -261,8 +275,8 @@ func _print_report(cohorts: Array, seeds: int) -> void:
 	var win := {}
 	for c in cohorts:
 		win[c["mode"]] = 100.0 * float(c["wins"]) / float(seeds)
-	print("Read: greedy %.1f%%  |  defensive %.1f%%  |  turtle %.1f%% (win rate)." % [
-		win.get("greedy", 0.0), win.get("defensive", 0.0), win.get("turtle", 0.0)])
+	print("Read: greedy %.1f%%  |  defensive %.1f%%  |  turtle %.1f%%  |  dex-turtle %.1f%% (win rate)." % [
+		win.get("greedy", 0.0), win.get("defensive", 0.0), win.get("turtle", 0.0), win.get("dex-turtle", 0.0)])
 	var g: float = win.get("greedy", 0.0)
 	var d: float = win.get("defensive", 0.0)
 	var t: float = win.get("turtle", 0.0)

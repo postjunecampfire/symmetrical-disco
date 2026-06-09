@@ -1,6 +1,6 @@
 # ADR-0005: Innate Strike/Defend, not in the deck
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0026](0026-derived-decks-from-skill-loadouts.md) — Strike/Defend are now ordinary common cards in the derived deck (no innate floor). The balance contract (basics cost energy; drawn skills are the spikes) carries forward.
 **Date:** 2026-06-05
 **Deciders:** Michael (owner); Claude (build partner)
 

@@ -1,9 +1,9 @@
 # ADR-0016: Party size fixed at 2; cards owner-tagged and stat-scaled
 
-**Status:** Accepted
+**Status:** Accepted — *the **shared-deck** aspect is superseded by [ADR-0026](0026-derived-decks-from-skill-loadouts.md) (per-character derived decks); party-of-2 and owner-tagging/stat-scaling carry forward.*
 **Date:** 2026-06-07
 **Deciders:** Michael (owner); Claude (build partner)
-**Supersedes:** the *2–3 (prototype with 2)* party sizing in [ADR-0004](0004-shared-deck-character-tagged-cards.md). The shared-deck + character-tagged-cards model of 0004 is **retained and reaffirmed** here; only the party-size range is fixed.
+**Supersedes:** the *2–3 (prototype with 2)* party sizing in [ADR-0004](0004-shared-deck-character-tagged-cards.md). The shared-deck + character-tagged-cards model of 0004 was retained here, but is now superseded by [ADR-0026](0026-derived-decks-from-skill-loadouts.md); only owner-tagging and the party-size fix remain binding from this ADR.
 
 ## Context
 

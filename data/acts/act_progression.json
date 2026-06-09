@@ -1,0 +1,441 @@
+{
+  "id": "act_progression",
+  "anchor": {
+    "act": 12,
+    "boss_level": 250
+  },
+  "acts": [
+    {
+      "act": 1,
+      "tier": 1,
+      "boss_level": 5,
+      "trash_level": 2,
+      "elite_level": 4,
+      "map": {
+        "rows": 7,
+        "width_min": 2,
+        "width_max": 3,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 6,
+          "elite": 1,
+          "rest": 2,
+          "event": 2
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "low"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 2,
+      "tier": 1,
+      "boss_level": 11,
+      "trash_level": 5,
+      "elite_level": 9,
+      "map": {
+        "rows": 8,
+        "width_min": 2,
+        "width_max": 3,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 6,
+          "elite": 1,
+          "rest": 2,
+          "event": 2
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "low"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 3,
+      "tier": 1,
+      "boss_level": 18,
+      "trash_level": 8,
+      "elite_level": 14,
+      "map": {
+        "rows": 8,
+        "width_min": 2,
+        "width_max": 3,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 6,
+          "elite": 1,
+          "rest": 2,
+          "event": 2
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "low"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 4,
+      "tier": 2,
+      "boss_level": 28,
+      "trash_level": 13,
+      "elite_level": 22,
+      "map": {
+        "rows": 9,
+        "width_min": 2,
+        "width_max": 3,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 6,
+          "elite": 1,
+          "rest": 2,
+          "event": 2
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "low_med"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 5,
+      "tier": 2,
+      "boss_level": 36,
+      "trash_level": 16,
+      "elite_level": 29,
+      "map": {
+        "rows": 9,
+        "width_min": 2,
+        "width_max": 3,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 7,
+          "elite": 2,
+          "rest": 2,
+          "event": 2
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "med"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 6,
+      "tier": 2,
+      "boss_level": 44,
+      "trash_level": 20,
+      "elite_level": 35,
+      "map": {
+        "rows": 10,
+        "width_min": 2,
+        "width_max": 3,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 7,
+          "elite": 2,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "med"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 7,
+      "tier": 3,
+      "boss_level": 62,
+      "trash_level": 28,
+      "elite_level": 50,
+      "map": {
+        "rows": 10,
+        "width_min": 2,
+        "width_max": 4,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 7,
+          "elite": 2,
+          "rest": 2,
+          "event": 2
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "med"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 8,
+      "tier": 3,
+      "boss_level": 82,
+      "trash_level": 37,
+      "elite_level": 66,
+      "map": {
+        "rows": 11,
+        "width_min": 2,
+        "width_max": 4,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 7,
+          "elite": 2,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "med"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 9,
+      "tier": 3,
+      "boss_level": 105,
+      "trash_level": 47,
+      "elite_level": 84,
+      "map": {
+        "rows": 11,
+        "width_min": 3,
+        "width_max": 4,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 8,
+          "elite": 3,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "med_high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 10,
+      "tier": 4,
+      "boss_level": 150,
+      "trash_level": 68,
+      "elite_level": 120,
+      "map": {
+        "rows": 12,
+        "width_min": 3,
+        "width_max": 4,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 9,
+          "elite": 3,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 11,
+      "tier": 4,
+      "boss_level": 198,
+      "trash_level": 89,
+      "elite_level": 158,
+      "map": {
+        "rows": 12,
+        "width_min": 3,
+        "width_max": 4,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 9,
+          "elite": 3,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 12,
+      "tier": 4,
+      "boss_level": 250,
+      "trash_level": 112,
+      "elite_level": 200,
+      "map": {
+        "rows": 13,
+        "width_min": 3,
+        "width_max": 4,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 9,
+          "elite": 3,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 13,
+      "tier": 5,
+      "boss_level": 360,
+      "trash_level": 162,
+      "elite_level": 288,
+      "map": {
+        "rows": 13,
+        "width_min": 3,
+        "width_max": 5,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 9,
+          "elite": 3,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 14,
+      "tier": 5,
+      "boss_level": 465,
+      "trash_level": 209,
+      "elite_level": 372,
+      "map": {
+        "rows": 14,
+        "width_min": 3,
+        "width_max": 5,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 9,
+          "elite": 4,
+          "rest": 2,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 15,
+      "tier": 5,
+      "boss_level": 580,
+      "trash_level": 261,
+      "elite_level": 464,
+      "map": {
+        "rows": 14,
+        "width_min": 3,
+        "width_max": 5,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 10,
+          "elite": 4,
+          "rest": 1,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "very_high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 16,
+      "tier": 6,
+      "boss_level": 820,
+      "trash_level": 369,
+      "elite_level": 656,
+      "map": {
+        "rows": 15,
+        "width_min": 3,
+        "width_max": 5,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 10,
+          "elite": 4,
+          "rest": 1,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "very_high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 17,
+      "tier": 6,
+      "boss_level": 1050,
+      "trash_level": 472,
+      "elite_level": 840,
+      "map": {
+        "rows": 15,
+        "width_min": 3,
+        "width_max": 5,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 10,
+          "elite": 4,
+          "rest": 1,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "very_high"
+      },
+      "boss_payload": ""
+    },
+    {
+      "act": 18,
+      "tier": 6,
+      "boss_level": 1300,
+      "trash_level": 585,
+      "elite_level": 1040,
+      "map": {
+        "rows": 16,
+        "width_min": 3,
+        "width_max": 5,
+        "branchiness": 0.5,
+        "type_weights": {
+          "combat": 10,
+          "elite": 5,
+          "rest": 1,
+          "event": 1
+        },
+        "guarantees": {
+          "rest_before_boss": true
+        },
+        "late_row_bias": "very_high"
+      },
+      "boss_payload": ""
+    }
+  ]
+}

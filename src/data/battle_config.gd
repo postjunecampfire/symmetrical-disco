@@ -33,3 +33,16 @@ extends Resource
 ## Acts cleared per cross-run meta cash-out (P3·08): the Nth boon unlocks after
 ## `meta_cash_out_acts * N` total acts cleared across runs. Default 9.
 @export var meta_cash_out_acts: int = 9
+
+# --- Enemy level scaling (ADR-0019, EnemyScaler) ----------------------------
+## The enemy level at which base enemy stat blocks (data/enemies/*) are authored:
+## EnemyScaler.factor(baseline) == 1.0, so an enemy fought at its baseline level is
+## unscaled. The per-act level CURVE (and its tier-gate spikes) is authored in
+## act_progression.json; this only sets where "1.0x" sits. Calibrating the baseline
+## against the authored Act-1 roster is a balance/roster-pass decision (ADR-0019).
+@export var enemy_scale_baseline_level: int = 1
+## Convexity of the level->stat factor (EnemyScaler): `factor = (level/baseline) ^
+## exponent`. 1.0 == stats track level proportionally (the "linear" ADR-0019
+## option, since the gate spikes already live in the level bands); > 1.0 ==
+## mild-exponential. The final value is a balance decision.
+@export var enemy_scale_exponent: float = 1.0

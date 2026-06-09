@@ -1,7 +1,7 @@
 {
   "id": "defend",
   "display_name": "Defend",
-  "description": "Gain 5 Block.",
+  "description": "Gain Block equal to your Dexterity.",
   "character_tag": "neutral",
   "energy_cost": 1,
   "keywords": [],
@@ -13,7 +13,7 @@
   "effects": [
     {
       "type": "block",
-      "amount": 5
+      "amount": 0
     }
   ]
 }
