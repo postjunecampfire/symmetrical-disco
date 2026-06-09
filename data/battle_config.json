@@ -12,5 +12,7 @@
   "xp_curve_base": 30,
   "xp_curve_step": 20,
   "promotion_level": 20,
-  "meta_cash_out_acts": 9
+  "meta_cash_out_acts": 9,
+  "enemy_scale_baseline_level": 8,
+  "enemy_scale_exponent": 1.0
 }

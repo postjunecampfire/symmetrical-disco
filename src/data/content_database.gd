@@ -360,6 +360,12 @@ func _parse_effects(value: Variant, source: String, label: String) -> Array[Effe
 		e.amount = _int(d.get("amount"), 0)
 		e.status = _sn(d.get("status"), &"")
 		e.stacks = _int(d.get("stacks"), 0)
+		# ADR-0020 scaling ladder: optional float, 1.0 (absent) == flat behavior.
+		e.stat_mult = _float(d.get("stat_mult"), 1.0)
+		if e.stat_mult < 0.0:
+			_result.add_error(
+				"%s in %s has a negative stat_mult (%s)" % [label, source, e.stat_mult]
+			)
 		# Positionless (ADR-0013): per-effect target_override was removed; every
 		# effect applies to its card/intent's resolved target set.
 		if d.has("params") and typeof(d["params"]) == TYPE_DICTIONARY:

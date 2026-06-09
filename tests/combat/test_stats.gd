@@ -113,3 +113,69 @@ func test_enemy_damage_is_flat() -> void:
 	var hero := _player(s, &"str", 0, 0, 0, 40)
 	s.apply_effects(foe, hero, [_dmg(6)])  # flat 6 (no stats on the enemy)
 	assert_eq(hero.hp, 34, "enemy intent damage stays as authored")
+
+
+# --- ADR-0020: stat_mult scaling ladder (flat -> hybrid -> multiplier) --------
+
+func _dmg_mult(amount: int, mult: float) -> Effect:
+	var e := Effect.new()
+	e.type = &"damage"
+	e.amount = amount
+	e.stat_mult = mult
+	return e
+
+
+func _blk_mult(amount: int, mult: float) -> Effect:
+	var e := Effect.new()
+	e.type = &"block"
+	e.amount = amount
+	e.stat_mult = mult
+	return e
+
+
+func test_stat_mult_default_reproduces_flat_behavior() -> void:
+	var s := _state()
+	var hero := _player(s, &"str", 6, 0, 0)
+	var foe := _enemy(s, 30)
+	s.apply_effects(hero, foe, [_dmg_mult(4, 1.0)])  # 4 + floor(6 * 1.0) = 10
+	assert_eq(foe.hp, 20, "stat_mult 1.0 == today's flat class-A behavior exactly")
+
+
+func test_hybrid_stat_mult_amplifies_the_stat() -> void:
+	var s := _state()
+	var hero := _player(s, &"str", 6, 0, 0)
+	var foe := _enemy(s, 30)
+	s.apply_effects(hero, foe, [_dmg_mult(4, 1.5)])  # 4 + floor(6 * 1.5) = 13
+	assert_eq(foe.hp, 17, "class B: base + floor(stat * 1.5)")
+
+
+func test_multiplier_card_is_pure_stat() -> void:
+	var s := _state()
+	var hero := _player(s, &"str", 7, 0, 0)
+	var foe := _enemy(s, 30)
+	s.apply_effects(hero, foe, [_dmg_mult(0, 2.0)])  # floor(7 * 2) = 14
+	assert_eq(foe.hp, 16, "class C: base 0, pure stat multiplier")
+
+
+func test_block_stat_mult_mirrors_offense() -> void:
+	var s := _state()
+	var hero := _player(s, &"str", 0, 5, 0)
+	s.apply_effects(hero, hero, [_blk_mult(3, 2.0)])  # 3 + floor(5 * 2) = 13
+	assert_eq(hero.block, 13, "the defense ladder mirrors offense (DEX * stat_mult)")
+
+
+func test_neutral_cards_ignore_stat_mult() -> void:
+	var s := _state()
+	var hero := _player(s, &"str", 9, 9, 0)
+	var foe := _enemy(s, 30)
+	s.apply_effects(hero, foe, [_dmg_mult(4, 3.0)], false)  # scale flag off (neutral)
+	assert_eq(foe.hp, 26, "a neutral (flat) card ignores stat_mult entirely")
+
+
+func test_weak_applies_after_stat_mult() -> void:
+	var s := _state()
+	var hero := _player(s, &"str", 6, 0, 0)
+	var foe := _enemy(s, 30)
+	s.apply_status(hero, &"weak", 1)
+	s.apply_effects(hero, foe, [_dmg_mult(4, 1.5)])  # floor((4 + 9) * 0.75) = 9
+	assert_eq(foe.hp, 21, "Weak reduces the already-multiplied total")

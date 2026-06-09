@@ -176,3 +176,13 @@ func test_empty_run_round_trips() -> void:
 	assert_eq(loaded.seed, 0, "default seed")
 	assert_eq(loaded.party.size(), 0, "empty party")
 	assert_null(loaded.map, "no map serializes back as null")
+
+
+# --- Act (ADR-0019) ----------------------------------------------------------
+
+func test_act_round_trips_and_defaults_to_one() -> void:
+	var run := RunState.new()
+	run.act = 3
+	var copy := RunState.from_dict(run.to_dict())
+	assert_eq(copy.act, 3, "act survives the save/load round trip")
+	assert_eq(RunState.from_dict({}).act, 1, "a pre-act save (missing key) defaults to act 1")

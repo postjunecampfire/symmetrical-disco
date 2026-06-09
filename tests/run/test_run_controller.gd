@@ -478,3 +478,78 @@ func _lowest_hp(units: Array[Combatant]) -> Combatant:
 		if best == null or u.hp < best.hp:
 			best = u
 	return best
+
+
+# --- 18-act act-advance flow (ADR-0019) ---------------------------------------
+
+func test_start_run_begins_at_act_one() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	assert_eq(rc.run.act, 1, "a fresh run starts in act 1")
+
+
+func test_advance_act_moves_on_and_regenerates_the_map() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.run.party_hp[&"fighter"] = 17  # mid-run damage that must carry across acts
+	rc.run.position = &"n_boss"
+	rc.run.cleared = [&"n_0_0", &"n_boss"] as Array[StringName]
+	assert_true(rc.advance_act(), "act 2 exists in the authored curve")
+	assert_eq(rc.run.act, 2, "the run moved to act 2")
+	assert_not_null(rc.run.map, "a new map was generated for act 2")
+	assert_eq(rc.run.position, &"", "position resets for the new act")
+	assert_true(rc.run.cleared.is_empty(), "cleared nodes reset for the new act")
+	assert_eq(rc.run.party_hp[&"fighter"], 17, "HP carries across the act boundary")
+
+
+func test_advance_act_is_deterministic_per_run_seed() -> void:
+	var a := _controller()
+	a.start_run([&"fighter", &"mage"] as Array[StringName], 99)
+	a.advance_act()
+	var b := _controller()
+	b.start_run([&"fighter", &"mage"] as Array[StringName], 99)
+	b.advance_act()
+	assert_eq(a.run.map.to_dict(), b.run.map.to_dict(), "same run seed -> same act-2 map")
+
+
+func test_advance_act_returns_false_past_the_last_act() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	rc.run.act = 18
+	assert_false(rc.advance_act(), "there is no act 19 — the run is won")
+	assert_eq(rc.run.act, 18, "a failed advance leaves the act unchanged")
+
+
+# --- Enemy band scaling at assembly (ADR-0019) --------------------------------
+
+func test_begin_combat_band_scales_enemy_stats() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	var plain: EncounterBattle = rc.begin_combat(&"enc_combat_01")
+	var banded: EncounterBattle = rc.begin_combat(&"enc_combat_01", &"trash")
+	var act1: ActConfig = _db.get_act(1)
+	assert_not_null(act1, "act 1 config loads")
+	var scaler := EnemyScaler.new(_db.get_battle_config())
+	var level: int = EnemyScaler.band_level(act1, &"trash")
+	var plain_enemies: Array[Combatant] = plain.living_enemies()
+	var banded_enemies: Array[Combatant] = banded.living_enemies()
+	assert_eq(banded_enemies.size(), plain_enemies.size(), "same spawn count either way")
+	var saw_reduction: bool = false
+	for i in range(plain_enemies.size()):
+		var expected: int = scaler.scaled(plain_enemies[i].max_hp, level, 1)
+		assert_eq(banded_enemies[i].max_hp, expected, "enemy %d HP scaled to the act-1 trash band" % i)
+		if banded_enemies[i].max_hp < plain_enemies[i].max_hp:
+			saw_reduction = true
+	assert_true(saw_reduction, "act-1 trash band (below baseline) actually reduces stats")
+
+
+func test_begin_combat_without_band_is_unscaled() -> void:
+	var rc := _controller()
+	rc.start_run([&"fighter", &"mage"] as Array[StringName], 1)
+	var plain: EncounterBattle = rc.begin_combat(&"enc_combat_01")
+	var plain_enemies: Array[Combatant] = plain.living_enemies()
+	assert_gt(plain_enemies.size(), 0, "encounter spawns enemies")
+	for e in plain_enemies:
+		var data := e.source_data as EnemyData
+		assert_not_null(data, "enemy has source data")
+		assert_eq(e.max_hp, data.max_hp, "no band -> authored stat block unscaled")

@@ -19,6 +19,20 @@ const _BOSS: StringName = &"boss"
 
 const _BOSS_ID: StringName = &"n_boss"
 
+## Ordinal late_row_bias knob (ADR-0019, act-progression.md) -> bias strength.
+## In the LAST THIRD of normal rows, combat weight is multiplied by (1 + bias)
+## and elite weight by (1 + 2*bias) — "density of hard nodes" escalates while
+## rest/event weights stay fixed ("scarcity of relief"). Unknown keys read as 0.
+const _LATE_BIAS := {
+	&"none": 0.0,
+	&"low": 0.25,
+	&"low_med": 0.5,
+	&"med": 0.75,
+	&"med_high": 1.0,
+	&"high": 1.5,
+	&"very_high": 2.0,
+}
+
 
 ## Generate a MapGraph from `config`, seeded by `gen_seed`. Returns an empty
 ## graph if `config` is null.
@@ -87,7 +101,9 @@ func generate(config: MapGenConfig, gen_seed: int) -> MapGraph:
 				# normal row is rest, so every path passes through one.
 				node.node_type = _REST
 			else:
-				node.node_type = _weighted_type(config.type_weights, r, rows, rng)
+				node.node_type = _weighted_type(
+					config.type_weights, r, rows, rng, _bias_strength(config.late_row_bias)
+				)
 
 	# Guarantee a sane distribution: at least one rest and one elite exist.
 	_ensure_type_present(nodes, row_ids, rows, _REST, rest_before_boss, rng)
@@ -182,9 +198,11 @@ func _map_index(i: int, from_n: int, to_n: int, rng: RandomNumberGenerator) -> i
 
 ## Weighted node-type draw for a normal (non-start, non-boss) node. Applies the
 ## documented row biases: elite scales up with depth, rest is rarer early, combat
-## keeps full weight so it stays the dominant type.
+## keeps full weight so it stays the dominant type. `late_bias` > 0 (ADR-0019
+## late_row_bias) additionally tilts the LAST THIRD of rows toward combat/elite.
 func _weighted_type(
-	weights: Dictionary, row: int, rows: int, rng: RandomNumberGenerator
+	weights: Dictionary, row: int, rows: int, rng: RandomNumberGenerator,
+	late_bias: float = 0.0
 ) -> StringName:
 	var denom: float = float(maxi(rows - 1, 1))
 	var depth: float = float(row) / denom  # 0.0 (early) .. 1.0 (late)
@@ -193,6 +211,10 @@ func _weighted_type(
 	var elite_w: float = _weight_of(weights, _ELITE, 2.0) * depth
 	var rest_w: float = _weight_of(weights, _REST, 2.0) * (0.25 + 0.75 * depth)
 	var event_w: float = _weight_of(weights, _EVENT, 2.0) * (0.5 + 0.5 * depth)
+
+	if late_bias > 0.0 and depth >= 2.0 / 3.0:
+		combat_w *= 1.0 + late_bias
+		elite_w *= 1.0 + 2.0 * late_bias
 
 	var total: float = combat_w + elite_w + rest_w + event_w
 	if total <= 0.0:
@@ -208,6 +230,12 @@ func _weighted_type(
 	if roll < rest_w:
 		return _REST
 	return _EVENT
+
+
+## Bias strength for an ordinal late_row_bias key; unknown keys read as 0.0.
+func _bias_strength(key: StringName) -> float:
+	var v: Variant = _LATE_BIAS.get(key, 0.0)
+	return float(v)
 
 
 ## Read a node-type weight from the (Variant-valued) config dictionary as a float,

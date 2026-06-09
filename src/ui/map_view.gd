@@ -86,7 +86,11 @@ func _ready() -> void:
 		if run_seed == 0:
 			run_seed = randi()
 		_controller.start_run(party, run_seed, party_races)
-		_controller.run.map = MapGenerator.new().generate(MapGenConfig.new(), run_seed)
+		# Act 1 uses the authored per-act map config (ADR-0019); fall back to the
+		# generic defaults if the act curve is absent (partial content).
+		var act1: ActConfig = _db.get_act(1)
+		var map_cfg: MapGenConfig = act1.map if act1 != null and act1.map != null else MapGenConfig.new()
+		_controller.run.map = MapGenerator.new().generate(map_cfg, run_seed)
 		_meta_progress.apply_boons(_controller.run)  # banked cross-run boons (P3·08)
 	# Open the run's telemetry file (interactive runs were previously unlogged —
 	# only the headless harness wired a logger). RunController's combat_result /
@@ -315,7 +319,7 @@ func _on_node_chosen(node: MapNode) -> void:
 
 func _start_combat(node: MapNode) -> void:
 	var enc_id: StringName = _nav.encounter_for(node)
-	_active_battle = _controller.begin_combat(enc_id) if enc_id != &"" else null
+	_active_battle = _controller.begin_combat(enc_id, _band_for(node.node_type)) if enc_id != &"" else null
 	if _active_battle == null:
 		# No encounter available — treat the node as resolved so the run continues.
 		_status_label.text = "No encounter for this node; skipping."
@@ -529,7 +533,30 @@ func _resolve_act_end() -> void:
 	if _meta_progress != null and _meta_progress.cash_out_available():
 		_show_cashout()
 		return
-	_show_run_end(true)
+	_advance_act_or_victory()
+
+
+## ADR-0019: the act's boss is down — move to the next authored act (new map,
+## same party/HP/deck/relics/levels), or end the run in victory when the final
+## authored act has fallen.
+func _advance_act_or_victory() -> void:
+	if not _controller.advance_act():
+		_show_run_end(true)
+		return
+	_nav = RunNavigator.new(_db, _controller.run)
+	_status_label.text = "Act %d — the descent continues. Choose your next stop." % _controller.run.act
+	_refresh()
+
+
+## Node type -> enemy level band (ADR-0019) for combat scaling.
+func _band_for(node_type: StringName) -> StringName:
+	match node_type:
+		&"elite":
+			return &"elite"
+		&"boss":
+			return &"boss"
+		_:
+			return &"trash"
 
 
 ## Cross-run cash-out (P3·08): pick one banked boon for future runs.

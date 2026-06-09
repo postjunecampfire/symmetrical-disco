@@ -35,6 +35,9 @@ const DEFAULT_SAVE_PATH: String = "user://saves/run.json"
 @export var position: StringName = &""
 ## Resolved node ids.
 @export var cleared: Array[StringName] = []
+## Current act, 1-based (ADR-0019 18-act dungeon). The map/position/cleared above
+## describe THIS act; RunController.advance_act() regenerates them per act.
+@export var act: int = 1
 
 # --- Leveling (ADR-0015, P3·05) ---------------------------------------------
 ## character_id -> current level (1-based). Absent key == level 1.
@@ -115,6 +118,7 @@ func to_dict() -> Dictionary:
 		"map": map_out,
 		"position": String(position),
 		"cleared": _sn_array_to_strings(cleared),
+		"act": act,
 		"party_races": _sn_dict_to_strings(party_races),
 		"party_level": _int_dict_to_strings(party_level),
 		"party_xp": _int_dict_to_strings(party_xp),
@@ -136,6 +140,7 @@ static func from_dict(d: Dictionary) -> RunState:
 	state.relics = _strings_to_sn_array(d.get("relics", []))
 	state.cleared = _strings_to_sn_array(d.get("cleared", []))
 	state.position = StringName(String(d.get("position", "")))
+	state.act = maxi(1, int(d.get("act", 1)))
 	var hp_in: Dictionary = {}
 	var hp_v: Variant = d.get("party_hp", {})
 	if hp_v is Dictionary:

@@ -234,3 +234,50 @@ func test_null_config_returns_empty_graph() -> void:
 	assert_not_null(graph, "null config yields an empty graph, not a crash")
 	assert_eq(graph.nodes.size(), 0, "empty graph has no nodes")
 	assert_eq(graph.start.size(), 0, "empty graph has no start set")
+
+
+# --- Late-row bias (ADR-0019) --------------------------------------------------
+
+func test_late_row_bias_tilts_last_third_toward_combat_and_elite() -> void:
+	var plain := MapGenConfig.new()
+	var biased := MapGenConfig.new()
+	biased.late_row_bias = &"very_high"
+	var plain_hard: int = 0
+	var biased_hard: int = 0
+	for s in range(30):
+		plain_hard += _hard_late_nodes(MapGenerator.new().generate(plain, 5000 + s))
+		biased_hard += _hard_late_nodes(MapGenerator.new().generate(biased, 5000 + s))
+	assert_true(
+		biased_hard > plain_hard,
+		"very_high late bias yields more late combat/elite than none (%d vs %d over 30 seeds)" % [biased_hard, plain_hard]
+	)
+
+
+func test_unknown_late_row_bias_reads_as_none() -> void:
+	var plain := MapGenConfig.new()
+	var odd := MapGenConfig.new()
+	odd.late_row_bias = &"nonsense_key"
+	for s in range(5):
+		var a: MapGraph = MapGenerator.new().generate(plain, 7000 + s)
+		var b: MapGraph = MapGenerator.new().generate(odd, 7000 + s)
+		assert_eq(a.to_dict(), b.to_dict(), "unknown bias key behaves exactly like none (seed %d)" % s)
+
+
+## Count combat+elite nodes in the last third of NORMAL rows (boss row excluded;
+## the forced pre-boss rest row is identical across configs so it cancels out).
+func _hard_late_nodes(graph: MapGraph) -> int:
+	var max_row: int = 0
+	for key: Variant in graph.nodes.keys():
+		var n: MapNode = graph.nodes[key]
+		if n.node_type != &"boss":
+			max_row = maxi(max_row, n.row)
+	var rows: int = max_row + 1
+	var cutoff: int = int(ceil(float(rows) * 2.0 / 3.0))
+	var count: int = 0
+	for key: Variant in graph.nodes.keys():
+		var n: MapNode = graph.nodes[key]
+		if n.node_type == &"boss" or n.row < cutoff:
+			continue
+		if n.node_type == &"combat" or n.node_type == &"elite":
+			count += 1
+	return count

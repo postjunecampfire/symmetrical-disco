@@ -51,6 +51,7 @@ func _init(database: ContentDatabase, logger: TelemetryLogger = null) -> void:
 func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> void:
 	run = RunState.new()
 	run.seed = seed
+	run.act = 1
 	run.party = party.duplicate()
 	run.party_hp = {}
 	run.downed = []
@@ -80,18 +81,45 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 ## ready EncounterBattle the caller drives — synchronously via a policy
 ## (`resolve_combat`) or turn-by-turn from the UI (MapView/BattleView) — then hands
 ## back to `finish_combat`. Returns null if the encounter id is unknown.
-func begin_combat(encounter_id: StringName) -> EncounterBattle:
+func begin_combat(encounter_id: StringName, band: StringName = &"") -> EncounterBattle:
 	var encounter: EncounterData = db.get_encounter(encounter_id)
 	if encounter == null:
 		return null
 	var carried: Dictionary = _carried_for_next_fight()
+	# Enemy level scaling (ADR-0019): when the caller names the node's band
+	# ("trash" | "elite" | "boss"), enemies are scaled to the current act's level
+	# band via EnemyScaler. An empty band (legacy callers, the attrition sim,
+	# tests) keeps the authored stat blocks unscaled.
+	var enemy_level: int = 0
+	if band != &"":
+		var act_cfg: ActConfig = db.get_act(run.act)
+		if act_cfg != null:
+			enemy_level = EnemyScaler.band_level(act_cfg, band)
 	# Combat deck is built from the accumulated run deck (P2·06): race custom cards
 	# and drafted rewards in RunState.run_deck now appear in the fight, not just the
 	# class starting decks. The assembler falls back to starting decks if it is empty.
 	return _assembler.build(
 		encounter, db, run.party, run.seed, carried, run.party_races, run.run_deck,
-		run.allocated_stats, _active_relics()
+		run.allocated_stats, _active_relics(), enemy_level
 	)
+
+
+## Boss cleared (ADR-0019): move the run to the next authored act. Regenerates the
+## map from the next act's MapGenConfig (seed derived from the run seed + act so
+## each act's map is deterministic but distinct), resets position/cleared, and
+## keeps HP / deck / relics / levels — the run carries on. Returns false when no
+## next act exists (the cleared act was the last authored one -> true victory).
+func advance_act() -> bool:
+	var next_cfg: ActConfig = db.get_act(run.act + 1)
+	if next_cfg == null or next_cfg.map == null:
+		return false
+	run.act += 1
+	run.map = MapGenerator.new().generate(next_cfg.map, run.seed + run.act * 7919)
+	run.position = &""
+	run.cleared = []
+	if telemetry != null:
+		telemetry.log_event(&"act_advanced", {"act": run.act})
+	return true
 
 
 ## Resolve the run's relic ids (RunState.relics) to RelicData via the db, skipping

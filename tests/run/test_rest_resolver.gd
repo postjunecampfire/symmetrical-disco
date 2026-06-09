@@ -31,11 +31,16 @@ func _run(fighter_hp: int = 20, mage_hp: int = 20) -> RunState:
 # --- heal -------------------------------------------------------------------
 
 func test_heal_restores_living_members_by_config_amount() -> void:
+	# Expectations derive from data AND respect each member's max-HP cap, so
+	# rest_heal balance changes can't break this structural test (fighter max 34,
+	# mage max 24).
 	var amount: int = _db.get_battle_config().rest_heal
 	var run := _run(10, 12)
 	_resolver().heal(run)
-	assert_eq(int(run.party_hp[&"fighter"]), 10 + amount, "fighter healed by rest_heal")
-	assert_eq(int(run.party_hp[&"mage"]), 12 + amount, "mage healed by rest_heal")
+	assert_eq(int(run.party_hp[&"fighter"]), mini(10 + amount, 34), "fighter healed by rest_heal (capped)")
+	assert_eq(int(run.party_hp[&"mage"]), mini(12 + amount, 24), "mage healed by rest_heal (capped)")
+	assert_gt(int(run.party_hp[&"fighter"]), 10, "fighter actually healed")
+	assert_gt(int(run.party_hp[&"mage"]), 12, "mage actually healed")
 
 
 func test_heal_caps_at_base_max_and_skips_downed() -> void:

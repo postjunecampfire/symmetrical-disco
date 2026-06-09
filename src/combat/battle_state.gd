@@ -294,10 +294,14 @@ func add_energy(n: int) -> void:
 ## intent damage stays as authored. Never returns below 0.
 ## `use_attack_stat` is false for neutral (flat) cards (ADR-0016) so they never
 ## scale with the actor's sheet; the Strength status still applies either way.
-func modified_damage(attacker: Combatant, amount: int, use_attack_stat: bool = true) -> int:
+## `stat_mult` (ADR-0020): the stat contribution is floor(attack_power * stat_mult);
+## 1.0 reproduces the original flat add exactly.
+func modified_damage(
+	attacker: Combatant, amount: int, use_attack_stat: bool = true, stat_mult: float = 1.0
+) -> int:
 	if attacker == null:
 		return max(0, amount)
-	var bonus: int = attacker.attack_power() if use_attack_stat else 0
+	var bonus: int = int(floor(float(attacker.attack_power()) * stat_mult)) if use_attack_stat else 0
 	var out: int = amount + bonus + attacker.status_stacks(STATUS_STRENGTH)
 	if attacker.has_status(STATUS_WEAK):
 		# Weak: -25% outgoing (floored). Behaviour in code, the FLAG in data.
@@ -307,10 +311,13 @@ func modified_damage(attacker: Combatant, amount: int, use_attack_stat: bool = t
 
 ## Compute the DEX-modified block `source` grants for a base `amount` (ADR-0014:
 ## DEX -> block). Enemies have dexterity 0; `use_dex` is false for neutral (flat)
-## cards (ADR-0016).
-func modified_block(source: Variant, amount: int, use_dex: bool = true) -> int:
+## cards (ADR-0016). `stat_mult` (ADR-0020): the DEX contribution is
+## floor(DEX * stat_mult); 1.0 reproduces the original flat add exactly.
+func modified_block(
+	source: Variant, amount: int, use_dex: bool = true, stat_mult: float = 1.0
+) -> int:
 	var dex: int = (source as Combatant).dexterity if (use_dex and source is Combatant) else 0
-	return max(0, amount + dex)
+	return max(0, amount + int(floor(float(dex) * stat_mult)))
 
 
 ## Deal damage FROM `attacker` to `target`, applying strength/weak first, then the
@@ -349,11 +356,11 @@ func apply_effects(source: Combatant, target: Variant, effects: Array, scale_wit
 		for t in targets:
 			if e.type == &"damage":
 				var modified := e.duplicate() as Effect
-				modified.amount = modified_damage(source, e.amount, scale_with_stats)
+				modified.amount = modified_damage(source, e.amount, scale_with_stats, e.stat_mult)
 				_resolver.resolve(modified, source, t, self)
 			elif e.type == &"block":
 				var mb := e.duplicate() as Effect
-				mb.amount = modified_block(source, e.amount, scale_with_stats)
+				mb.amount = modified_block(source, e.amount, scale_with_stats, e.stat_mult)
 				_resolver.resolve(mb, source, t, self)
 			else:
 				_resolver.resolve(e, source, t, self)

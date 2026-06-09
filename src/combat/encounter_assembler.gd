@@ -60,7 +60,8 @@ func build(
 	party_races: Dictionary = {},
 	run_deck: Array[StringName] = [],
 	allocated_stats: Dictionary = {},
-	relics: Array[RelicData] = []
+	relics: Array[RelicData] = [],
+	enemy_level: int = 0
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
@@ -98,7 +99,7 @@ func build(
 		_apply_carried_hp(battle, carried_hp)
 	if not relics.is_empty():
 		_relic_engine.apply_combat_start(battle, relics)
-	_spawn_enemies(battle, encounter, db)
+	_spawn_enemies(battle, encounter, db, enemy_level, config)
 
 	return battle
 
@@ -172,9 +173,24 @@ func _spawn_players(battle: BattleState, party: Array[CharacterData]) -> void:
 ## Spawn one enemy Combatant per id in `encounter.enemies`, looking up its
 ## EnemyData in the db. Ids that do not resolve are skipped (loader validation
 ## guarantees ids resolve for /data; this keeps assembly robust with partial content).
-func _spawn_enemies(battle: BattleState, encounter: EncounterData, db: ContentDatabase) -> void:
+## `enemy_level` > 0 (ADR-0019) scales every spawned enemy to that act-band level
+## via EnemyScaler (factor shape from BattleConfig); 0 spawns authored blocks
+## unscaled. Mid-fight summons (enemy_db) spawn at authored stats — a known v1
+## simplification, revisit if summoners reach deep acts.
+func _spawn_enemies(
+	battle: BattleState,
+	encounter: EncounterData,
+	db: ContentDatabase,
+	enemy_level: int = 0,
+	config: BattleConfig = null
+) -> void:
+	var scaler: EnemyScaler = null
+	if enemy_level > 0:
+		scaler = EnemyScaler.new(config)
 	for enemy_id in encounter.enemies:
 		var data: EnemyData = db.get_enemy(enemy_id)
 		if data == null:
 			continue
+		if scaler != null:
+			data = scaler.apply_to(data, enemy_level)
 		battle.add_combatant(Combatant.from_enemy(data))
