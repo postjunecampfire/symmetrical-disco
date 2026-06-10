@@ -1,0 +1,51 @@
+{
+  "id": "evt_arcane_residue",
+  "title": "Arcane Residue",
+  "body": "A spell died badly here. Its residue pools in the cracks, humming with leftover intent.",
+  "tiers": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "choices": [
+    {
+      "label": "Siphon it safely",
+      "condition": {
+        "class": "mage"
+      },
+      "outcomes": [
+        {
+          "kind": "heal",
+          "amount": 5
+        },
+        {
+          "kind": "add_consumable",
+          "id": "energy_philter"
+        }
+      ]
+    },
+    {
+      "label": "Scoop it into a flask bare-handed",
+      "outcomes": [
+        {
+          "kind": "add_consumable",
+          "id": "energy_philter"
+        },
+        {
+          "kind": "damage_party",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "label": "Don't touch it",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

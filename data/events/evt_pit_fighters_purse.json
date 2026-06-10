@@ -1,0 +1,63 @@
+{
+  "id": "evt_pit_fighters_purse",
+  "title": "The Pit-Fighter's Purse",
+  "body": "A fighting pit dug into the dungeon floor. The purse hangs over the sand; the champion cracks his knuckles.",
+  "tiers": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "choices": [
+    {
+      "label": "Step into the pit",
+      "condition": {
+        "class": "brawler"
+      },
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 45
+        },
+        {
+          "kind": "damage_party",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "label": "Bet 15 gold on the champion",
+      "condition": {
+        "min_gold": 15
+      },
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 35
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "lose_gold",
+              "amount": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Watch from the rail",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

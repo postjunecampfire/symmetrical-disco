@@ -1,0 +1,49 @@
+{
+  "id": "evt_starving_prisoner",
+  "title": "The Starving Prisoner",
+  "body": "A gaunt figure grips the bars of a forgotten cell. \"The candle,\" they rasp. \"Free me and the candle is yours.\"",
+  "tiers": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "choices": [
+    {
+      "label": "Buy the keys from the warden (30 gold)",
+      "condition": {
+        "min_gold": 30
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 30
+        },
+        {
+          "kind": "add_relic",
+          "id": "graveside_candle"
+        }
+      ]
+    },
+    {
+      "label": "Pick the cell lock",
+      "condition": {
+        "class": "rogue"
+      },
+      "outcomes": [
+        {
+          "kind": "add_relic",
+          "id": "graveside_candle"
+        }
+      ]
+    },
+    {
+      "label": "Slip them bread and move on",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

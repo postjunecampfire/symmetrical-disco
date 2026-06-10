@@ -1,0 +1,58 @@
+{
+  "id": "evt_mysterious_door",
+  "title": "The Mysterious Door",
+  "body": "A door of black iron, set where no door should be. Something behind it ticks like a patient clock.",
+  "choices": [
+    {
+      "label": "Force it open",
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "add_relic",
+              "id": "members_card"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "outcomes": [
+            {
+              "kind": "damage_party",
+              "amount": 3
+            },
+            {
+              "kind": "add_curse",
+              "id": "vertigo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Pick the lock properly",
+      "condition": {
+        "class": "rogue"
+      },
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 25
+        },
+        {
+          "kind": "add_consumable",
+          "id": "lucky_coin"
+        }
+      ]
+    },
+    {
+      "label": "Leave it sealed",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

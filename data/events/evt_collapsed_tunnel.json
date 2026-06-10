@@ -1,0 +1,45 @@
+{
+  "id": "evt_collapsed_tunnel",
+  "title": "The Collapsed Tunnel",
+  "body": "A cave-in has buried a miner's strongbox under loose rock. There is a gap \u2014 a narrow one.",
+  "tiers": [
+    1,
+    2,
+    3
+  ],
+  "choices": [
+    {
+      "label": "Dig it out (3 damage to everyone)",
+      "outcomes": [
+        {
+          "kind": "damage_party",
+          "amount": 3
+        },
+        {
+          "kind": "gain_gold",
+          "amount": 40
+        }
+      ]
+    },
+    {
+      "label": "Slip through the gap",
+      "condition": {
+        "class": "rogue"
+      },
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 40
+        }
+      ]
+    },
+    {
+      "label": "Take the long way around",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

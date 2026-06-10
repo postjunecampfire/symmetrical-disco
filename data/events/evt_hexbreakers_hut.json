@@ -1,0 +1,62 @@
+{
+  "id": "evt_hexbreakers_hut",
+  "title": "The Hexbreaker's Hut",
+  "body": "Bundled herbs, chalk sigils, a crone who squints at the marks on you that you cannot see.",
+  "choices": [
+    {
+      "label": "Pay 40 gold for a cleansing rite",
+      "condition": {
+        "min_gold": 40,
+        "has_curse": true
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 40
+        },
+        {
+          "kind": "remove_curse"
+        }
+      ]
+    },
+    {
+      "label": "Offer blood for the rite instead",
+      "condition": {
+        "has_curse": true
+      },
+      "outcomes": [
+        {
+          "kind": "damage_party",
+          "amount": 3
+        },
+        {
+          "kind": "remove_curse"
+        }
+      ]
+    },
+    {
+      "label": "Buy a smoke vial (15 gold)",
+      "condition": {
+        "min_gold": 15
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 15
+        },
+        {
+          "kind": "add_consumable",
+          "id": "smoke_vial"
+        }
+      ]
+    },
+    {
+      "label": "Step back out",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

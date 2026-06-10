@@ -1,0 +1,50 @@
+{
+  "id": "evt_cats_paw_idol",
+  "title": "The Cat's-Paw Idol",
+  "body": "A squat idol with one paw raised, beckoning. Coins are scattered around its base \u2014 some toward it, some away.",
+  "choices": [
+    {
+      "label": "Knead the idol's paw",
+      "condition": {
+        "race": "cat"
+      },
+      "outcomes": [
+        {
+          "kind": "add_card",
+          "id": "pounce"
+        }
+      ]
+    },
+    {
+      "label": "Rub it for luck",
+      "random_outcomes": [
+        {
+          "weight": 2,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 20
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "lose_gold",
+              "amount": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Ignore the kitsch",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

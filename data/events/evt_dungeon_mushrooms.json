@@ -1,0 +1,51 @@
+{
+  "id": "evt_dungeon_mushrooms",
+  "title": "The Mushroom Grove",
+  "body": "A cavern carpeted in fungus. Some caps glow a wholesome gold; some only pretend to.",
+  "tiers": [
+    1,
+    2
+  ],
+  "choices": [
+    {
+      "label": "Eat the bright ones",
+      "random_outcomes": [
+        {
+          "weight": 2,
+          "outcomes": [
+            {
+              "kind": "heal",
+              "amount": 6
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "damage_party",
+              "amount": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Harvest carefully for the road",
+      "outcomes": [
+        {
+          "kind": "add_consumable",
+          "id": "antidote"
+        }
+      ]
+    },
+    {
+      "label": "Trust nothing that glows",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

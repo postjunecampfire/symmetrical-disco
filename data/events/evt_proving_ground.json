@@ -1,0 +1,44 @@
+{
+  "id": "evt_proving_ground",
+  "title": "The Proving Ground",
+  "body": "An old training hall: pells, racks, and an iron bell said to ring only for the worthy.",
+  "choices": [
+    {
+      "label": "Ring the iron bell",
+      "condition": {
+        "class": "fighter"
+      },
+      "outcomes": [
+        {
+          "kind": "add_consumable",
+          "id": "whetstone_oil"
+        },
+        {
+          "kind": "heal",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "label": "Train until it hurts",
+      "outcomes": [
+        {
+          "kind": "damage_party",
+          "amount": 2
+        },
+        {
+          "kind": "add_card",
+          "id": "focused_blow"
+        }
+      ]
+    },
+    {
+      "label": "Save your strength",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

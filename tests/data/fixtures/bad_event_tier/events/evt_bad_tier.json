@@ -1,0 +1,12 @@
+{
+  "id": "evt_bad_tier",
+  "title": "Out-of-Band Event",
+  "body": "Declares tiers outside the 1..6 dungeon bands.",
+  "tiers": [0, 7],
+  "choices": [
+    {
+      "label": "Shrug",
+      "outcomes": [ { "kind": "nothing" } ]
+    }
+  ]
+}

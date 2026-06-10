@@ -1,0 +1,50 @@
+{
+  "id": "evt_elven_waystone",
+  "title": "The Elven Waystone",
+  "body": "A mossy pillar carved with flowing script, still warm to the touch after a thousand years.",
+  "choices": [
+    {
+      "label": "Sing the waystone awake",
+      "condition": {
+        "race": "elf"
+      },
+      "outcomes": [
+        {
+          "kind": "add_card",
+          "id": "elven_focus"
+        }
+      ]
+    },
+    {
+      "label": "Trace the runes anyway",
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "heal",
+              "amount": 6
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "damage_party",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Keep walking",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

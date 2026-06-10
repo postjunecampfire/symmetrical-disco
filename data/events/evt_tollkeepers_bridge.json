@@ -1,0 +1,50 @@
+{
+  "id": "evt_tollkeepers_bridge",
+  "title": "The Tollkeeper's Bridge",
+  "body": "A chasm, a rope bridge, and a tollkeeper whose smile has too many teeth. Fifteen gold, or the hard way.",
+  "tiers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "choices": [
+    {
+      "label": "Pay the 15 gold toll",
+      "condition": {
+        "min_gold": 15
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 15
+        },
+        {
+          "kind": "heal",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "label": "Shove past him",
+      "outcomes": [
+        {
+          "kind": "damage_party",
+          "amount": 3
+        },
+        {
+          "kind": "gain_gold",
+          "amount": 20
+        }
+      ]
+    },
+    {
+      "label": "Find another crossing",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

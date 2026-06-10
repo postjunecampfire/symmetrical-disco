@@ -1111,6 +1111,10 @@ func _show_event(node: MapNode) -> void:
 		panel.add_child(body)
 	for i in ev.choices.size():
 		var choice: EventChoice = ev.choices[i]
+		# M3: flavor-gated choices (race/class/min_gold/has_curse) are HIDDEN
+		# when unmet — the resolver rejects them too; this is just presentation.
+		if not EventResolver.is_choice_available(_controller.run, choice):
+			continue
 		var b := Button.new()
 		b.custom_minimum_size = Vector2(420, 36)
 		b.text = choice.label

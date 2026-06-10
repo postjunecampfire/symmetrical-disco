@@ -1,0 +1,57 @@
+{
+  "id": "evt_whispering_idol",
+  "title": "The Whispering Idol",
+  "body": "A faceless idol that whispers your name in a voice you almost recognize. It knows things. It wants to share.",
+  "tiers": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "choices": [
+    {
+      "label": "Listen to the whispers",
+      "outcomes": [
+        {
+          "kind": "add_relic",
+          "id": "oracles_eye"
+        },
+        {
+          "kind": "add_curse",
+          "id": "doubt"
+        }
+      ]
+    },
+    {
+      "label": "Smash it",
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 30
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "add_curse",
+              "id": "hex_mark"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Cover your ears and go",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

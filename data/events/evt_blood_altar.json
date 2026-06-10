@@ -1,0 +1,44 @@
+{
+  "id": "evt_blood_altar",
+  "title": "The Blood Altar",
+  "body": "A basalt altar, its channels worn smooth by old offerings. The dungeon waits to see what you are willing to pay.",
+  "choices": [
+    {
+      "label": "Open a vein (everyone bleeds for 5)",
+      "outcomes": [
+        {
+          "kind": "damage_party",
+          "amount": 5
+        },
+        {
+          "kind": "add_relic",
+          "id": "iron_brand"
+        }
+      ]
+    },
+    {
+      "label": "Leave 25 gold in the channels",
+      "condition": {
+        "min_gold": 25
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 25
+        },
+        {
+          "kind": "add_consumable",
+          "id": "healing_draught"
+        }
+      ]
+    },
+    {
+      "label": "Back away slowly",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

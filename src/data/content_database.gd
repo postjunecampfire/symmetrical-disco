@@ -42,6 +42,10 @@ const EFFECT_TYPES: Array[StringName] = [
 ## ADR-0029: the card-kind discriminator values (`card_kind` on CardData).
 const CARD_KINDS: Array[StringName] = [&"skill", &"curse", &"consumable"]
 
+## M3 event-choice condition vocabulary (docs/systems/events.md). Evaluated by
+## EventResolver.is_choice_available; unknown keys are a load error.
+const EVENT_CONDITION_KEYS: Array[String] = ["race", "class", "min_gold", "has_curse", "has_relic"]
+
 ## Reserved character_tag meaning "any unit can play" (data-schemas.md §3).
 const NEUTRAL_TAG: StringName = &"neutral"
 
@@ -443,6 +447,21 @@ func _parse_event(d: Dictionary, source: String) -> Dictionary:
 	ev.title = _str(d.get("title"))
 	ev.body = _str(d.get("body"))
 	ev.choices = _parse_event_choices(d.get("choices"), source, ev.id)
+	# M3 tier banding: optional `tiers` array of ints in 1..6 (ADR-0019's six
+	# dungeon tiers). Empty/absent = the event is global.
+	var tiers_v: Variant = d.get("tiers")
+	if tiers_v != null:
+		if typeof(tiers_v) != TYPE_ARRAY:
+			_result.add_error("event '%s' in %s: tiers must be an array" % [ev.id, source])
+		else:
+			for t_v: Variant in (tiers_v as Array):
+				var t: int = _int(t_v, 0)
+				if t < 1 or t > 6:
+					_result.add_error(
+						"event '%s' in %s has out-of-range tier %s (must be 1..6)" % [ev.id, source, t_v]
+					)
+					continue
+				ev.tiers.append(t)
 	return {"id": ev.id, "value": ev}
 
 
@@ -459,6 +478,40 @@ func _parse_event_choices(value: Variant, source: String, event_id: StringName) 
 		var choice := EventChoice.new()
 		choice.label = _str(cd.get("label"))
 		choice.outcomes = _parse_event_outcomes(cd.get("outcomes"), source, event_id)
+		# M3: optional availability gate. Keys are validated against the known
+		# vocabulary here; race/class id references in _validate_references.
+		var cond_v: Variant = cd.get("condition")
+		if cond_v != null:
+			if typeof(cond_v) != TYPE_DICTIONARY:
+				_result.add_error("event '%s' in %s: condition must be an object" % [event_id, source])
+			else:
+				choice.condition = (cond_v as Dictionary).duplicate()
+				for key: Variant in choice.condition.keys():
+					if not EVENT_CONDITION_KEYS.has(String(key)):
+						_result.add_error(
+							"event '%s' in %s uses unknown condition key '%s'" % [event_id, source, key]
+						)
+		# M3: optional weighted gamble table (applied INSTEAD of outcomes).
+		var rnd_v: Variant = cd.get("random_outcomes")
+		if rnd_v != null:
+			if typeof(rnd_v) != TYPE_ARRAY:
+				_result.add_error("event '%s' in %s: random_outcomes must be an array" % [event_id, source])
+			else:
+				for group_v: Variant in (rnd_v as Array):
+					if typeof(group_v) != TYPE_DICTIONARY:
+						_result.add_error(
+							"event '%s' in %s has a non-object random_outcomes group" % [event_id, source]
+						)
+						continue
+					var gd: Dictionary = group_v
+					var weight: int = _int(gd.get("weight"), 1)
+					if weight < 1:
+						_result.add_error(
+							"event '%s' in %s has a random_outcomes group with weight < 1" % [event_id, source]
+						)
+						weight = 1
+					choice.random_weights.append(weight)
+					choice.random_groups.append(_parse_event_outcomes(gd.get("outcomes"), source, event_id))
 		out.append(choice)
 	return out
 
@@ -1034,18 +1087,44 @@ func _validate_references() -> void:
 		elif boon.kind == &"card" and not cards.has(boon.target):
 			_result.add_error("boon '%s' references unknown card '%s'" % [boon.id, boon.target])
 
-	# event outcomes: add_card/remove_card -> card ids. (add_relic references the
-	# relic set, which is deferred — P2·12 — so relic ids are not validated yet.)
-	# ADR-0029: add_curse must name a curse card; add_consumable a consumable;
-	# remove_curse may carry an empty id ("remove the first curse found").
+	# event outcomes: add_card/remove_card -> card ids; add_relic -> relic ids
+	# (the relic registry is live since P2·12). ADR-0029: add_curse must name a
+	# curse card; add_consumable a consumable; remove_curse may carry an empty id
+	# ("remove the first curse found"). M3: gamble groups are validated like
+	# plain outcomes; condition race/class ids must exist; every event keeps at
+	# least one UNCONDITIONAL choice so no party composition can soft-lock.
 	for id in events:
 		var ev: EventData = events[id]
+		var has_unconditional := false
 		for choice in ev.choices:
-			for outcome in choice.outcomes:
+			if choice.condition.is_empty():
+				has_unconditional = true
+			if choice.condition.has("race") and not races.has(_sn(choice.condition.get("race"))):
+				_result.add_error(
+					"event '%s' condition references unknown race '%s'" % [ev.id, choice.condition.get("race")]
+				)
+			if choice.condition.has("class") and not characters.has(_sn(choice.condition.get("class"))):
+				_result.add_error(
+					"event '%s' condition references unknown class '%s'" % [ev.id, choice.condition.get("class")]
+				)
+			if choice.condition.has("has_relic") and not relics.has(_sn(choice.condition.get("has_relic"))):
+				_result.add_error(
+					"event '%s' condition references unknown relic '%s'" % [ev.id, choice.condition.get("has_relic")]
+				)
+			var all_outcomes: Array = choice.outcomes.duplicate()
+			for group_v: Variant in choice.random_groups:
+				all_outcomes.append_array(group_v as Array)
+			for outcome_v: Variant in all_outcomes:
+				var outcome: EventOutcome = outcome_v
 				if outcome.kind == &"add_card" or outcome.kind == &"remove_card":
 					if outcome.id == &"" or not cards.has(outcome.id):
 						_result.add_error(
 							"event '%s' %s references unknown card '%s'" % [ev.id, outcome.kind, outcome.id]
+						)
+				elif outcome.kind == &"add_relic":
+					if outcome.id == &"" or not relics.has(outcome.id):
+						_result.add_error(
+							"event '%s' add_relic references unknown relic '%s'" % [ev.id, outcome.id]
 						)
 				elif outcome.kind == &"add_curse" or outcome.kind == &"add_consumable":
 					var want: StringName = &"curse" if outcome.kind == &"add_curse" else &"consumable"
@@ -1060,6 +1139,10 @@ func _validate_references() -> void:
 						_result.add_error(
 							"event '%s' remove_curse references non-curse card '%s'" % [ev.id, outcome.id]
 						)
+		if not ev.choices.is_empty() and not has_unconditional:
+			_result.add_error(
+				"event '%s' has no unconditional choice (every option could be hidden)" % ev.id
+			)
 
 
 func _validate_effect_statuses(effects: Array[Effect], owner_label: String) -> void:

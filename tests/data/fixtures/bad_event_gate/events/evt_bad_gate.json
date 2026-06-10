@@ -1,0 +1,17 @@
+{
+  "id": "evt_bad_gate",
+  "title": "Badly Gated Event",
+  "body": "Every choice is conditional, one key is gibberish, one race does not exist.",
+  "choices": [
+    {
+      "label": "Gated by nonsense",
+      "condition": { "alignment": "chaotic" },
+      "outcomes": [ { "kind": "nothing" } ]
+    },
+    {
+      "label": "Gated by a ghost race",
+      "condition": { "race": "ghoul" },
+      "outcomes": [ { "kind": "nothing" } ]
+    }
+  ]
+}

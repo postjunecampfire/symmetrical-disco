@@ -1,0 +1,40 @@
+{
+  "id": "evt_orcish_war_shrine",
+  "title": "The Orcish War Shrine",
+  "body": "Tusked totems ring a fire pit long gone cold. Offering bowls still glitter between the stones.",
+  "choices": [
+    {
+      "label": "Sound the old warcry",
+      "condition": {
+        "race": "orc"
+      },
+      "outcomes": [
+        {
+          "kind": "add_card",
+          "id": "orcish_rage"
+        }
+      ]
+    },
+    {
+      "label": "Loot the offering bowls",
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 35
+        },
+        {
+          "kind": "add_curse",
+          "id": "cowardice"
+        }
+      ]
+    },
+    {
+      "label": "Pass in silence",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

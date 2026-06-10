@@ -72,8 +72,9 @@ func test_character_stats_and_con_derived_hp() -> void:
 	assert_eq(ch.constitution, 15, "CON parsed from data")
 	assert_eq(ch.strength, 5, "STR parsed")
 	assert_eq(ch.attack_stat, &"str", "attack_stat parsed")
-	# max_hp is derived: constitution (15) * hp_per_con (default 2) = 30.
-	assert_eq(ch.max_hp, 30, "max_hp derived from CON * hp_per_con")
+	# max_hp is derived: base_hp (default 4) + constitution (15) * hp_per_con
+	# (default 2) = 34 (ADR-0021 pt1 adds the flat floor).
+	assert_eq(ch.max_hp, 34, "max_hp derived from base_hp + CON * hp_per_con")
 
 
 # --- Validation: duplicate id ---
@@ -146,6 +147,38 @@ func test_unknown_event_outcome_kind_fails_loudly() -> void:
 	assert_true(
 		_any_contains(result.errors, "unknown outcome.kind"),
 		"error should name the unknown outcome kind: %s" % str(result.errors)
+	)
+
+
+# --- Validation: event choice gates (M3, docs/systems/events.md) ---
+func test_bad_event_gates_fail_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("bad_event_gate"))
+
+	assert_false(result.ok, "bad choice conditions must fail the load")
+	assert_true(
+		_any_contains(result.errors, "unknown condition key"),
+		"error should name the unknown condition key: %s" % str(result.errors)
+	)
+	assert_true(
+		_any_contains(result.errors, "unknown race"),
+		"error should name the dangling race id: %s" % str(result.errors)
+	)
+	assert_true(
+		_any_contains(result.errors, "no unconditional choice"),
+		"an event whose every choice could be hidden must fail: %s" % str(result.errors)
+	)
+
+
+# --- Validation: event tier bands (M3) ---
+func test_out_of_range_event_tier_fails_loudly() -> void:
+	var db := _db()
+	var result := db.load_from_dir(FIXTURES.path_join("bad_event_tier"))
+
+	assert_false(result.ok, "tiers outside 1..6 must fail the load")
+	assert_true(
+		_any_contains(result.errors, "out-of-range tier"),
+		"error should name the out-of-range tier: %s" % str(result.errors)
 	)
 
 

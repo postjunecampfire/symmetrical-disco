@@ -1,0 +1,43 @@
+{
+  "id": "evt_curse_eater",
+  "title": "The Curse-Eater",
+  "body": "A pale, swollen thing chained in an alcove. It smells the hex on you and drools coins in anticipation.",
+  "choices": [
+    {
+      "label": "Let it swallow your curse",
+      "condition": {
+        "has_curse": true
+      },
+      "outcomes": [
+        {
+          "kind": "remove_curse"
+        },
+        {
+          "kind": "gain_gold",
+          "amount": 50
+        }
+      ]
+    },
+    {
+      "label": "Bottle its drool",
+      "outcomes": [
+        {
+          "kind": "add_consumable",
+          "id": "antidote"
+        },
+        {
+          "kind": "add_curse",
+          "id": "doubt"
+        }
+      ]
+    },
+    {
+      "label": "Leave the thing chained",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

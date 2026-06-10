@@ -1,0 +1,49 @@
+{
+  "id": "evt_smugglers_drop",
+  "title": "The Smugglers' Drop",
+  "body": "A cache of contraband behind a false wall: bombs, blades, and a ledger of names. Smugglers always collect.",
+  "tiers": [
+    2,
+    3,
+    4
+  ],
+  "choices": [
+    {
+      "label": "Take the whole cache",
+      "outcomes": [
+        {
+          "kind": "add_consumable",
+          "id": "fire_bomb"
+        },
+        {
+          "kind": "add_consumable",
+          "id": "throwing_knife"
+        },
+        {
+          "kind": "add_curse",
+          "id": "debt"
+        }
+      ]
+    },
+    {
+      "label": "Forge a ledger entry of your own",
+      "condition": {
+        "has_relic": "merchants_ledger"
+      },
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 45
+        }
+      ]
+    },
+    {
+      "label": "Reseal the wall",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

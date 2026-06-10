@@ -107,20 +107,42 @@ func encounter_for(node: MapNode) -> StringName:
 		return &""
 	if node.payload != &"":
 		return node.payload
+	# Per-act roster first (ADR-0019 remainder): the current act's tier pool
+	# decides which fights exist here; the global encounter_pool.json is only
+	# the fallback for content sets without an act curve.
+	var act_cfg: ActConfig = db.get_act(run.act)
+	if act_cfg != null and act_cfg.encounter_pool.has(node.node_type):
+		var act_pool_v: Variant = act_cfg.encounter_pool[node.node_type]
+		if act_pool_v is Array and not (act_pool_v as Array).is_empty():
+			var act_pool: Array[StringName] = []
+			for item: Variant in act_pool_v:
+				act_pool.append(StringName(String(item)))
+			return _seeded_pick(act_pool, node.id)
 	var pool: Array[StringName] = db.get_encounters_for_type(node.node_type)
 	return _seeded_pick(pool, node.id)
 
 
 ## The event id an event `node` should present: its `payload` if set, else a
-## deterministic pick from all loaded events. "" if none exist.
+## deterministic pick from the loaded events whose tier band (EventData.tiers,
+## M3 — empty = global) admits the current act's tier. If banding would empty
+## the pool entirely, fall back to ALL events rather than presenting nothing.
 func event_for(node: MapNode) -> StringName:
 	if node == null:
 		return &""
 	if node.payload != &"":
 		return node.payload
+	var act_cfg: ActConfig = db.get_act(run.act)
+	var tier: int = act_cfg.tier if act_cfg != null else 0
 	var ids: Array[StringName] = []
 	for key: Variant in db.events.keys():
-		ids.append(StringName(String(key)))
+		var eid := StringName(String(key))
+		var ev: EventData = db.events[eid]
+		if tier > 0 and ev != null and not ev.tiers.is_empty() and not ev.tiers.has(tier):
+			continue
+		ids.append(eid)
+	if ids.is_empty():
+		for key: Variant in db.events.keys():
+			ids.append(StringName(String(key)))
 	ids.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
 	return _seeded_pick(ids, node.id)
 

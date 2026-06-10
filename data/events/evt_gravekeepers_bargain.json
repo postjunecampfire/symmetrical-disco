@@ -1,0 +1,37 @@
+{
+  "id": "evt_gravekeepers_bargain",
+  "title": "The Gravekeeper's Bargain",
+  "body": "Rows of crypts, one stacked with grave-gold. The keeper is gone, but the dead keep their own ledger.",
+  "choices": [
+    {
+      "label": "Pry open the rich crypt",
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 60
+        },
+        {
+          "kind": "add_curse",
+          "id": "burden"
+        }
+      ]
+    },
+    {
+      "label": "Tend the neglected graves",
+      "outcomes": [
+        {
+          "kind": "heal",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "label": "Move on",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

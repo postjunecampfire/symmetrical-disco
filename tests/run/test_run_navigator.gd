@@ -144,6 +144,33 @@ func test_event_for_picks_a_loaded_event() -> void:
 	assert_true(_db.get_event(ev) != null, "event node resolves to a real event: %s" % ev)
 
 
+# --- M3 tier banding (EventData.tiers, docs/systems/events.md) ----------------
+
+func test_event_for_respects_tier_bands() -> void:
+	# Act 1 == tier 1: sample many node salts; no pick may carry a band that
+	# excludes tier 1 (e.g. evt_echoing_stairwell is tiers [5,6]).
+	var run := _run()
+	run.act = 1
+	var nav := _nav(run)
+	for i in 40:
+		var picked := nav.event_for(_node(StringName("salt_%d" % i), &"event", 0, []))
+		var ev: EventData = _db.get_event(picked)
+		assert_not_null(ev, "pick resolves: %s" % picked)
+		if ev == null:
+			continue
+		assert_true(ev.tiers.is_empty() or ev.tiers.has(1),
+			"act 1 (tier 1) must never draw off-band event '%s' (tiers %s)" % [picked, ev.tiers])
+
+
+func test_event_for_payload_bypasses_tier_band() -> void:
+	var run := _run()
+	run.act = 1  # tier 1, but the authored payload is a tier 5-6 event
+	var nav := _nav(run)
+	var n := _node(&"fixed", &"event", 0, [])
+	n.payload = &"evt_echoing_stairwell"
+	assert_eq(nav.event_for(n), &"evt_echoing_stairwell", "explicit payload wins over banding")
+
+
 # --- Resume: navigator works off a SAVED-then-LOADED run (save/resume wiring) -
 
 func test_navigator_resumes_from_a_saved_run() -> void:

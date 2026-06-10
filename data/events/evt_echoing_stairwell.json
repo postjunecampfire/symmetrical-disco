@@ -1,0 +1,66 @@
+{
+  "id": "evt_echoing_stairwell",
+  "title": "The Echoing Stairwell",
+  "body": "A stairwell spiraling far below the mapped floors. Your last torch gutters; the dark below sounds wealthy.",
+  "tiers": [
+    5,
+    6
+  ],
+  "choices": [
+    {
+      "label": "Descend in darkness",
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 70
+            },
+            {
+              "kind": "add_consumable",
+              "id": "barrier_scroll"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "damage_party",
+              "amount": 5
+            },
+            {
+              "kind": "add_curse",
+              "id": "vertigo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Descend by torchlight (spend 20 gold on oil)",
+      "condition": {
+        "min_gold": 20
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 20
+        },
+        {
+          "kind": "gain_gold",
+          "amount": 50
+        }
+      ]
+    },
+    {
+      "label": "Climb back up",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

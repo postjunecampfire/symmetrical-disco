@@ -1,0 +1,59 @@
+{
+  "id": "evt_rusted_vault",
+  "title": "The Rusted Vault",
+  "body": "A pre-collapse vault, its mechanism seized with rust. A spectral warden still drifts before the door, palms open.",
+  "tiers": [
+    4,
+    5,
+    6
+  ],
+  "choices": [
+    {
+      "label": "Bribe the vault-warden (60 gold)",
+      "condition": {
+        "min_gold": 60
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 60
+        },
+        {
+          "kind": "add_relic",
+          "id": "collectors_folio"
+        }
+      ]
+    },
+    {
+      "label": "Force the mechanism",
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 90
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "outcomes": [
+            {
+              "kind": "damage_party",
+              "amount": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Leave it rusted shut",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

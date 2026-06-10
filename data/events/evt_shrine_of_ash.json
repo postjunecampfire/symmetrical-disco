@@ -1,0 +1,46 @@
+{
+  "id": "evt_shrine_of_ash",
+  "title": "The Shrine of Ash",
+  "body": "A bed of coals that never cools, ringed with votive gold. The faithful crossed barefoot. The greedy just reached in.",
+  "tiers": [
+    4,
+    5,
+    6
+  ],
+  "choices": [
+    {
+      "label": "Walk the coals (6 damage to everyone)",
+      "outcomes": [
+        {
+          "kind": "damage_party",
+          "amount": 6
+        },
+        {
+          "kind": "add_relic",
+          "id": "ember_pendant"
+        }
+      ]
+    },
+    {
+      "label": "Pocket the votive gold",
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 45
+        },
+        {
+          "kind": "add_curse",
+          "id": "wound"
+        }
+      ]
+    },
+    {
+      "label": "Bow and retreat",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

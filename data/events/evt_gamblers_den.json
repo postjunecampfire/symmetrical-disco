@@ -1,0 +1,53 @@
+{
+  "id": "evt_gamblers_den",
+  "title": "The Gambler's Den",
+  "body": "Lantern smoke and the rattle of bone dice. A scarred croupier waves you to the table: double your stake or lose it.",
+  "choices": [
+    {
+      "label": "Wager 20 gold on the bones",
+      "condition": {
+        "min_gold": 20
+      },
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 50
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "lose_gold",
+              "amount": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Palm the dice mid-throw",
+      "condition": {
+        "class": "rogue"
+      },
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 30
+        }
+      ]
+    },
+    {
+      "label": "Keep your purse shut",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

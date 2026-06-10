@@ -14,13 +14,18 @@ extends Resource
 ##   remove_curse  — remove one copy of curse `id` from whichever member carries
 ##                   it; an empty id removes the first curse found (party order).
 ##   add_consumable— append consumable card `id` to the party inventory (ADR-0029).
+##   gain_gold     — add `amount` to the run's currency (M3 event economy).
+##   lose_gold     — subtract `amount` from the run's currency, floored at 0.
+##                   Pair with a `min_gold` choice condition when the cost is a
+##                   real price (the floor is a safety net, not a discount).
 ##   nothing       — no effect (a "walk away" choice).
 
 ## The full outcome vocabulary. The loader validates `kind` against this set and
 ## EventResolver dispatches on it; keeping it here puts the contract on the data.
 const KINDS: Array[StringName] = [
 	&"heal", &"damage_party", &"add_card", &"remove_card", &"add_relic",
-	&"add_curse", &"remove_curse", &"add_consumable", &"nothing",
+	&"add_curse", &"remove_curse", &"add_consumable", &"gain_gold",
+	&"lose_gold", &"nothing",
 ]
 
 @export var kind: StringName = &"nothing"

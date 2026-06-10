@@ -25,7 +25,16 @@ extends RefCounted
 ##   remove_curse  remove ONE copy of curse `id` from whichever member carries it
 ##                 (party order); empty id = the first curse found at all.
 ##   add_consumable  append consumable `id` to the party inventory (ADR-0029).
+##   gain_gold     add `amount` to run.currency.
+##   lose_gold     subtract `amount` from run.currency, floored at 0.
 ##   nothing       no-op.
+##
+## M3 extensions (docs/systems/events.md): choices may carry a `condition` gate
+## (race / class / min_gold / has_curse / has_relic — evaluated by
+## is_choice_available; unmet
+## choices are hidden by the UI and rejected here) and a weighted gamble table
+## (`random_groups`), resolved with run-seeded RNG so the same event node in the
+## same run always rolls the same fate.
 
 ## card/relic registry source for HP caps. A ContentDatabase or null.
 var _db: ContentDatabase
@@ -38,20 +47,102 @@ func _init(database: ContentDatabase = null) -> void:
 # --- Public API -------------------------------------------------------------
 
 ## Apply every outcome of `choice` to `run`, in order. A null choice is a no-op.
-func apply(run: RunState, choice: EventChoice) -> void:
+## `salt` seeds the gamble roll (callers pass the event id); a choice with a
+## random table applies exactly ONE weighted group instead of `outcomes`.
+func apply(run: RunState, choice: EventChoice, salt: StringName = &"") -> void:
 	if choice == null:
+		return
+	if choice.is_gamble():
+		var group: Array = _pick_gamble_group(run, choice, salt)
+		for outcome_v: Variant in group:
+			_apply_outcome(run, outcome_v as EventOutcome)
 		return
 	for outcome in choice.outcomes:
 		_apply_outcome(run, outcome)
 
 
 ## Convenience: resolve choice `index` of `event` against `run`. Returns true if
-## the index was valid and applied; false otherwise (out-of-range / null event).
+## the index was valid, its condition (if any) is met, and it was applied; false
+## otherwise (out-of-range / null event / gated choice).
 func apply_choice_index(run: RunState, event: EventData, index: int) -> bool:
 	if event == null or index < 0 or index >= event.choices.size():
 		return false
-	apply(run, event.choices[index])
+	var choice: EventChoice = event.choices[index]
+	if not is_choice_available(run, choice):
+		return false
+	apply(run, choice, event.id)
 	return true
+
+
+# --- Choice conditions (M3) --------------------------------------------------
+
+## True if `choice` may be offered/taken given the run's current state. An empty
+## condition is always available. Recognized keys (ANDed): "race", "class",
+## "min_gold", "has_curse", "has_relic" — see EventChoice's class doc. Unknown
+## keys are ignored here (the loader flags them at load time).
+static func is_choice_available(run: RunState, choice: EventChoice) -> bool:
+	if run == null or choice == null:
+		return choice != null
+	var cond: Dictionary = choice.condition
+	if cond.is_empty():
+		return true
+	if cond.has("race"):
+		var want_race := StringName(String(cond.get("race")))
+		var found_race := false
+		for cid in run.party:
+			if StringName(String(run.party_races.get(cid, &""))) == want_race:
+				found_race = true
+				break
+		if not found_race:
+			return false
+	if cond.has("class"):
+		# Pre-class members record &"" (ADR-0021 pt2) and never match, so class
+		# branches simply stay hidden until the Act-3 pick.
+		var want_class := StringName(String(cond.get("class")))
+		var found_class := false
+		for cid in run.party:
+			if StringName(String(run.member_classes.get(cid, &""))) == want_class:
+				found_class = true
+				break
+		if not found_class:
+			return false
+	if cond.has("min_gold"):
+		if run.currency < int(cond.get("min_gold")):
+			return false
+	if cond.has("has_relic"):
+		if not run.relics.has(StringName(String(cond.get("has_relic")))):
+			return false
+	if cond.has("has_curse"):
+		var any_curse := false
+		for cid in run.party:
+			if not run.curses_of(cid).is_empty():
+				any_curse = true
+				break
+		if any_curse != bool(cond.get("has_curse")):
+			return false
+	return true
+
+
+# --- Gamble resolution (M3) ---------------------------------------------------
+
+## Pick one weighted outcome group. Seeded by run.seed ^ hash(salt): the same
+## event node in the same run is deterministic (no save-scumming the wheel), but
+## different runs/seeds roll differently.
+func _pick_gamble_group(run: RunState, choice: EventChoice, salt: StringName) -> Array:
+	if choice.random_groups.is_empty():
+		return []
+	var rng := RandomNumberGenerator.new()
+	rng.seed = run.seed ^ hash(salt)
+	var total: int = 0
+	for w in choice.random_weights:
+		total += maxi(1, w)
+	var roll: int = rng.randi_range(0, maxi(1, total) - 1)
+	for i in choice.random_groups.size():
+		var w_i: int = maxi(1, choice.random_weights[i] if i < choice.random_weights.size() else 1)
+		if roll < w_i:
+			return choice.random_groups[i]
+		roll -= w_i
+	return choice.random_groups.back()
 
 
 # --- Outcome handlers -------------------------------------------------------
@@ -97,6 +188,12 @@ func _apply_outcome(run: RunState, outcome: EventOutcome) -> void:
 		&"add_consumable":
 			if outcome.id != &"":
 				run.consumables.append(outcome.id)
+		&"gain_gold":
+			if outcome.amount > 0:
+				run.currency += outcome.amount
+		&"lose_gold":
+			if outcome.amount > 0:
+				run.currency = maxi(0, run.currency - outcome.amount)
 		_:
 			pass  # `nothing` and any unknown kind: no effect.
 

@@ -1,0 +1,62 @@
+{
+  "id": "evt_abandoned_shop",
+  "title": "The Abandoned Shop",
+  "body": "Shelves askew, till empty, dust thick as wool. Whoever ran this place left in a hurry \u2014 or didn't leave at all.",
+  "tiers": [
+    1,
+    2
+  ],
+  "choices": [
+    {
+      "label": "Ransack the shelves",
+      "random_outcomes": [
+        {
+          "weight": 2,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 20
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "add_curse",
+              "id": "fatigue"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Leave 25 gold and take the good stock",
+      "condition": {
+        "min_gold": 25
+      },
+      "outcomes": [
+        {
+          "kind": "lose_gold",
+          "amount": 25
+        },
+        {
+          "kind": "add_consumable",
+          "id": "fire_bomb"
+        },
+        {
+          "kind": "add_consumable",
+          "id": "healing_draught"
+        }
+      ]
+    },
+    {
+      "label": "Let the dust settle",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "evt_moonlit_pool",
+  "title": "The Moonlit Pool",
+  "body": "Somehow, moonlight reaches this deep. It silvers a still pool, and something glimmers at the bottom.",
+  "tiers": [
+    1,
+    2,
+    3
+  ],
+  "choices": [
+    {
+      "label": "Drink deep",
+      "outcomes": [
+        {
+          "kind": "heal",
+          "amount": 8
+        }
+      ]
+    },
+    {
+      "label": "Dive for the glimmer",
+      "random_outcomes": [
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "gain_gold",
+              "amount": 45
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "damage_party",
+              "amount": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Stay dry",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "evt_silver_tongued_stranger",
+  "title": "The Silver-Tongued Stranger",
+  "body": "A stranger in a fine coat materializes from the gloom with an opportunity, friend, an OPPORTUNITY.",
+  "choices": [
+    {
+      "label": "Out-charm the charmer",
+      "condition": {
+        "class": "charmer"
+      },
+      "outcomes": [
+        {
+          "kind": "gain_gold",
+          "amount": 30
+        }
+      ]
+    },
+    {
+      "label": "Hear the pitch out",
+      "random_outcomes": [
+        {
+          "weight": 2,
+          "outcomes": [
+            {
+              "kind": "add_consumable",
+              "id": "lucky_coin"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "outcomes": [
+            {
+              "kind": "lose_gold",
+              "amount": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Walk away mid-sentence",
+      "outcomes": [
+        {
+          "kind": "nothing"
+        }
+      ]
+    }
+  ]
+}
