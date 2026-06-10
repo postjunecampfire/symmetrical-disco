@@ -1,0 +1,6 @@
+{
+  "id": "bleed",
+  "display_name": "Bleed",
+  "stacking": "intensity",
+  "decays_each_turn": false
+}

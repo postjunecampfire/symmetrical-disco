@@ -1,0 +1,26 @@
+{
+  "id": "ult_firestorm",
+  "display_name": "Firestorm",
+  "description": "ULT \u2014 burn all. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 1.25
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 4
+    }
+  ]
+}

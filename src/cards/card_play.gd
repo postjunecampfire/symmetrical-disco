@@ -4,7 +4,7 @@ extends RefCounted
 ## a unit, a card, and a chosen target, VALIDATES the play, SPENDS energy, RESOLVES
 ## the card's effects in order, and ROUTES the card to the correct pile by its
 ## keywords. It is the seam between input/UI and the combat spine: it orchestrates
-## BattleState (shared energy pool, combatants, resolve_targets, apply_effects) and
+## BattleState (per-character energy pools ADR-0025, combatants, resolve_targets, apply_effects) and
 ## Deck (hand/piles, play_from_hand) without re-implementing either.
 ##
 ## Two entry points share one validation+spend+resolve core:
@@ -18,7 +18,7 @@ extends RefCounted
 ## Validation (all enforced before any energy is spent or effect applied):
 ##   1. Tag    — only the owning character (matching character_tag) or a `neutral`
 ##               card may be played by a given unit (ADR-0004).
-##   2. Energy — card.energy_cost must not exceed the shared BattleState pool.
+##   2. Energy — card.energy_cost must not exceed the ACTING unit's own pool (ADR-0025).
 ##   3. Target — the chosen target must satisfy the card's TargetSpec.target_type
 ##               (positionless, by kind — ADR-0013). Single-target kinds (enemy /
 ##               ally) require a Combatant of the right allegiance; group kinds
@@ -65,15 +65,15 @@ func play_card(unit: Combatant, card: CardData, target: Variant) -> PlayResult:
 		return PlayResult.new("CardPlay: null unit")
 	if card == null:
 		return PlayResult.new("CardPlay: null card")
-	if not battle.deck.hand.has(card):
-		return PlayResult.new("CardPlay: card '%s' is not in hand" % card.id)
+	if not battle.deck_of(unit).hand.has(card):
+		return PlayResult.new("CardPlay: card '%s' is not in %s's hand" % [card.id, unit.display_name])
 
 	var check := _validate(unit, card, target)
 	if not check.ok:
 		return check
 
 	_spend_and_resolve(unit, card, target)
-	battle.deck.play_from_hand(card)
+	battle.deck_of(unit).play_from_hand(card)
 	return PlayResult.new()
 
 
@@ -114,10 +114,11 @@ func _validate(unit: Combatant, card: CardData, target: Variant) -> PlayResult:
 			"CardPlay: %s may not play '%s' (tag '%s')"
 			% [unit.display_name, card.id, card.character_tag]
 		)
-	if card.energy_cost > battle.energy:
+	# ADR-0025: the ACTING unit's own pool pays — never the other character's.
+	if card.energy_cost > battle.energy_of(unit):
 		return PlayResult.new(
-			"CardPlay: not enough energy for '%s' (cost %d, pool %d)"
-			% [card.id, card.energy_cost, battle.energy]
+			"CardPlay: not enough energy for '%s' (cost %d, %s's pool %d)"
+			% [card.id, card.energy_cost, unit.display_name, battle.energy_of(unit)]
 		)
 	var target_check := _validate_target(unit, card, target)
 	if not target_check.ok:
@@ -133,7 +134,9 @@ func _tag_allows(unit: Combatant, card: CardData) -> bool:
 	var char_data := unit.source_data as CharacterData
 	if char_data == null:
 		return false
-	return char_data.id == card.character_tag
+	# Member ids are no longer class ids (ADR-0024): a synthesized member sheet
+	# carries its chosen class in `tags`, so class-tagged cards stay playable.
+	return char_data.id == card.character_tag or char_data.tags.has(card.character_tag)
 
 
 ## Whether `card` is declared on `unit`'s CharacterData.innate_actions.
@@ -195,9 +198,14 @@ func _type_error(target_type: StringName, why: String) -> PlayResult:
 ## BattleState.apply_effects (which folds in strength/weak for damage). Called
 ## only after _validate has passed.
 func _spend_and_resolve(unit: Combatant, card: CardData, target: Variant) -> void:
-	battle.energy -= card.energy_cost
+	battle.spend_energy(unit, card.energy_cost)  # ADR-0025: owner pays
 	var targets: Array[Combatant] = battle.resolve_targets(card.target, unit, target)
-	# Owned cards and innate actions scale with the actor's sheet (ADR-0014);
-	# neutral deck cards are flat (ADR-0016) to avoid per-actor routing math.
-	var scale: bool = card.innate or card.character_tag != TAG_NEUTRAL
-	battle.apply_effects(unit, targets, card.effects, scale)
+	# EVERY player card scales with its actor's sheet (ADR-0014). The old
+	# neutral-flat rule (ADR-0016) existed to dodge per-actor routing in the
+	# SHARED deck; under per-member derived decks (ADR-0026) the actor is always
+	# the deck's owner, so basics (Strike/Defend) scale like everything else —
+	# without this, post-0026 Defend granted 0 block.
+	battle.apply_effects(unit, targets, card.effects, true)
+	# Bleed (M3): playing a card is an ACT — a bleeding caster pays in blood after
+	# the card resolves (one proc per play, stacks as unblockable damage, then -1).
+	battle.on_unit_acted(unit)

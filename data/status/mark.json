@@ -1,0 +1,6 @@
+{
+  "id": "mark",
+  "display_name": "Mark",
+  "stacking": "intensity",
+  "decays_each_turn": false
+}
