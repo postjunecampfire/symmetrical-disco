@@ -1,0 +1,24 @@
+{
+  "id": "enfeeble",
+  "display_name": "Enfeeble",
+  "description": "Apply 1 Weak and 1 Frail.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 1
+    }
+  ]
+}

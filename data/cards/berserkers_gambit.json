@@ -1,0 +1,25 @@
+{
+  "id": "berserkers_gambit",
+  "display_name": "Berserker's Gambit",
+  "description": "Take 6 damage (your Block absorbs it). Deal 3 + 250% STR damage. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "self_damage",
+      "amount": 6
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 2.5
+    }
+  ]
+}

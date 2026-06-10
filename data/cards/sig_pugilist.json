@@ -1,0 +1,25 @@
+{
+  "id": "sig_pugilist",
+  "display_name": "One-Two",
+  "description": "Deal 3 + 50% STR damage twice.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    }
+  ],
+  "signature": true
+}

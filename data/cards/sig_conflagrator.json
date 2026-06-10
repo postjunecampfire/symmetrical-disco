@@ -1,0 +1,26 @@
+{
+  "id": "sig_conflagrator",
+  "display_name": "Living Flame",
+  "description": "Deal 2 + 100% INT damage and apply 7 Burn. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 7
+    }
+  ],
+  "signature": true
+}

@@ -1,0 +1,22 @@
+{
+  "id": "sig_venomancer",
+  "display_name": "Venom Cascade",
+  "description": "Apply 10 Poison. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 10
+    }
+  ],
+  "signature": true
+}

@@ -1,0 +1,23 @@
+{
+  "id": "frost_lance",
+  "display_name": "Frost Lance",
+  "description": "Deal 4 damage and apply 1 Weak.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
+  ]
+}

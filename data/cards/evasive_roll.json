@@ -1,0 +1,22 @@
+{
+  "id": "evasive_roll",
+  "display_name": "Evasive Roll",
+  "description": "Gain 4 Block and draw 1 card.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

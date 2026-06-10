@@ -1,0 +1,21 @@
+{
+  "id": "disintegrate",
+  "display_name": "Disintegrate",
+  "description": "Deal 250% INT damage. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 0,
+      "stat_mult": 2.5
+    }
+  ]
+}

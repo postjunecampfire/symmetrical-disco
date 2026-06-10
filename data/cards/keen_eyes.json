@@ -1,0 +1,18 @@
+{
+  "id": "keen_eyes",
+  "display_name": "Keen Eyes",
+  "description": "Draw 2 cards.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ]
+}

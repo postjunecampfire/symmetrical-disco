@@ -1,0 +1,18 @@
+{
+  "id": "brace_up",
+  "display_name": "Brace Up",
+  "description": "Gain 4 Block.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4
+    }
+  ]
+}

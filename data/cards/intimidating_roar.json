@@ -1,0 +1,19 @@
+{
+  "id": "intimidating_roar",
+  "display_name": "Intimidating Roar",
+  "description": "Apply 2 Weak to ALL enemies.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ]
+}

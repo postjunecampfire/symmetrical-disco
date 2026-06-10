@@ -1,0 +1,27 @@
+{
+  "id": "sig_soulreaver",
+  "display_name": "Reave the Soul",
+  "description": "Deal 200% INT damage and apply 2 Weak. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 0,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

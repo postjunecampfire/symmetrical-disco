@@ -1,0 +1,19 @@
+{
+  "id": "shadow_feint",
+  "display_name": "Shadow Feint",
+  "description": "Gain 3 + 150% DEX Block.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 3,
+      "stat_mult": 1.5
+    }
+  ]
+}

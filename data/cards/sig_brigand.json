@@ -1,0 +1,28 @@
+{
+  "id": "sig_brigand",
+  "display_name": "Brigand's Edge",
+  "description": "Deal 4 damage and apply 2 Bleed. Draw 1 card.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "bleed",
+      "stacks": 2
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ],
+  "signature": true
+}

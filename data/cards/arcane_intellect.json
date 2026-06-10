@@ -1,0 +1,22 @@
+{
+  "id": "arcane_intellect",
+  "display_name": "Arcane Intellect",
+  "description": "Draw 2 cards and gain 2 Block.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 2
+    },
+    {
+      "type": "block",
+      "amount": 2
+    }
+  ]
+}

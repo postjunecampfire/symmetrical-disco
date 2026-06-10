@@ -1,0 +1,22 @@
+{
+  "id": "sig_plaguebringer",
+  "display_name": "Plague Touch",
+  "description": "Apply 9 Poison. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 9
+    }
+  ],
+  "signature": true
+}

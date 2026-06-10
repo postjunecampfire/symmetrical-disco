@@ -1,0 +1,22 @@
+{
+  "id": "sig_grand_incantatrix",
+  "display_name": "Word of Unmaking",
+  "description": "Deal 2 + 250% INT damage. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 2.5
+    }
+  ],
+  "signature": true
+}

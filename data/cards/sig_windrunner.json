@@ -1,0 +1,25 @@
+{
+  "id": "sig_windrunner",
+  "display_name": "Wind Dance",
+  "description": "Gain 1 energy and draw 2 cards. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 1
+    },
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ],
+  "signature": true
+}

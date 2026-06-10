@@ -1,0 +1,22 @@
+{
+  "id": "bulwark_charge",
+  "display_name": "Bulwark Charge",
+  "description": "Deal 6 damage and gain 8 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6
+    },
+    {
+      "type": "self_block",
+      "amount": 8
+    }
+  ]
+}

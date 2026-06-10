@@ -1,0 +1,25 @@
+{
+  "id": "sig_beguiler",
+  "display_name": "Sweet Nothings",
+  "description": "Apply 4 Charm and 2 Weak.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "charm",
+      "stacks": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

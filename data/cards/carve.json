@@ -1,0 +1,19 @@
+{
+  "id": "carve",
+  "display_name": "Carve",
+  "description": "Deal 3 + 150% STR damage.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 1.5
+    }
+  ]
+}

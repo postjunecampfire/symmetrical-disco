@@ -1,0 +1,24 @@
+{
+  "id": "sig_thief",
+  "display_name": "Thief's Cunning",
+  "description": "Deal 2 + 50% DEX damage and draw 1 card.",
+  "character_tag": "rogue",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ],
+  "signature": true
+}

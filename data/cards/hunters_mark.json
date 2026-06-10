@@ -1,0 +1,19 @@
+{
+  "id": "hunters_mark",
+  "display_name": "Hunter's Mark",
+  "description": "Apply 3 Mark.",
+  "character_tag": "rogue",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "mark",
+      "stacks": 3
+    }
+  ]
+}

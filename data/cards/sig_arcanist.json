@@ -1,0 +1,24 @@
+{
+  "id": "sig_arcanist",
+  "display_name": "Glyph of Power",
+  "description": "Deal 3 + 150% INT damage and gain 3 Block.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "self_block",
+      "amount": 3
+    }
+  ],
+  "signature": true
+}

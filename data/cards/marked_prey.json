@@ -1,0 +1,23 @@
+{
+  "id": "marked_prey",
+  "display_name": "Marked Prey",
+  "description": "Deal 4 damage and apply 3 Mark.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "mark",
+      "stacks": 3
+    }
+  ]
+}

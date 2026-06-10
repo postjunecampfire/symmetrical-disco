@@ -1,0 +1,215 @@
+{
+  "id": "mage",
+  "nodes": [
+    {
+      "id": "elementalist",
+      "display_name": "Elementalist",
+      "parent": "mage",
+      "act": 6,
+      "stat_bonus": {
+        "int": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_elementalist"
+      ]
+    },
+    {
+      "id": "pyromancer",
+      "display_name": "Pyromancer",
+      "parent": "elementalist",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_pyromancer"
+      ]
+    },
+    {
+      "id": "conflagrator",
+      "display_name": "Conflagrator",
+      "parent": "pyromancer",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_firestorm",
+      "ascension_stat_mult": 0.5,
+      "hook": "burn all",
+      "unlock_cards": [
+        "sig_conflagrator"
+      ]
+    },
+    {
+      "id": "magmancer",
+      "display_name": "Magmancer",
+      "parent": "pyromancer",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_eruption",
+      "ascension_stat_mult": 0.5,
+      "hook": "massive single-target nuke",
+      "unlock_cards": [
+        "sig_magmancer"
+      ]
+    },
+    {
+      "id": "cryomancer",
+      "display_name": "Cryomancer",
+      "parent": "elementalist",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_cryomancer"
+      ]
+    },
+    {
+      "id": "frostbinder",
+      "display_name": "Frostbinder",
+      "parent": "cryomancer",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_absolute_zero",
+      "ascension_stat_mult": 0.5,
+      "hook": "stun all",
+      "unlock_cards": [
+        "sig_frostbinder"
+      ]
+    },
+    {
+      "id": "tempest_sage",
+      "display_name": "Tempest Sage",
+      "parent": "cryomancer",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_thunderstorm",
+      "ascension_stat_mult": 0.5,
+      "hook": "chain lightning",
+      "unlock_cards": [
+        "sig_tempest_sage"
+      ]
+    },
+    {
+      "id": "sorcerer",
+      "display_name": "Sorcerer",
+      "parent": "mage",
+      "act": 6,
+      "stat_bonus": {
+        "int": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_sorcerer"
+      ]
+    },
+    {
+      "id": "necromancer",
+      "display_name": "Necromancer",
+      "parent": "sorcerer",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_necromancer"
+      ]
+    },
+    {
+      "id": "lich",
+      "display_name": "Lich",
+      "parent": "necromancer",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_army_of_the_dead",
+      "ascension_stat_mult": 0.5,
+      "hook": "drain horde",
+      "unlock_cards": [
+        "sig_lich"
+      ]
+    },
+    {
+      "id": "soulreaver",
+      "display_name": "Soulreaver",
+      "parent": "necromancer",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_soul_harvest",
+      "ascension_stat_mult": 0.5,
+      "hook": "drain all, refund energy",
+      "unlock_cards": [
+        "sig_soulreaver"
+      ]
+    },
+    {
+      "id": "warlock",
+      "display_name": "Warlock",
+      "parent": "sorcerer",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_warlock"
+      ]
+    },
+    {
+      "id": "plaguebringer",
+      "display_name": "Plaguebringer",
+      "parent": "warlock",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_pandemic",
+      "ascension_stat_mult": 0.5,
+      "hook": "max poison all, ignores block",
+      "unlock_cards": [
+        "sig_plaguebringer"
+      ]
+    },
+    {
+      "id": "hexblade",
+      "display_name": "Hexblade",
+      "parent": "warlock",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_doom",
+      "ascension_stat_mult": 0.5,
+      "hook": "escalating curse damage",
+      "unlock_cards": [
+        "sig_hexblade"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "sig_princess",
+  "display_name": "Royal Presence",
+  "description": "Apply 5 Charm and 2 Weak. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "charm",
+      "stacks": 5
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

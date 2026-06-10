@@ -1,0 +1,22 @@
+{
+  "id": "quick_thinking",
+  "display_name": "Quick Thinking",
+  "description": "Draw 1 card and gain 2 Block.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 1
+    },
+    {
+      "type": "block",
+      "amount": 2
+    }
+  ]
+}

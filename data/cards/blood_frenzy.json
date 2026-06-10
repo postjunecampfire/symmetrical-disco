@@ -1,0 +1,23 @@
+{
+  "id": "blood_frenzy",
+  "display_name": "Blood Frenzy",
+  "description": "Take 4 damage (your Block absorbs it). Deal 5 + 150% STR damage.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "self_damage",
+      "amount": 4
+    },
+    {
+      "type": "damage",
+      "amount": 5,
+      "stat_mult": 1.5
+    }
+  ]
+}

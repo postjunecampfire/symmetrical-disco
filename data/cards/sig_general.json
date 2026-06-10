@@ -1,0 +1,19 @@
+{
+  "id": "sig_general",
+  "display_name": "Hold the Line",
+  "description": "ALL allies gain 6 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 6
+    }
+  ],
+  "signature": true
+}

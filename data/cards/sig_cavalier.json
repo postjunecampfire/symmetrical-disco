@@ -1,0 +1,24 @@
+{
+  "id": "sig_cavalier",
+  "display_name": "Cavalier's Charge",
+  "description": "Deal 5 + 150% STR damage and gain 5 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 5,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "self_block",
+      "amount": 5
+    }
+  ],
+  "signature": true
+}

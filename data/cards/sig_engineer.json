@@ -1,0 +1,25 @@
+{
+  "id": "sig_engineer",
+  "display_name": "Field Engineering",
+  "description": "Gain 8 Block and draw 2 cards. Exhaust.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 8
+    },
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ],
+  "signature": true
+}

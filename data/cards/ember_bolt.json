@@ -1,0 +1,23 @@
+{
+  "id": "ember_bolt",
+  "display_name": "Ember Bolt",
+  "description": "Deal 3 damage and apply 2 Burn.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 2
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "temporal_lock",
+  "display_name": "Temporal Lock",
+  "description": "Stun the target for 1 turn and draw 2 cards. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    },
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ]
+}

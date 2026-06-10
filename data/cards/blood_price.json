@@ -1,0 +1,22 @@
+{
+  "id": "blood_price",
+  "display_name": "Blood Price",
+  "description": "Take 3 damage (your Block absorbs it). Draw 2 cards.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "self_damage",
+      "amount": 3
+    },
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ]
+}

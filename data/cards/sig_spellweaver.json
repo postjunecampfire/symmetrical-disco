@@ -1,0 +1,26 @@
+{
+  "id": "sig_spellweaver",
+  "display_name": "Weave the Threads",
+  "description": "Deal 3 + 200% INT damage and draw 1 card. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ],
+  "signature": true
+}

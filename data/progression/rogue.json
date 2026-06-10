@@ -1,0 +1,215 @@
+{
+  "id": "rogue",
+  "nodes": [
+    {
+      "id": "assassin",
+      "display_name": "Assassin",
+      "parent": "rogue",
+      "act": 6,
+      "stat_bonus": {
+        "dex": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_assassin"
+      ]
+    },
+    {
+      "id": "stalker",
+      "display_name": "Stalker",
+      "parent": "assassin",
+      "act": 9,
+      "stat_bonus": {
+        "dex": 2,
+        "str": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_stalker"
+      ]
+    },
+    {
+      "id": "nightblade",
+      "display_name": "Nightblade",
+      "parent": "stalker",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_death_mark",
+      "ascension_stat_mult": 0.5,
+      "hook": "execute strike",
+      "unlock_cards": [
+        "sig_nightblade"
+      ]
+    },
+    {
+      "id": "reaper",
+      "display_name": "Reaper",
+      "parent": "stalker",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_thousand_cuts",
+      "ascension_stat_mult": 0.5,
+      "hook": "multi-hit barrage",
+      "unlock_cards": [
+        "sig_reaper"
+      ]
+    },
+    {
+      "id": "duelist",
+      "display_name": "Duelist",
+      "parent": "assassin",
+      "act": 9,
+      "stat_bonus": {
+        "dex": 2,
+        "str": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_duelist"
+      ]
+    },
+    {
+      "id": "bladedancer",
+      "display_name": "Bladedancer",
+      "parent": "duelist",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_riposte_stance",
+      "ascension_stat_mult": 0.5,
+      "hook": "counter stance",
+      "unlock_cards": [
+        "sig_bladedancer"
+      ]
+    },
+    {
+      "id": "phantom",
+      "display_name": "Phantom",
+      "parent": "duelist",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_vanish",
+      "ascension_stat_mult": 0.5,
+      "hook": "untargetable + setup",
+      "unlock_cards": [
+        "sig_phantom"
+      ]
+    },
+    {
+      "id": "thief",
+      "display_name": "Thief",
+      "parent": "rogue",
+      "act": 6,
+      "stat_bonus": {
+        "dex": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_thief"
+      ]
+    },
+    {
+      "id": "poisoner",
+      "display_name": "Poisoner",
+      "parent": "thief",
+      "act": 9,
+      "stat_bonus": {
+        "dex": 2,
+        "str": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_poisoner"
+      ]
+    },
+    {
+      "id": "venomancer",
+      "display_name": "Venomancer",
+      "parent": "poisoner",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_toxic_bloom",
+      "ascension_stat_mult": 0.5,
+      "hook": "max poison all, ignores block",
+      "unlock_cards": [
+        "sig_venomancer"
+      ]
+    },
+    {
+      "id": "apothecary",
+      "display_name": "Apothecary",
+      "parent": "poisoner",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_alchemical_bomb",
+      "ascension_stat_mult": 0.5,
+      "hook": "AoE Vulnerable + Frail",
+      "unlock_cards": [
+        "sig_apothecary"
+      ]
+    },
+    {
+      "id": "shadow",
+      "display_name": "Shadow",
+      "parent": "thief",
+      "act": 9,
+      "stat_bonus": {
+        "dex": 2,
+        "str": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_shadow"
+      ]
+    },
+    {
+      "id": "shade",
+      "display_name": "Shade",
+      "parent": "shadow",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_smoke_mirrors",
+      "ascension_stat_mult": 0.5,
+      "hook": "full evasion",
+      "unlock_cards": [
+        "sig_shade"
+      ]
+    },
+    {
+      "id": "windrunner",
+      "display_name": "Windrunner",
+      "parent": "shadow",
+      "act": 12,
+      "stat_bonus": {
+        "dex": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_flurry",
+      "ascension_stat_mult": 0.5,
+      "hook": "extra actions / free cards",
+      "unlock_cards": [
+        "sig_windrunner"
+      ]
+    }
+  ]
+}

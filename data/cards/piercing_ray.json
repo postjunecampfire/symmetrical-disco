@@ -1,0 +1,19 @@
+{
+  "id": "piercing_ray",
+  "display_name": "Piercing Ray",
+  "description": "Deal 2 + 150% INT damage.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 1.5
+    }
+  ]
+}

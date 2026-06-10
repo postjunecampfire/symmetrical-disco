@@ -1,0 +1,22 @@
+{
+  "id": "sig_reaver",
+  "display_name": "Reaving Sweep",
+  "description": "Deal 4 damage to ALL enemies, at reduced stat scaling. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 0.6
+    }
+  ],
+  "signature": true
+}

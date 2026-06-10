@@ -1,0 +1,18 @@
+{
+  "id": "iron_guard",
+  "display_name": "Iron Guard",
+  "description": "Gain 6 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 6
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "sig_phantom",
+  "display_name": "Phantom Step",
+  "description": "Gain 250% DEX Block and draw 1 card. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 0,
+      "stat_mult": 2.5
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ],
+  "signature": true
+}

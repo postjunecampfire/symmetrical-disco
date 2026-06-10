@@ -1,0 +1,23 @@
+{
+  "id": "sig_sorcerer",
+  "display_name": "Dark Pact",
+  "description": "Take 2 damage (your Block absorbs it). Deal 5 damage.",
+  "character_tag": "mage",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "self_damage",
+      "amount": 2
+    },
+    {
+      "type": "damage",
+      "amount": 5
+    }
+  ],
+  "signature": true
+}

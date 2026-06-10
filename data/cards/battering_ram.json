@@ -1,0 +1,26 @@
+{
+  "id": "battering_ram",
+  "display_name": "Battering Ram",
+  "description": "Deal 5 + 150% STR damage and Stun the target for 1 turn. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 5,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "pyre",
+  "display_name": "Pyre",
+  "description": "Apply 8 Burn and 2 Vulnerable. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 8
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ]
+}

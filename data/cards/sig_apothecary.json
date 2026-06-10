@@ -1,0 +1,32 @@
+{
+  "id": "sig_apothecary",
+  "display_name": "Debilitating Flask",
+  "description": "Apply 2 Vulnerable, 2 Frail and 2 Weak. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

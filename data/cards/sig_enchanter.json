@@ -1,0 +1,25 @@
+{
+  "id": "sig_enchanter",
+  "display_name": "Winsome Gaze",
+  "description": "Apply 3 Charm and 1 Weak.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "charm",
+      "stacks": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
+  ],
+  "signature": true
+}

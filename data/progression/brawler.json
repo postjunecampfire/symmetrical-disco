@@ -1,0 +1,215 @@
+{
+  "id": "brawler",
+  "nodes": [
+    {
+      "id": "demolitionist",
+      "display_name": "Demolitionist",
+      "parent": "brawler",
+      "act": 6,
+      "stat_bonus": {
+        "str": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_demolitionist"
+      ]
+    },
+    {
+      "id": "sapper",
+      "display_name": "Sapper",
+      "parent": "demolitionist",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_sapper"
+      ]
+    },
+    {
+      "id": "trapmaster",
+      "display_name": "Trapmaster",
+      "parent": "sapper",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_hidden_pit",
+      "ascension_stat_mult": 0.5,
+      "hook": "AOE control: damage + stun all",
+      "unlock_cards": [
+        "sig_trapmaster"
+      ]
+    },
+    {
+      "id": "engineer",
+      "display_name": "Engineer",
+      "parent": "sapper",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_crafting_table",
+      "ascension_stat_mult": 0.5,
+      "hook": "tempo engine: cards + energy",
+      "unlock_cards": [
+        "sig_engineer"
+      ]
+    },
+    {
+      "id": "anarchist",
+      "display_name": "Anarchist",
+      "parent": "demolitionist",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_anarchist"
+      ]
+    },
+    {
+      "id": "compensated_anarchist",
+      "display_name": "Compensated Anarchist",
+      "parent": "anarchist",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_collateral_damage",
+      "ascension_stat_mult": 0.5,
+      "hook": "huge scaling AOE nuke",
+      "unlock_cards": [
+        "sig_compensated_anarchist"
+      ]
+    },
+    {
+      "id": "firebrand",
+      "display_name": "Firebrand",
+      "parent": "anarchist",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_inferno_payload",
+      "ascension_stat_mult": 0.5,
+      "hook": "AOE damage + Vulnerable setup",
+      "unlock_cards": [
+        "sig_firebrand"
+      ]
+    },
+    {
+      "id": "pugilist",
+      "display_name": "Pugilist",
+      "parent": "brawler",
+      "act": 6,
+      "stat_bonus": {
+        "str": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_pugilist"
+      ]
+    },
+    {
+      "id": "bruiser",
+      "display_name": "Bruiser",
+      "parent": "pugilist",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_bruiser"
+      ]
+    },
+    {
+      "id": "juggernaut",
+      "display_name": "Juggernaut",
+      "parent": "bruiser",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_haymaker",
+      "ascension_stat_mult": 0.5,
+      "hook": "single-target haymaker nuke",
+      "unlock_cards": [
+        "sig_juggernaut"
+      ]
+    },
+    {
+      "id": "prizefighter",
+      "display_name": "Prizefighter",
+      "parent": "bruiser",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_combination",
+      "ascension_stat_mult": 0.5,
+      "hook": "multi-hit Strength scaling",
+      "unlock_cards": [
+        "sig_prizefighter"
+      ]
+    },
+    {
+      "id": "survivor",
+      "display_name": "Survivor",
+      "parent": "pugilist",
+      "act": 9,
+      "stat_bonus": {
+        "str": 1,
+        "dex": 1,
+        "con": 2
+      },
+      "unlock_cards": [
+        "sig_survivor"
+      ]
+    },
+    {
+      "id": "unbreakable",
+      "display_name": "Unbreakable",
+      "parent": "survivor",
+      "act": 12,
+      "stat_bonus": {
+        "str": 2,
+        "con": 3
+      },
+      "ult_card_id": "ult_you_will_not_break_me",
+      "ascension_stat_mult": 0.5,
+      "hook": "huge Block + Strength stand",
+      "unlock_cards": [
+        "sig_unbreakable"
+      ]
+    },
+    {
+      "id": "royal_bodyguard",
+      "display_name": "Royal Bodyguard",
+      "parent": "survivor",
+      "act": 12,
+      "stat_bonus": {
+        "str": 2,
+        "con": 3
+      },
+      "ult_card_id": "ult_shield_the_princess",
+      "ascension_stat_mult": 0.5,
+      "hook": "party-wide Block + heal",
+      "unlock_cards": [
+        "sig_royal_bodyguard"
+      ]
+    }
+  ]
+}

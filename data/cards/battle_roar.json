@@ -1,0 +1,23 @@
+{
+  "id": "battle_roar",
+  "display_name": "Battle Roar",
+  "description": "Apply 1 Weak and gain 3 Block.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    },
+    {
+      "type": "self_block",
+      "amount": 3
+    }
+  ]
+}

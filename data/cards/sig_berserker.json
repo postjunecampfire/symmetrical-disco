@@ -1,0 +1,24 @@
+{
+  "id": "sig_berserker",
+  "display_name": "Berserk Swing",
+  "description": "Take 3 damage (your Block absorbs it). Deal 6 + 150% STR damage.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "self_damage",
+      "amount": 3
+    },
+    {
+      "type": "damage",
+      "amount": 6,
+      "stat_mult": 1.5
+    }
+  ],
+  "signature": true
+}

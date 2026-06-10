@@ -1,0 +1,30 @@
+{
+  "id": "sig_spellslinger",
+  "display_name": "Rapid Cantrips",
+  "description": "Deal 2 + 60% INT damage three times.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.6
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.6
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.6
+    }
+  ],
+  "signature": true
+}

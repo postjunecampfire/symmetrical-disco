@@ -1,0 +1,18 @@
+{
+  "id": "focused_blow",
+  "display_name": "Focused Blow",
+  "description": "Deal 9 damage.",
+  "character_tag": "neutral",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 9
+    }
+  ]
+}

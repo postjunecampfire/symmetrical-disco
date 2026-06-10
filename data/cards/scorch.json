@@ -1,0 +1,23 @@
+{
+  "id": "scorch",
+  "display_name": "Scorch",
+  "description": "Deal 2 damage and apply 3 Burn.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 3
+    }
+  ]
+}

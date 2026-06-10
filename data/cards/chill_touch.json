@@ -1,0 +1,23 @@
+{
+  "id": "chill_touch",
+  "display_name": "Chill Touch",
+  "description": "Deal 3 damage and apply 1 Frail.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 1
+    }
+  ]
+}

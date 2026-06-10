@@ -1,0 +1,23 @@
+{
+  "id": "surgical_strike",
+  "display_name": "Surgical Strike",
+  "description": "Deal 2 + 150% DEX damage and draw 1 card.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

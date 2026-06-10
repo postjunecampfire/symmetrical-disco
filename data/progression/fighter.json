@@ -1,0 +1,215 @@
+{
+  "id": "fighter",
+  "nodes": [
+    {
+      "id": "brigand",
+      "display_name": "Brigand",
+      "parent": "fighter",
+      "act": 6,
+      "stat_bonus": {
+        "str": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_brigand"
+      ]
+    },
+    {
+      "id": "warrior",
+      "display_name": "Warrior",
+      "parent": "brigand",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_warrior"
+      ]
+    },
+    {
+      "id": "warlord",
+      "display_name": "Warlord",
+      "parent": "warrior",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_banner_of_war",
+      "ascension_stat_mult": 0.5,
+      "hook": "party-wide Strength + block",
+      "unlock_cards": [
+        "sig_warlord"
+      ]
+    },
+    {
+      "id": "reaver",
+      "display_name": "Reaver",
+      "parent": "warrior",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_endless_onslaught",
+      "ascension_stat_mult": 0.5,
+      "hook": "hit all enemies",
+      "unlock_cards": [
+        "sig_reaver"
+      ]
+    },
+    {
+      "id": "berserker",
+      "display_name": "Berserker",
+      "parent": "brigand",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_berserker"
+      ]
+    },
+    {
+      "id": "ravager",
+      "display_name": "Ravager",
+      "parent": "berserker",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_bloodlust",
+      "ascension_stat_mult": 0.5,
+      "hook": "massive single strike",
+      "unlock_cards": [
+        "sig_ravager"
+      ]
+    },
+    {
+      "id": "bloodletter",
+      "display_name": "Bloodletter",
+      "parent": "berserker",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_exsanguinate",
+      "ascension_stat_mult": 0.5,
+      "hook": "poison all + drain",
+      "unlock_cards": [
+        "sig_bloodletter"
+      ]
+    },
+    {
+      "id": "knight",
+      "display_name": "Knight",
+      "parent": "fighter",
+      "act": 6,
+      "stat_bonus": {
+        "str": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_knight"
+      ]
+    },
+    {
+      "id": "cavalier",
+      "display_name": "Cavalier",
+      "parent": "knight",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_cavalier"
+      ]
+    },
+    {
+      "id": "paladin",
+      "display_name": "Paladin",
+      "parent": "cavalier",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_aegis_of_dawn",
+      "ascension_stat_mult": 0.5,
+      "hook": "party heal + block",
+      "unlock_cards": [
+        "sig_paladin"
+      ]
+    },
+    {
+      "id": "great_knight",
+      "display_name": "Great Knight",
+      "parent": "cavalier",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_cavalry_charge",
+      "ascension_stat_mult": 0.5,
+      "hook": "trample, hits all",
+      "unlock_cards": [
+        "sig_great_knight"
+      ]
+    },
+    {
+      "id": "general",
+      "display_name": "General",
+      "parent": "knight",
+      "act": 9,
+      "stat_bonus": {
+        "str": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_general"
+      ]
+    },
+    {
+      "id": "marshal",
+      "display_name": "Marshal",
+      "parent": "general",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_iron_wall",
+      "ascension_stat_mult": 0.5,
+      "hook": "team gains big block",
+      "unlock_cards": [
+        "sig_marshal"
+      ]
+    },
+    {
+      "id": "sentinel",
+      "display_name": "Sentinel",
+      "parent": "general",
+      "act": 12,
+      "stat_bonus": {
+        "str": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_last_bastion",
+      "ascension_stat_mult": 0.5,
+      "hook": "massive self block + strength",
+      "unlock_cards": [
+        "sig_sentinel"
+      ]
+    }
+  ]
+}

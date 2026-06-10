@@ -1,0 +1,22 @@
+{
+  "id": "reckless_swing",
+  "display_name": "Reckless Swing",
+  "description": "Deal 5 damage. Take 2 damage (your Block absorbs it).",
+  "character_tag": "fighter",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 5
+    },
+    {
+      "type": "self_damage",
+      "amount": 2
+    }
+  ]
+}

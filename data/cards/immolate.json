@@ -1,0 +1,24 @@
+{
+  "id": "immolate",
+  "display_name": "Immolate",
+  "description": "Deal 4 + 150% INT damage and apply 4 Burn.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 4
+    }
+  ]
+}

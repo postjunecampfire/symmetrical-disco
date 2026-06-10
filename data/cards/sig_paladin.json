@@ -1,0 +1,25 @@
+{
+  "id": "sig_paladin",
+  "display_name": "Lay on Hands",
+  "description": "ALL allies heal 4 HP and gain 4 Block. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "heal",
+      "amount": 4
+    },
+    {
+      "type": "block",
+      "amount": 4
+    }
+  ],
+  "signature": true
+}

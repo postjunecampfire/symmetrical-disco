@@ -1,0 +1,23 @@
+{
+  "id": "sig_idol",
+  "display_name": "Adoring Crowd",
+  "description": "ALL allies gain 4 Block. Draw 1 card.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ],
+  "signature": true
+}

@@ -1,0 +1,24 @@
+{
+  "id": "nimble_escape",
+  "display_name": "Nimble Escape",
+  "description": "Gain 8 Block and draw 1 card. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 8
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

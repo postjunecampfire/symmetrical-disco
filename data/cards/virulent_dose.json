@@ -1,0 +1,26 @@
+{
+  "id": "virulent_dose",
+  "display_name": "Virulent Dose",
+  "description": "Apply 8 Poison and 2 Frail. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 8
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 2
+    }
+  ]
+}

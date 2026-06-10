@@ -1,0 +1,27 @@
+{
+  "id": "sig_ravager",
+  "display_name": "Ravage",
+  "description": "Deal 4 + 200% STR damage and apply 2 Vulnerable. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

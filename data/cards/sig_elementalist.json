@@ -1,0 +1,29 @@
+{
+  "id": "sig_elementalist",
+  "display_name": "Elemental Surge",
+  "description": "Deal 3 damage, apply 2 Burn and 1 Weak.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
+  ],
+  "signature": true
+}

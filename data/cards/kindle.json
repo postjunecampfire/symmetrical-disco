@@ -1,0 +1,19 @@
+{
+  "id": "kindle",
+  "display_name": "Kindle",
+  "description": "Apply 3 Burn.",
+  "character_tag": "mage",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 3
+    }
+  ]
+}

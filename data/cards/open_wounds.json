@@ -1,0 +1,20 @@
+{
+  "id": "open_wounds",
+  "display_name": "Open Wounds",
+  "description": "Deal damage equal to the target's Bleed, then remove it all. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "consume_status_damage",
+      "status": "bleed"
+    }
+  ]
+}

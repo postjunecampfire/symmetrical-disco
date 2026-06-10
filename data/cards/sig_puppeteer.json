@@ -1,0 +1,27 @@
+{
+  "id": "sig_puppeteer",
+  "display_name": "Pull the Strings",
+  "description": "Apply 6 Charm and 2 Vulnerable. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "charm",
+      "stacks": 6
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

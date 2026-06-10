@@ -1,0 +1,18 @@
+{
+  "id": "arcane_ward",
+  "display_name": "Arcane Ward",
+  "description": "Gain 5 Block.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 5
+    }
+  ]
+}

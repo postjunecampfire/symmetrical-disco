@@ -1,0 +1,25 @@
+{
+  "id": "sig_stalker",
+  "display_name": "Stalk the Prey",
+  "description": "Deal 2 + 150% DEX damage and apply 2 Mark.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "apply_status",
+      "status": "mark",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

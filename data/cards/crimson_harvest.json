@@ -1,0 +1,26 @@
+{
+  "id": "crimson_harvest",
+  "display_name": "Crimson Harvest",
+  "description": "Deal 200% STR damage and apply 4 Bleed. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 0,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "apply_status",
+      "status": "bleed",
+      "stacks": 4
+    }
+  ]
+}

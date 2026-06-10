@@ -1,0 +1,25 @@
+{
+  "id": "sig_pyromancer",
+  "display_name": "Flame Burst",
+  "description": "Deal 2 + 150% INT damage and apply 3 Burn.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 3
+    }
+  ],
+  "signature": true
+}

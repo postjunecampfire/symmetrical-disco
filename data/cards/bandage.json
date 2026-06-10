@@ -1,0 +1,20 @@
+{
+  "id": "bandage",
+  "display_name": "Bandage",
+  "description": "Heal 4 HP. Exhaust.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "heal",
+      "amount": 4
+    }
+  ]
+}

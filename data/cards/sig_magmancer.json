@@ -1,0 +1,22 @@
+{
+  "id": "sig_magmancer",
+  "display_name": "Magma Spike",
+  "description": "Deal 3 + 250% INT damage. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 2.5
+    }
+  ],
+  "signature": true
+}

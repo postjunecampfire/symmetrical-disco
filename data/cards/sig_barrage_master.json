@@ -1,0 +1,37 @@
+{
+  "id": "sig_barrage_master",
+  "display_name": "Full Barrage",
+  "description": "Deal 2 + 80% INT damage four times. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    }
+  ],
+  "signature": true
+}

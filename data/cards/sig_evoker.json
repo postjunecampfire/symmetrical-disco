@@ -1,0 +1,25 @@
+{
+  "id": "sig_evoker",
+  "display_name": "Sparkle Volley",
+  "description": "Deal 2 + 50% INT damage twice.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    }
+  ],
+  "signature": true
+}

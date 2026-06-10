@@ -1,0 +1,22 @@
+{
+  "id": "shield_slam",
+  "display_name": "Shield Slam",
+  "description": "Deal 5 damage and gain 4 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 5
+    },
+    {
+      "type": "self_block",
+      "amount": 4
+    }
+  ]
+}

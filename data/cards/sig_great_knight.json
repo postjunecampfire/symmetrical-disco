@@ -1,0 +1,26 @@
+{
+  "id": "sig_great_knight",
+  "display_name": "Armored Advance",
+  "description": "Deal 6 + 150% STR damage and gain 6 Block. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "self_block",
+      "amount": 6
+    }
+  ],
+  "signature": true
+}

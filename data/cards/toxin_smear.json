@@ -1,0 +1,24 @@
+{
+  "id": "toxin_smear",
+  "display_name": "Toxin Smear",
+  "description": "Apply 4 Poison and 1 Weak.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
+  ]
+}

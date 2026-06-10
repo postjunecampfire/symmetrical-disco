@@ -1,0 +1,22 @@
+{
+  "id": "mind_spike",
+  "display_name": "Mind Spike",
+  "description": "Deal 4 damage and draw 1 card.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

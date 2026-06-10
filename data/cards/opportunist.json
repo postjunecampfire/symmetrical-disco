@@ -1,0 +1,22 @@
+{
+  "id": "opportunist",
+  "display_name": "Opportunist",
+  "description": "Deal 3 damage and draw 1 card.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

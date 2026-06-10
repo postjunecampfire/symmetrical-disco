@@ -1,0 +1,25 @@
+{
+  "id": "sig_superstar",
+  "display_name": "Showstopper",
+  "description": "ALL allies gain 6 Block. Gain 1 energy. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 6
+    },
+    {
+      "type": "gain_energy",
+      "amount": 1
+    }
+  ],
+  "signature": true
+}

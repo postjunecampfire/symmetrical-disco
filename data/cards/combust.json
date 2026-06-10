@@ -1,0 +1,20 @@
+{
+  "id": "combust",
+  "display_name": "Combust",
+  "description": "Deal damage equal to the target's Burn, then remove it all. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "consume_status_damage",
+      "status": "burn"
+    }
+  ]
+}

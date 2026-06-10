@@ -1,0 +1,26 @@
+{
+  "id": "sig_juggernaut",
+  "display_name": "Unstoppable Slam",
+  "description": "Deal 2 + 200% STR damage and gain 6 Block. Exhaust.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "self_block",
+      "amount": 6
+    }
+  ],
+  "signature": true
+}

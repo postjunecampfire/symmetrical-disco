@@ -1,0 +1,37 @@
+{
+  "id": "sig_prizefighter",
+  "display_name": "Title Bout",
+  "description": "Deal 2 + 80% STR damage four times. Exhaust.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.8
+    }
+  ],
+  "signature": true
+}

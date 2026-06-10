@@ -1,0 +1,22 @@
+{
+  "id": "sig_heartbreaker",
+  "display_name": "Heartbreak",
+  "description": "Deal 6 + 150% INT damage; apply Charm equal to the unblocked damage. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "charm_damage",
+      "amount": 6,
+      "stat_mult": 1.5
+    }
+  ],
+  "signature": true
+}

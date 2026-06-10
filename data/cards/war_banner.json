@@ -1,0 +1,18 @@
+{
+  "id": "war_banner",
+  "display_name": "War Banner",
+  "description": "ALL allies gain 4 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4
+    }
+  ]
+}

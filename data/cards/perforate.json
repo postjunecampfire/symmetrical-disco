@@ -1,0 +1,28 @@
+{
+  "id": "perforate",
+  "display_name": "Perforate",
+  "description": "Deal 1 + 100% DEX damage three times. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 1
+    },
+    {
+      "type": "damage",
+      "amount": 1
+    },
+    {
+      "type": "damage",
+      "amount": 1
+    }
+  ]
+}

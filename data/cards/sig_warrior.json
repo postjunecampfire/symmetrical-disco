@@ -1,0 +1,25 @@
+{
+  "id": "sig_warrior",
+  "display_name": "Relentless Assault",
+  "description": "Deal 3 + 75% STR damage twice.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.75
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.75
+    }
+  ],
+  "signature": true
+}

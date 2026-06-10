@@ -1,0 +1,23 @@
+{
+  "id": "sig_survivor",
+  "display_name": "Tough It Out",
+  "description": "Gain 7 Block and heal 3 HP.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 7
+    },
+    {
+      "type": "heal",
+      "amount": 3
+    }
+  ],
+  "signature": true
+}

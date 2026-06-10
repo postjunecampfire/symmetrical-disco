@@ -1,0 +1,24 @@
+{
+  "id": "spark_volley",
+  "display_name": "Spark Volley",
+  "description": "Deal 2 + 50% INT damage twice.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    }
+  ]
+}

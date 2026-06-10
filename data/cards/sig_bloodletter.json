@@ -1,0 +1,27 @@
+{
+  "id": "sig_bloodletter",
+  "display_name": "Bloodletting",
+  "description": "Apply 6 Bleed and 4 Poison. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "bleed",
+      "stacks": 6
+    },
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 4
+    }
+  ],
+  "signature": true
+}

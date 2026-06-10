@@ -1,0 +1,22 @@
+{
+  "id": "steady_advance",
+  "display_name": "Steady Advance",
+  "description": "Deal 3 damage and gain 3 Block.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "self_block",
+      "amount": 3
+    }
+  ]
+}

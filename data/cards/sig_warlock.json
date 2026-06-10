@@ -1,0 +1,25 @@
+{
+  "id": "sig_warlock",
+  "display_name": "Curse of Agony",
+  "description": "Apply 4 Poison and 2 Vulnerable.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

@@ -1,0 +1,27 @@
+{
+  "id": "sig_hexblade",
+  "display_name": "Hexblade's Doom",
+  "description": "Deal 3 + 150% INT damage and apply 5 Mark. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "apply_status",
+      "status": "mark",
+      "stacks": 5
+    }
+  ],
+  "signature": true
+}

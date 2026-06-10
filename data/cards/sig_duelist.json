@@ -1,0 +1,23 @@
+{
+  "id": "sig_duelist",
+  "display_name": "Riposte Form",
+  "description": "Deal 4 damage and gain 4 Block.",
+  "character_tag": "rogue",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "self_block",
+      "amount": 4
+    }
+  ],
+  "signature": true
+}

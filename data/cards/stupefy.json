@@ -1,0 +1,21 @@
+{
+  "id": "stupefy",
+  "display_name": "Stupefy",
+  "description": "Stun the target for 1 turn. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    }
+  ]
+}

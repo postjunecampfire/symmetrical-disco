@@ -1,0 +1,22 @@
+{
+  "id": "guardians_oath",
+  "display_name": "Guardian's Oath",
+  "description": "An ally gains 6 Block; you gain 3 Block.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "ally"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 6
+    },
+    {
+      "type": "self_block",
+      "amount": 3
+    }
+  ]
+}

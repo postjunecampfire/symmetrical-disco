@@ -1,0 +1,29 @@
+{
+  "id": "flurry_of_blades",
+  "display_name": "Flurry of Blades",
+  "description": "Deal 2 + 50% DEX damage three times.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 0.5
+    }
+  ]
+}

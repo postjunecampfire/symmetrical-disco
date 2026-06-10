@@ -1,0 +1,215 @@
+{
+  "id": "charmer",
+  "nodes": [
+    {
+      "id": "enchanter",
+      "display_name": "Enchanter",
+      "parent": "charmer",
+      "act": 6,
+      "stat_bonus": {
+        "int": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_enchanter"
+      ]
+    },
+    {
+      "id": "beguiler",
+      "display_name": "Beguiler",
+      "parent": "enchanter",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_beguiler"
+      ]
+    },
+    {
+      "id": "heartbreaker",
+      "display_name": "Heartbreaker",
+      "parent": "beguiler",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_coup_de_grace",
+      "ascension_stat_mult": 0.5,
+      "hook": "single-target execute nuke",
+      "unlock_cards": [
+        "sig_heartbreaker"
+      ]
+    },
+    {
+      "id": "puppeteer",
+      "display_name": "Puppeteer",
+      "parent": "beguiler",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_enthrall",
+      "ascension_stat_mult": 0.5,
+      "hook": "AOE stun control",
+      "unlock_cards": [
+        "sig_puppeteer"
+      ]
+    },
+    {
+      "id": "idol",
+      "display_name": "Idol",
+      "parent": "enchanter",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_idol"
+      ]
+    },
+    {
+      "id": "superstar",
+      "display_name": "Superstar",
+      "parent": "idol",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_standing_ovation",
+      "ascension_stat_mult": 0.5,
+      "hook": "party-wide Block + Strength",
+      "unlock_cards": [
+        "sig_superstar"
+      ]
+    },
+    {
+      "id": "former_child_actor",
+      "display_name": "Former Child Actor",
+      "parent": "idol",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_encore",
+      "ascension_stat_mult": 0.5,
+      "hook": "burst tempo: energy + cards",
+      "unlock_cards": [
+        "sig_former_child_actor"
+      ]
+    },
+    {
+      "id": "evoker",
+      "display_name": "Evoker",
+      "parent": "charmer",
+      "act": 6,
+      "stat_bonus": {
+        "int": 2,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_evoker"
+      ]
+    },
+    {
+      "id": "spellslinger",
+      "display_name": "Spellslinger",
+      "parent": "evoker",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_spellslinger"
+      ]
+    },
+    {
+      "id": "barrage_master",
+      "display_name": "Barrage Master",
+      "parent": "spellslinger",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_missile_storm",
+      "ascension_stat_mult": 0.5,
+      "hook": "multi-hit AOE missiles",
+      "unlock_cards": [
+        "sig_barrage_master"
+      ]
+    },
+    {
+      "id": "spellweaver",
+      "display_name": "Spellweaver",
+      "parent": "spellslinger",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_spell_weave",
+      "ascension_stat_mult": 0.5,
+      "hook": "draw engine + defense",
+      "unlock_cards": [
+        "sig_spellweaver"
+      ]
+    },
+    {
+      "id": "arcanist",
+      "display_name": "Arcanist",
+      "parent": "evoker",
+      "act": 9,
+      "stat_bonus": {
+        "int": 2,
+        "dex": 1,
+        "con": 1
+      },
+      "unlock_cards": [
+        "sig_arcanist"
+      ]
+    },
+    {
+      "id": "grand_incantatrix",
+      "display_name": "Grand Incantatrix",
+      "parent": "arcanist",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_grand_incantation",
+      "ascension_stat_mult": 0.5,
+      "hook": "AOE damage + full debuff suite",
+      "unlock_cards": [
+        "sig_grand_incantatrix"
+      ]
+    },
+    {
+      "id": "princess",
+      "display_name": "Princess",
+      "parent": "arcanist",
+      "act": 12,
+      "stat_bonus": {
+        "int": 3,
+        "con": 2
+      },
+      "ult_card_id": "ult_royal_decree",
+      "ascension_stat_mult": 0.5,
+      "hook": "AOE lockdown decree",
+      "unlock_cards": [
+        "sig_princess"
+      ]
+    }
+  ]
+}

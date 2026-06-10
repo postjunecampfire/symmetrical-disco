@@ -1,0 +1,24 @@
+{
+  "id": "sig_bruiser",
+  "display_name": "Haymaker Hook",
+  "description": "Deal 4 + 150% STR damage and gain 3 Block.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "self_block",
+      "amount": 3
+    }
+  ],
+  "signature": true
+}

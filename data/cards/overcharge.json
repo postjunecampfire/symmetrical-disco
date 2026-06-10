@@ -1,0 +1,20 @@
+{
+  "id": "overcharge",
+  "display_name": "Overcharge",
+  "description": "Gain 2 energy. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 0,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 2
+    }
+  ]
+}

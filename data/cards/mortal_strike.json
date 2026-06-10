@@ -1,0 +1,26 @@
+{
+  "id": "mortal_strike",
+  "display_name": "Mortal Strike",
+  "description": "Deal 2 + 200% STR damage and apply 2 Vulnerable. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "sig_necromancer",
+  "display_name": "Drain Bolt",
+  "description": "Deal 3 + 150% INT damage and apply 2 Weak.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 1.5
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

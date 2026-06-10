@@ -1,0 +1,26 @@
+{
+  "id": "sig_warlord",
+  "display_name": "Warlord's Banner",
+  "description": "ALL allies gain 5 Block and 1 Strength. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 5
+    },
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 1
+    }
+  ],
+  "signature": true
+}

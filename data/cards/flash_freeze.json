@@ -1,0 +1,28 @@
+{
+  "id": "flash_freeze",
+  "display_name": "Flash Freeze",
+  "description": "Deal 4 damage, apply 2 Frail and 1 Weak.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "sig_frostbinder",
+  "display_name": "Absolute Chill",
+  "description": "Stun the target for 1 turn and apply 2 Frail. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 2
+    }
+  ],
+  "signature": true
+}

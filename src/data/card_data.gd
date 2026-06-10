@@ -14,3 +14,7 @@ extends Resource
 @export var effects: Array[Effect] = []
 @export var art: Texture2D
 @export var upgrade_of: StringName = &""
+## Tree-signature skill (M3): granted only by a progression-node pick
+## (`unlock_cards` on a data/progression node). Signature cards are EXCLUDED
+## from the draft/shop pools (CardReward.eligible_pool), like _plus variants.
+@export var signature: bool = false

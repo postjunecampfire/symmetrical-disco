@@ -1,0 +1,21 @@
+{
+  "id": "death_from_shadow",
+  "display_name": "Death from Shadow",
+  "description": "Deal 1 + 250% DEX damage. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 1,
+      "stat_mult": 2.5
+    }
+  ]
+}

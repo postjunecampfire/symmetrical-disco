@@ -1,0 +1,29 @@
+{
+  "id": "sig_bladedancer",
+  "display_name": "Blade Waltz",
+  "description": "Deal 3 + 50% DEX damage twice and gain 4 Block.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "self_block",
+      "amount": 4
+    }
+  ],
+  "signature": true
+}

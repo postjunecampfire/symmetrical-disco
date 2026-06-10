@@ -1,0 +1,21 @@
+{
+  "id": "sig_marshal",
+  "display_name": "Marshal's Command",
+  "description": "ALL allies gain 9 Block. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 9
+    }
+  ],
+  "signature": true
+}

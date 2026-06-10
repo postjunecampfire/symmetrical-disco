@@ -27,6 +27,12 @@ const EFFECT_TYPES: Array[StringName] = [
 	&"apply_status",
 	&"draw",
 	&"gain_energy",
+	# ADR-0028 (DCC adaptation) extensions:
+	&"self_damage",            # caster-side damage tax (bombs): once per card, block absorbs, never stat-amplified
+	&"self_block",             # caster-side block rider: once per card, DEX-scaled like any block grant
+	&"charm_damage",           # attack that applies Charm equal to UNBLOCKED damage dealt
+	&"consume_status_damage",  # deal damage equal to the target's stacks of `status`, then remove them (Coup de Grace)
+	&"add_card",               # add the card `params.card_id` to the caster's hand (token generation)
 ]
 
 ## Reserved character_tag meaning "any unit can play" (data-schemas.md §3).
@@ -59,6 +65,10 @@ var boons: Dictionary = {}
 ## §9 / P2·09): which encounters feed which node types when a MapNode has no
 ## explicit payload. Loaded from data/encounter_pool.json.
 var encounter_pool: Dictionary = {}
+## class_id -> {node_id -> node Dictionary} (ADR-0022 progression trees,
+## data/progression/*.json). Raw dictionaries: {id, display_name, parent, act,
+## stat_bonus{...}; capstones += ult_card_id, ascension_stat_mult}.
+var progression_trees: Dictionary = {}
 var battle_config: BattleConfig
 ## The 18-act dungeon curve (ADR-0019), loaded from data/acts/act_progression.json.
 ## Null when no acts file is present (the loader treats it as optional content, so
@@ -176,6 +186,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	promotions.clear()
 	boons.clear()
 	encounter_pool.clear()
+	progression_trees.clear()
 	battle_config = null
 	act_progression = null
 
@@ -192,6 +203,7 @@ func load_from_dir(data_dir: String) -> LoadResult:
 	_load_category(data_dir.path_join("relics"), _parse_relic, relics, "relic")
 	_load_category(data_dir.path_join("promotions"), _parse_promotion, promotions, "promotion")
 	_load_category(data_dir.path_join("boons"), _parse_boon, boons, "boon")
+	_load_progression_trees(data_dir.path_join("progression"))
 	_load_encounter_pool(data_dir.path_join("encounter_pool.json"))
 	_load_battle_config(data_dir.path_join("battle_config.json"))
 	_load_act_progression(data_dir.path_join("acts").path_join("act_progression.json"))
@@ -397,11 +409,15 @@ func _parse_race(d: Dictionary, source: String) -> Dictionary:
 	var r := RaceData.new()
 	r.id = _sn(d.get("id"))
 	r.display_name = _str(d.get("display_name"))
-	r.str_mod = _int(d.get("str_mod"), 0)
-	r.dex_mod = _int(d.get("dex_mod"), 0)
-	r.con_mod = _int(d.get("con_mod"), 0)
-	r.int_mod = _int(d.get("int_mod"), 0)
+	# ADR-0021 pt1: races are base stat templates. Plain stat keys are canonical;
+	# the legacy *_mod keys are still accepted (loader fixtures, older content).
+	r.str_mod = _int(d.get("strength"), _int(d.get("str_mod"), 0))
+	r.dex_mod = _int(d.get("dexterity"), _int(d.get("dex_mod"), 0))
+	r.con_mod = _int(d.get("constitution"), _int(d.get("con_mod"), 0))
+	r.int_mod = _int(d.get("intelligence"), _int(d.get("int_mod"), 0))
 	r.custom_card = _sn(d.get("custom_card"), &"")
+	if d.has("starting_kit"):
+		r.starting_kit = _sn_array(d.get("starting_kit"))
 	return {"id": r.id, "value": r}
 
 
@@ -547,6 +563,7 @@ func _parse_card(d: Dictionary, source: String) -> Dictionary:
 	c.target = _parse_target(d.get("target"))
 	c.effects = _parse_effects(d.get("effects"), source, "card '%s'" % c.id)
 	c.upgrade_of = _sn(d.get("upgrade_of"), &"")
+	c.signature = _bool(d.get("signature"), false)
 	return {"id": c.id, "value": c}
 
 
@@ -687,14 +704,33 @@ func _load_battle_config(path: String) -> void:
 		return
 	var bc := BattleConfig.new()
 	bc.energy_per_turn = _int(d.get("energy_per_turn"), 3)
+	bc.energy_per_character = _int(d.get("energy_per_character"), 2)
 	bc.draw_per_turn = _int(d.get("draw_per_turn"), 5)
+	bc.skill_slots = _int(d.get("skill_slots"), 10)
+	bc.copies_common = _int(d.get("copies_common"), 3)
+	bc.copies_uncommon = _int(d.get("copies_uncommon"), 2)
+	bc.copies_rare = _int(d.get("copies_rare"), 1)
+	bc.derived_deck_floor = _int(d.get("derived_deck_floor"), 20)
+	bc.gold_per_combat = _int(d.get("gold_per_combat"), 12)
+	bc.gold_per_elite = _int(d.get("gold_per_elite"), 25)
+	bc.gold_per_boss = _int(d.get("gold_per_boss"), 40)
+	bc.shop_price_common = _int(d.get("shop_price_common"), 55)
+	bc.shop_price_uncommon = _int(d.get("shop_price_uncommon"), 85)
+	bc.shop_price_rare = _int(d.get("shop_price_rare"), 140)
+	bc.shop_price_relic = _int(d.get("shop_price_relic"), 120)
+	bc.shop_price_heal = _int(d.get("shop_price_heal"), 35)
+	bc.shop_act_scale = _float(d.get("shop_act_scale"), 0.15)
+	bc.treasure_gold_min = _int(d.get("treasure_gold_min"), 25)
+	bc.treasure_gold_max = _int(d.get("treasure_gold_max"), 60)
 	bc.max_hand = _int(d.get("max_hand"), 10)
 	bc.reshuffle_discard = _bool(d.get("reshuffle_discard"), true)
 	bc.hp_per_con = _int(d.get("hp_per_con"), 2)
+	bc.base_hp = _int(d.get("base_hp"), 4)
 	bc.revive_hp = _int(d.get("revive_hp"), 8)
 	bc.post_combat_heal = _int(d.get("post_combat_heal"), 5)
 	bc.rest_heal = _int(d.get("rest_heal"), 12)
 	bc.stat_points_per_level = _int(d.get("stat_points_per_level"), 3)
+	bc.auto_stats_per_level = _int(d.get("auto_stats_per_level"), 1)
 	bc.xp_per_combat = _int(d.get("xp_per_combat"), 10)
 	bc.xp_curve_base = _int(d.get("xp_curve_base"), 30)
 	bc.xp_curve_step = _int(d.get("xp_curve_step"), 20)
@@ -721,6 +757,20 @@ func _load_act_progression(path: String) -> void:
 		_result.add_error("act_progression.json top-level must be an object: %s" % path)
 		return
 	var dict: Dictionary = d
+	# Per-tier encounter rosters (ADR-0019 remainder): "tier_pools" maps tier
+	# ("1".."6") -> {combat/elite/boss -> [encounter ids]}; each act inherits
+	# its tier's pool. Optional — absent pools fall back to encounter_pool.json.
+	var tier_pools: Dictionary = {}
+	var tp_v: Variant = dict.get("tier_pools", {})
+	if tp_v is Dictionary:
+		for tier_key: Variant in (tp_v as Dictionary):
+			var pool_v: Variant = (tp_v as Dictionary)[tier_key]
+			if not (pool_v is Dictionary):
+				continue
+			var pool: Dictionary = {}
+			for node_type: Variant in (pool_v as Dictionary):
+				pool[StringName(String(node_type))] = _sn_array((pool_v as Dictionary)[node_type])
+			tier_pools[int(String(tier_key))] = pool
 	var prog := ActProgression.new()
 	var raw_acts: Variant = dict.get("acts")
 	if typeof(raw_acts) != TYPE_ARRAY:
@@ -732,7 +782,25 @@ func _load_act_progression(path: String) -> void:
 			_result.add_error("act_progression.json has a non-object act entry: %s" % path)
 			continue
 		var act_dict: Dictionary = raw
-		list.append(_parse_act_config(act_dict, path))
+		var cfg: ActConfig = _parse_act_config(act_dict, path)
+		# Attach the act's tier roster (ADR-0019 remainder); per-act "encounters"
+		# overrides its tier pool when authored.
+		var own_pool_v: Variant = act_dict.get("encounters")
+		if own_pool_v is Dictionary:
+			var own: Dictionary = {}
+			for node_type: Variant in (own_pool_v as Dictionary):
+				own[StringName(String(node_type))] = _sn_array((own_pool_v as Dictionary)[node_type])
+			cfg.encounter_pool = own
+		else:
+			cfg.encounter_pool = tier_pools.get(cfg.tier, {})
+		# Every pooled encounter id must resolve (same rule as encounter_pool.json).
+		for node_type: Variant in cfg.encounter_pool:
+			for enc_id: StringName in cfg.encounter_pool[node_type]:
+				if not encounters.has(enc_id):
+					_result.add_error(
+						"act %d %s pool references unknown encounter '%s'" % [cfg.act, node_type, enc_id]
+					)
+		list.append(cfg)
 	prog.acts = list
 	act_progression = prog
 	# §5 invariants: collect every problem so a bad curve fails the load loudly.
@@ -787,14 +855,67 @@ func _parse_map_gen_config(value: Variant) -> MapGenConfig:
 	return m
 
 
+## Load the ADR-0022 progression trees (optional content). Each file is one
+## class line: {"id": class_id, "nodes": [...]}; capstone ult_card_id refs are
+## validated against the card registry.
+func _load_progression_trees(dir_path: String) -> void:
+	if not DirAccess.dir_exists_absolute(dir_path):
+		return
+	var dir := DirAccess.open(dir_path)
+	if dir == null:
+		return
+	for file in dir.get_files():
+		if not file.ends_with(".json"):
+			continue
+		var entries := _read_json_array(dir_path.path_join(file))
+		for raw: Variant in entries:
+			if not (raw is Dictionary):
+				continue
+			var doc: Dictionary = raw
+			var line_id := StringName(String(doc.get("id", "")))
+			if line_id == &"":
+				_result.add_error("progression file %s has no line id" % file)
+				continue
+			var nodes: Dictionary = {}
+			var nodes_v: Variant = doc.get("nodes", [])
+			if nodes_v is Array:
+				for n_v: Variant in nodes_v:
+					if not (n_v is Dictionary):
+						continue
+					var node: Dictionary = n_v
+					var nid := StringName(String(node.get("id", "")))
+					if nid == &"":
+						continue
+					nodes[nid] = node
+					var ult := StringName(String(node.get("ult_card_id", "")))
+					if ult != &"" and not cards.has(ult):
+						_result.add_error("progression node '%s' references unknown ult '%s'" % [nid, ult])
+					# M3 signatures: a node pick grants these skills (apply_progression).
+					var unlocks_v: Variant = node.get("unlock_cards", [])
+					if unlocks_v is Array:
+						for u_v: Variant in unlocks_v:
+							var uid := StringName(String(u_v))
+							if uid == &"" or not cards.has(uid):
+								_result.add_error(
+									"progression node '%s' unlock_cards references unknown card '%s'" % [nid, uid]
+								)
+			progression_trees[line_id] = nodes
+
+
 ## Derive every character's max_hp from CON (ADR-0014: CON -> max HP) using the
 ## loaded BattleConfig.hp_per_con. Runs after both characters and battle_config
 ## have loaded so the formula's knob comes from data.
 func _derive_character_hp() -> void:
 	var per_con: int = battle_config.hp_per_con if battle_config != null else 2
+	var base: int = battle_config.base_hp if battle_config != null else 4
 	for id in characters:
 		var ch: CharacterData = characters[id]
-		ch.max_hp = ch.constitution * per_con
+		# ADR-0021 pt1: class CON is now a small overlay, so a flat base_hp floor
+		# keeps low-CON race lines (Elf CON 2) above one-shot range. Full member
+		# HP = base_hp + (class + race + allocated CON) × hp_per_con; the race and
+		# allocated parts stack additively downstream (apply_race /
+		# apply_stat_allocation / PartyStats), all sharing hp_per_con.
+		ch.max_hp = base + ch.constitution * per_con
 
 
 # --- Reference validation (data-schemas.md §8 relationships) ---
@@ -911,12 +1032,23 @@ func _validate_references() -> void:
 
 func _validate_effect_statuses(effects: Array[Effect], owner_label: String) -> void:
 	for e in effects:
-		if e.type == &"apply_status":
+		if e.type == &"apply_status" or e.type == &"consume_status_damage":
 			if e.status == &"":
 				_result.add_error(
-					"%s has an apply_status effect with no 'status' id" % owner_label
+					"%s has a %s effect with no 'status' id" % [owner_label, e.type]
 				)
 			elif not statuses.has(e.status):
 				_result.add_error(
 					"%s references unknown status '%s'" % [owner_label, e.status]
+				)
+		# ADR-0028: a token generator must name a real card.
+		if e.type == &"add_card":
+			var token_id := StringName(String(e.params.get("card_id", "")))
+			if token_id == &"":
+				_result.add_error(
+					"%s has an add_card effect with no params.card_id" % owner_label
+				)
+			elif not cards.has(token_id):
+				_result.add_error(
+					"%s add_card references unknown card '%s'" % [owner_label, token_id]
 				)

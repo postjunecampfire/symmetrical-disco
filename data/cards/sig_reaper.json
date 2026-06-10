@@ -1,0 +1,37 @@
+{
+  "id": "sig_reaper",
+  "display_name": "Reaping Cuts",
+  "description": "Deal 1 + 80% DEX damage four times. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 1,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 1,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 1,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 1,
+      "stat_mult": 0.8
+    }
+  ],
+  "signature": true
+}

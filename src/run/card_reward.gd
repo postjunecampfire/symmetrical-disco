@@ -8,7 +8,7 @@ extends RefCounted
 ## (strike/defend) and within-offer duplicates are excluded.
 ##
 ## The draft is seeded (deterministic: same seed -> same offer) and optionally
-## rarity-weighted. The chosen card id is appended to RunState.run_deck via
+## rarity-weighted. The chosen card id joins a member's SKILL COLLECTION via
 ## pick(); skip() takes nothing.
 ##
 ## Usage:
@@ -35,6 +35,20 @@ var _cards: Dictionary = {}
 var _rarity_weights: Dictionary = {}
 
 
+## ADR-0020 reward pools: rarity weights shift A -> B -> C with depth. Tier 1
+## drafts are all-common (the classless origin pool); rares only weigh in from
+## tier 2 and climb toward the deep game.
+static func weights_for_act(act: int) -> Dictionary:
+	var tier: int = clampi((maxi(1, act) - 1) / 3 + 1, 1, 6)
+	match tier:
+		1: return {&"common": 8, &"uncommon": 2, &"rare": 0}
+		2: return {&"common": 6, &"uncommon": 3, &"rare": 1}
+		3: return {&"common": 5, &"uncommon": 4, &"rare": 1}
+		4: return {&"common": 4, &"uncommon": 4, &"rare": 2}
+		5: return {&"common": 3, &"uncommon": 4, &"rare": 3}
+		_: return {&"common": 2, &"uncommon": 4, &"rare": 4}
+
+
 ## card_registry is either a ContentDatabase or a Dictionary (card_id -> CardData).
 func _init(card_registry: Variant, rarity_weights: Dictionary = {}) -> void:
 	_cards = _normalize_registry(card_registry)
@@ -48,9 +62,15 @@ func _init(card_registry: Variant, rarity_weights: Dictionary = {}) -> void:
 ## id so the pool ordering is deterministic regardless of registry iteration
 ## order (the seed then drives selection on top of a stable base order).
 func eligible_pool(run_state: RunState) -> Array[CardData]:
+	# Draft-pool gating (ADR-0021 pt2): a tagged card is draftable only if some
+	# member HAS that class. Pre-class members contribute nothing — the origin
+	# tier drafts from the neutral pool only; the Act-3 pick opens class pools.
 	var party: Dictionary = {}
 	for cid: StringName in run_state.party:
-		party[cid] = true
+		party[cid] = true  # legacy class-keyed member ids
+		var cls: StringName = StringName(String(run_state.member_classes.get(cid, "")))
+		if cls != &"":
+			party[cls] = true
 
 	var pool: Array[CardData] = []
 	for key: Variant in _cards.keys():
@@ -58,6 +78,10 @@ func eligible_pool(run_state: RunState) -> Array[CardData]:
 		if not (value is CardData):
 			continue
 		var card: CardData = value
+		if card.upgrade_of != &"":
+			continue  # upgrade variants are reached via rest upgrades, not drafts
+		if card.signature:
+			continue  # tree signatures arrive via progression unlock_cards only
 		if card.innate:
 			continue
 		if card.character_tag == NEUTRAL_TAG or party.has(card.character_tag):
@@ -93,12 +117,29 @@ func draft(run_state: RunState, n: int = DEFAULT_CHOICES, rng_seed: int = 0) -> 
 	return offer
 
 
-## Append the chosen card id to run_state.run_deck. Returns true if appended;
+## Grant the chosen skill: tagged cards join their OWNER's collection, neutral
+## cards join the first member's (ADR-0026). Returns true if granted;
 ## false for an empty id (a no-op). Mirrors §6: the picked id joins the run deck.
 func pick(run_state: RunState, card_id: StringName) -> bool:
 	if card_id == &"":
 		return false
-	run_state.run_deck.append(card_id)
+	var owner: StringName = run_state.party[0] if not run_state.party.is_empty() else &""
+	var card: CardData = _cards.get(card_id, null)
+	if card != null and card.character_tag != &"neutral":
+		for member in run_state.party:
+			var cls: StringName = StringName(String(run_state.member_classes.get(member, "")))
+			if member == card.character_tag or cls == card.character_tag:
+				owner = member
+				break
+	if owner == &"":
+		return false
+	var coll_v: Variant = run_state.skill_collections.get(owner)
+	var load_v: Variant = run_state.active_loadouts.get(owner)
+	if not (coll_v is Array):
+		return false
+	(coll_v as Array).append(card_id)
+	if load_v is Array and (load_v as Array).size() < 10:
+		(load_v as Array).append(card_id)
 	return true
 
 

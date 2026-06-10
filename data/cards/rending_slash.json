@@ -1,0 +1,23 @@
+{
+  "id": "rending_slash",
+  "display_name": "Rending Slash",
+  "description": "Deal 4 damage and apply 2 Bleed.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "apply_status",
+      "status": "bleed",
+      "stacks": 2
+    }
+  ]
+}

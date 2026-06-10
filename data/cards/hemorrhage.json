@@ -1,0 +1,19 @@
+{
+  "id": "hemorrhage",
+  "display_name": "Hemorrhage",
+  "description": "Apply 5 Bleed.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "bleed",
+      "stacks": 5
+    }
+  ]
+}

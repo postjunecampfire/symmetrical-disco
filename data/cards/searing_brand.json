@@ -1,0 +1,19 @@
+{
+  "id": "searing_brand",
+  "display_name": "Searing Brand",
+  "description": "Apply 5 Burn.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "burn",
+      "stacks": 5
+    }
+  ]
+}
