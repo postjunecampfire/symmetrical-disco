@@ -1,0 +1,18 @@
+{
+  "id": "hunker_down",
+  "display_name": "Hunker Down",
+  "description": "Gain 13 Block.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 13
+    }
+  ]
+}

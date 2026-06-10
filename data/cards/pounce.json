@@ -1,0 +1,22 @@
+{
+  "id": "pounce",
+  "display_name": "Pounce",
+  "description": "Deal 3 damage. Draw 1 card.",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

@@ -5,7 +5,7 @@
   "character_tag": "neutral",
   "energy_cost": 1,
   "keywords": [],
-  "innate": true,
+  "innate": false,
   "rarity": "common",
   "target": {
     "target_type": "self"

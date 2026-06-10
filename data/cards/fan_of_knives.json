@@ -1,7 +1,7 @@
 {
   "id": "fan_of_knives",
   "display_name": "Fan of Knives",
-  "description": "Deal 3 damage to all enemies. Exhaust.",
+  "description": "Deal 3 damage to all enemies. Exhaust. Hits ALL, at reduced stat scaling.",
   "character_tag": "rogue",
   "energy_cost": 2,
   "keywords": [
@@ -14,7 +14,8 @@
   "effects": [
     {
       "type": "damage",
-      "amount": 3
+      "amount": 3,
+      "stat_mult": 0.6
     }
   ]
 }

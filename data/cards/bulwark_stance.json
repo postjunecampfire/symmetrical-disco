@@ -1,0 +1,19 @@
+{
+  "id": "bulwark_stance",
+  "display_name": "Bulwark Stance",
+  "description": "Gain 4 + 150% DEX block.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4,
+      "stat_mult": 1.5
+    }
+  ]
+}

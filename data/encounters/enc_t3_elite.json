@@ -1,0 +1,10 @@
+{
+  "id": "enc_t3_elite",
+  "display_name": "Witch and Blades",
+  "enemies": [
+    "coven_witch",
+    "hardened_skirmisher",
+    "skirmisher"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "enc_t2_warband",
+  "display_name": "Warband Scouts",
+  "enemies": [
+    "grunt",
+    "hobgoblin",
+    "gremlin"
+  ],
+  "win_condition": "defeat_all"
+}

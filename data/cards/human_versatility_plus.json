@@ -1,0 +1,19 @@
+{
+  "id": "human_versatility_plus",
+  "display_name": "Versatility+",
+  "description": "Draw 2 card. (Upgraded.)",
+  "character_tag": "neutral",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ],
+  "upgrade_of": "human_versatility"
+}

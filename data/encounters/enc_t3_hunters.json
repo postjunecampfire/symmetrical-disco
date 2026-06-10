@@ -1,0 +1,10 @@
+{
+  "id": "enc_t3_hunters",
+  "display_name": "Hunting Party",
+  "enemies": [
+    "hardened_skirmisher",
+    "archer",
+    "hexer"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -39,6 +39,8 @@ var constitution: int = 0
 var intelligence: int = 0
 ## Which stat powers this unit's attacks: `str`, `int`, or `&""` (none, enemies).
 var attack_stat: StringName = &""
+## Ascension stat_mult step (ADR-0022): added to every card's stat_mult.
+var ascension_mult: float = 0.0
 
 ## How many times this unit has taken an enemy-phase action (drives the scheduled
 ## ramp's cadence, EnemyData.ramp_every). Player units leave this at 0.
@@ -64,6 +66,7 @@ static func from_character(data: CharacterData) -> Combatant:
 	c.constitution = data.constitution
 	c.intelligence = data.intelligence
 	c.attack_stat = data.attack_stat
+	c.ascension_mult = data.ascension_mult
 	return c
 
 
@@ -129,6 +132,9 @@ func attack_power() -> int:
 			return dexterity
 		&"int":
 			return intelligence
+		&"highest":
+			# Classless members (ADR-0021 pt2): the peak stat is the weapon.
+			return maxi(strength, maxi(dexterity, intelligence))
 		_:
 			return 0
 

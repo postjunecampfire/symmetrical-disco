@@ -1,0 +1,9 @@
+{
+  "id": "enc_t1_elite",
+  "display_name": "Gate Footmen",
+  "enemies": [
+    "footman",
+    "footman"
+  ],
+  "win_condition": "defeat_all"
+}

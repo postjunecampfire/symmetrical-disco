@@ -1,0 +1,24 @@
+{
+  "id": "adrenaline_rush",
+  "display_name": "Adrenaline Rush",
+  "description": "Gain 2 Energy. Draw 1 card. Exhaust.",
+  "character_tag": "brawler",
+  "energy_cost": 0,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 2
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

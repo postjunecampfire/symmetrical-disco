@@ -1,0 +1,24 @@
+{
+  "id": "purr",
+  "display_name": "Purr",
+  "description": "Heal 3 HP and gain 3 Block. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "heal",
+      "amount": 3
+    },
+    {
+      "type": "block",
+      "amount": 3
+    }
+  ]
+}

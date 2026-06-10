@@ -1,0 +1,24 @@
+{
+  "id": "brawler",
+  "display_name": "Brawler",
+  "speed": 9,
+  "strength": 2,
+  "dexterity": 0,
+  "constitution": 1,
+  "intelligence": 0,
+  "attack_stat": "str",
+  "innate_actions": [
+    "strike",
+    "defend"
+  ],
+  "starting_deck": [
+    "gut_check",
+    "cobbled_bomb",
+    "cheap_shot",
+    "brace_for_impact",
+    "smoke_bomb"
+  ],
+  "tags": [
+    "melee"
+  ]
+}

@@ -75,6 +75,15 @@ func grant_xp(run: RunState, cid: StringName, amount: int) -> int:
 		level += 1
 		levels_gained += 1
 		run.unspent_points[cid] = int(run.unspent_points.get(cid, 0)) + config.stat_points_per_level
+		# Automatic growth (owner, 2026-06-10): every stat +auto_stats_per_level
+		# per level, recorded in allocated_stats so it flows to combat, max-HP
+		# derivation and heal caps through the existing seams.
+		if config.auto_stats_per_level > 0:
+			var alloc_v: Variant = run.allocated_stats.get(cid, {&"str": 0, &"dex": 0, &"con": 0, &"int": 0})
+			var alloc: Dictionary = alloc_v if alloc_v is Dictionary else {}
+			for stat in [&"str", &"dex", &"con", &"int"]:
+				alloc[stat] = int(alloc.get(stat, 0)) + config.auto_stats_per_level
+			run.allocated_stats[cid] = alloc
 	run.party_level[cid] = level
 	run.party_xp[cid] = xp
 	return levels_gained

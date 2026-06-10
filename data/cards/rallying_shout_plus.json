@@ -1,0 +1,23 @@
+{
+  "id": "rallying_shout_plus",
+  "display_name": "Rallying Shout+",
+  "description": "Gain 7 Block and draw 2 card. (Upgraded.)",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 7
+    },
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ],
+  "upgrade_of": "rallying_shout"
+}

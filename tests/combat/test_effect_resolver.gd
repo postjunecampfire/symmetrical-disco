@@ -32,10 +32,10 @@ class RecordingContext extends BattleContext:
 	func apply_status(target: Variant, status_id: StringName, stacks: int) -> void:
 		_record(&"apply_status", [target, status_id, stacks])
 
-	func draw_cards(n: int) -> void:
+	func draw_cards(n: int, _unit: Combatant = null) -> void:
 		_record(&"draw_cards", [n])
 
-	func add_energy(n: int) -> void:
+	func add_energy(n: int, _unit: Combatant = null) -> void:
 		_record(&"add_energy", [n])
 
 

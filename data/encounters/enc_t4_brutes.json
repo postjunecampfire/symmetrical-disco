@@ -1,0 +1,10 @@
+{
+  "id": "enc_t4_brutes",
+  "display_name": "Brute Pack",
+  "enemies": [
+    "brute",
+    "brute",
+    "hexer"
+  ],
+  "win_condition": "defeat_all"
+}

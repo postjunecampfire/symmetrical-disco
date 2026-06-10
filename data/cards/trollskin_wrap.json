@@ -1,0 +1,24 @@
+{
+  "id": "trollskin_wrap",
+  "display_name": "Trollskin Wrap",
+  "description": "Heal 4 HP and gain 3 Block. Exhaust.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "heal",
+      "amount": 4
+    },
+    {
+      "type": "block",
+      "amount": 3
+    }
+  ]
+}

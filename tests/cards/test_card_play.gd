@@ -26,7 +26,7 @@ const DeckScript := preload("res://src/cards/deck.gd")
 
 func _config(energy: int = 3) -> BattleConfig:
 	var c := BattleConfig.new()
-	c.energy_per_turn = energy
+	c.energy_per_character = energy
 	c.draw_per_turn = 5
 	c.max_hand = 10
 	c.reshuffle_discard = true
@@ -79,6 +79,8 @@ func _player(battle: BattleState, char_data: CharacterData, hp: int = 30) -> Com
 	c.hp = hp
 	c.max_hp = hp
 	battle.add_combatant(c)
+	if c.is_player():
+		battle.add_energy(battle.config.energy_per_character, c)  # ADR-0025: own pool
 	return c
 
 
@@ -92,13 +94,12 @@ func _enemy(battle: BattleState, hp: int = 20) -> Combatant:
 	return c
 
 
-## A fresh positionless BattleState with the given energy pool.
+## A fresh positionless BattleState; each _player() added to it is credited with
+## its own pool of config.energy_per_character (ADR-0025).
 func _battle(energy: int = 3) -> BattleState:
 	var cfg := _config(energy)
 	var deck: Deck = DeckScript.new(cfg)
-	var b: BattleState = BattleStateScript.new(cfg, deck, {})
-	b.energy = energy
-	return b
+	return BattleStateScript.new(cfg, deck, {})
 
 
 # --- Successful play: effects applied + card to discard ---------------------
@@ -117,7 +118,7 @@ func test_successful_play_applies_effects_and_discards() -> void:
 
 	assert_true(result.ok, "Legal play succeeds: %s" % result.reason)
 	assert_eq(foe.hp, 14, "6 damage applied to the enemy via the real battle state.")
-	assert_eq(battle.energy, 2, "Energy spent from the shared pool (3 - 1).")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 2, "Energy spent from the ACTOR'S pool (3 - 1, ADR-0025).")
 	assert_false(battle.deck.hand.has(strike), "Played card left the hand.")
 	assert_true(battle.deck.discard_pile.has(strike),
 		"A plain card rejoins the cycle via discard.")
@@ -176,7 +177,7 @@ func test_self_target_block_card_applies_block() -> void:
 
 	assert_true(result.ok, "Self-target play succeeds: %s" % result.reason)
 	assert_eq(hero.block, 5, "Block applied to the acting unit.")
-	assert_eq(battle.energy, 2, "Energy spent.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 2, "Energy spent.")
 
 
 # --- Rejection: insufficient energy -----------------------------------------
@@ -195,7 +196,7 @@ func test_reject_insufficient_energy() -> void:
 
 	assert_false(result.ok, "Play rejected: cost exceeds the energy pool.")
 	assert_eq(foe.hp, 20, "No effect applied on a rejected play.")
-	assert_eq(battle.energy, 1, "No energy spent on a rejected play.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 1, "No energy spent on a rejected play.")
 	assert_true(battle.deck.hand.has(pricey), "Rejected card stays in hand.")
 
 
@@ -216,7 +217,7 @@ func test_reject_wrong_target_type() -> void:
 
 	assert_false(result.ok, "Play rejected: enemy-typed card aimed at an ally.")
 	assert_eq(ally.hp, 30, "Friendly unit takes no damage from the rejected play.")
-	assert_eq(battle.energy, 3, "No energy spent.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 3, "No energy spent.")
 	assert_true(battle.deck.hand.has(attack), "Card stays in hand.")
 
 
@@ -252,7 +253,7 @@ func test_reject_character_tag_mismatch() -> void:
 
 	assert_false(result.ok, "Play rejected: wrong character_tag for this unit.")
 	assert_eq(foe.hp, 20, "No effect applied on a tag-mismatched play.")
-	assert_eq(battle.energy, 3, "No energy spent.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 3, "No energy spent.")
 	assert_true(battle.deck.hand.has(mage_card), "Card stays in hand.")
 
 
@@ -294,7 +295,7 @@ func test_innate_strike_plays_without_touching_deck() -> void:
 
 	assert_true(result.ok, "Innate Strike plays: %s" % result.reason)
 	assert_eq(foe.hp, 16, "Innate Strike still resolves its effects (4 damage).")
-	assert_eq(battle.energy, 2, "Innate Strike still spends energy (3 - 1).")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 2, "Innate Strike still spends energy (3 - 1).")
 
 	assert_eq(battle.deck.draw_pile.size(), draw_before, "Draw pile unchanged.")
 	assert_eq(battle.deck.hand.size(), hand_before, "Hand unchanged.")
@@ -316,7 +317,7 @@ func test_innate_defend_applies_block_to_self() -> void:
 
 	assert_true(result.ok, "Innate Defend plays: %s" % result.reason)
 	assert_eq(hero.block, 5, "Innate Defend applies block to the acting unit.")
-	assert_eq(battle.energy, 2, "Innate Defend spends energy.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 2, "Innate Defend spends energy.")
 
 
 func test_reject_innate_not_on_action_bar() -> void:
@@ -331,7 +332,7 @@ func test_reject_innate_not_on_action_bar() -> void:
 
 	assert_false(result.ok, "Innate not on the unit's action bar is rejected.")
 	assert_eq(hero.block, 0, "No block applied on a rejected innate play.")
-	assert_eq(battle.energy, 3, "No energy spent.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 3, "No energy spent.")
 
 
 func test_reject_non_innate_card_via_play_innate() -> void:
@@ -347,7 +348,7 @@ func test_reject_non_innate_card_via_play_innate() -> void:
 
 	assert_false(result.ok, "A non-innate card is rejected by play_innate.")
 	assert_eq(foe.hp, 20, "No effect applied.")
-	assert_eq(battle.energy, 3, "No energy spent.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 3, "No energy spent.")
 
 
 # --- Rejection: card not in hand --------------------------------------------
@@ -365,7 +366,7 @@ func test_reject_card_not_in_hand() -> void:
 
 	assert_false(result.ok, "A card not in hand cannot be played.")
 	assert_eq(foe.hp, 20, "No effect applied.")
-	assert_eq(battle.energy, 3, "No energy spent.")
+	assert_eq(battle.energy_of(battle.living_players()[0]), 3, "No energy spent.")
 
 
 # --- Neutral-flat vs. owned-scaling (ADR-0016) ------------------------------
@@ -384,7 +385,10 @@ func test_neutral_card_does_not_scale_with_stats() -> void:
 	var result := play.play_card(hero, neutral, foe)
 
 	assert_true(result.ok, result.reason)
-	assert_eq(foe.hp, 15, "neutral card is FLAT (5), not 5 + STR")
+	# Owner decision 2026-06-10 (supersedes the neutral-flat rule of ADR-0016):
+	# under per-member decks EVERY player card scales with its actor — the hero
+	# (STR-attacker) adds their attack stat to the neutral card's base.
+	assert_eq(foe.hp, 20 - (5 + hero.strength), "neutral card scales with the actor (5 + STR)")
 
 
 func test_owned_card_scales_with_stats() -> void:

@@ -1,0 +1,10 @@
+{
+  "id": "enc_t1_ambush",
+  "display_name": "Crossroads Ambush",
+  "enemies": [
+    "skirmisher",
+    "archer",
+    "gremlin"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "enc_t5_ogres",
+  "display_name": "Ogre Vanguard",
+  "enemies": [
+    "ogre",
+    "coven_witch",
+    "grunt"
+  ],
+  "win_condition": "defeat_all"
+}

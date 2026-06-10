@@ -1,0 +1,27 @@
+{
+  "id": "frost_nova_plus",
+  "display_name": "Frost Nova+",
+  "description": "Deal 7 damage and apply 2 Weak to all enemies. Exhaust. (Upgraded.) Hits ALL, at reduced stat scaling.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 7,
+      "stat_mult": 0.6
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "upgrade_of": "frost_nova"
+}

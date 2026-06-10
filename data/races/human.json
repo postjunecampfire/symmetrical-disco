@@ -1,9 +1,9 @@
 {
   "id": "human",
   "display_name": "Human",
-  "str_mod": 1,
-  "dex_mod": 1,
-  "con_mod": 1,
-  "int_mod": 1,
+  "strength": 3,
+  "dexterity": 3,
+  "constitution": 3,
+  "intelligence": 3,
   "custom_card": "human_versatility"
 }

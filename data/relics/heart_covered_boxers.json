@@ -1,0 +1,9 @@
+{
+  "id": "heart_covered_boxers",
+  "display_name": "Heart-Covered Boxers",
+  "description": "Each party member has +8 maximum HP.",
+  "rarity": "boss",
+  "trigger": "passive",
+  "effect": "max_hp_up",
+  "amount": 8
+}

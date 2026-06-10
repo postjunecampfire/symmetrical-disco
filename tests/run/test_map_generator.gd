@@ -281,3 +281,26 @@ func _hard_late_nodes(graph: MapGraph) -> int:
 		if n.node_type == &"combat" or n.node_type == &"elite":
 			count += 1
 	return count
+
+
+# --- Shop / treasure placement (ADR-0023) -------------------------------------
+
+func test_shop_and_treasure_guarantees_place_one_each() -> void:
+	# With the act-1 authored config (shop/treasure guaranteed), every generated
+	# map must contain at least one merchant and one treasure node.
+	var db := ContentDatabase.new()
+	db.load_from_dir("res://data")
+	var act1: ActConfig = db.get_act(1)
+	assert_not_null(act1, "act curve loaded")
+	for seed_i in range(6):
+		var graph: MapGraph = MapGenerator.new().generate(act1.map, 1000 + seed_i)
+		var shops: int = 0
+		var chests: int = 0
+		for key: Variant in graph.nodes.keys():
+			var node: MapNode = graph.nodes[key]
+			if node.node_type == &"shop":
+				shops += 1
+			elif node.node_type == &"treasure":
+				chests += 1
+		assert_gt(shops, 0, "seed %d: at least one merchant on the map" % seed_i)
+		assert_gt(chests, 0, "seed %d: at least one treasure on the map" % seed_i)

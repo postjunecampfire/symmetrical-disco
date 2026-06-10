@@ -1,0 +1,19 @@
+{
+  "id": "smoke_bomb",
+  "display_name": "Smoke Bomb",
+  "description": "Apply 1 Weak to ALL enemies.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 1
+    }
+  ]
+}

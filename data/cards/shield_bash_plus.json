@@ -7,7 +7,7 @@
   "keywords": [
     "exhaust"
   ],
-  "rarity": "uncommon",
+  "rarity": "common",
   "upgrade_of": "shield_bash",
   "target": {
     "target_type": "enemy"

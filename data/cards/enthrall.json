@@ -1,0 +1,26 @@
+{
+  "id": "enthrall",
+  "display_name": "Enthrall",
+  "description": "Apply 1 Stun and 2 Weak. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ]
+}

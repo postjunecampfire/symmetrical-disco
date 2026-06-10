@@ -1,0 +1,24 @@
+{
+  "id": "time_dilation",
+  "display_name": "Time Dilation",
+  "description": "Draw 2, gain 1 energy. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 2
+    },
+    {
+      "type": "gain_energy",
+      "amount": 1
+    }
+  ]
+}

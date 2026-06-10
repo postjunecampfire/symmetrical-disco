@@ -1,0 +1,9 @@
+{
+  "id": "enc_t1_rats",
+  "display_name": "Gremlin Pair",
+  "enemies": [
+    "gremlin",
+    "gremlin"
+  ],
+  "win_condition": "defeat_all"
+}

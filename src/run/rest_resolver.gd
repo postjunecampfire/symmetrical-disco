@@ -3,7 +3,7 @@ extends RefCounted
 ## Applies a rest-node choice to the RunState (run-structure.md §5, ADR-0012,
 ## P2·07). At a rest the player picks ONE of:
 ##   heal     — restore `BattleConfig.rest_heal` HP to each living party member.
-##   upgrade  — replace one copy of a base card in run_deck with its upgraded
+##   upgrade  — upgrade a SKILL (ADR-0026): swap the base id for its upgraded
 ##              variant (the card whose `upgrade_of` points at the base).
 ##
 ## Like the other run-layer resolvers (CardReward / EventResolver) it depends only
@@ -34,19 +34,36 @@ func heal(run: RunState) -> void:
 		run.party_hp[cid] = mini(cap, cur + amount)
 
 
-## Upgrade ONE copy of `base_card_id` in run_deck to its upgraded variant. Returns
+## Upgrade the SKILL `base_card_id` (ADR-0026): every copy in the derived deck
+## upgrades at once because copies are projections of the single collection
+## entry. Searches the party in order for the owning member. Returns
 ## true if a base copy was present AND an upgrade variant exists; false otherwise
 ## (nothing changes). The first occurrence is replaced, preserving deck order.
 func upgrade_card(run: RunState, base_card_id: StringName) -> bool:
 	if _db == null:
 		return false
-	var idx: int = run.run_deck.find(base_card_id)
+	var idx: int = -1
+	var owner: StringName = &""
+	for cid in run.party:
+		var coll: Variant = run.skill_collections.get(cid, [])
+		if coll is Array and (coll as Array).has(base_card_id):
+			owner = cid
+			idx = 0
+			break
 	if idx < 0:
 		return false
 	var upgrade: CardData = _db.get_upgrade_for(base_card_id)
 	if upgrade == null:
 		return false
-	run.run_deck[idx] = upgrade.id
+	var collection: Array = run.skill_collections.get(owner, [])
+	var loadout: Array = run.active_loadouts.get(owner, [])
+	for i in range(collection.size()):
+		if StringName(String(collection[i])) == base_card_id:
+			collection[i] = upgrade.id
+			break  # upgrade ONE skill entry; its derived copies all follow
+	for i in range(loadout.size()):
+		if StringName(String(loadout[i])) == base_card_id:
+			loadout[i] = upgrade.id
 	return true
 
 

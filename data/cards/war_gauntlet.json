@@ -1,0 +1,21 @@
+{
+  "id": "war_gauntlet",
+  "display_name": "War Gauntlet",
+  "description": "Gain 3 Strength. Exhaust.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 3
+    }
+  ]
+}

@@ -224,26 +224,47 @@ func test_apply_effects_draw_applies_once_for_aoe() -> void:
 
 # --- energy refill ----------------------------------------------------------
 
-func test_energy_refills_at_player_turn_start() -> void:
+func test_energy_refills_per_character_at_player_turn_start() -> void:
+	# ADR-0025: each living player refills their OWN pool to energy_per_character.
 	var state := _state(3)
-	_add_player(state, 30)
+	var p1 := _add_player(state, 30)
+	var p2 := _add_player(state, 30)
 	_add_enemy(state, 30)
 
-	state.energy = 0
 	state.start_player_turn()
-	assert_eq(state.energy, 3, "energy refills to energy_per_turn")
+	var base: int = state.config.energy_per_character
+	assert_eq(state.energy_of(p1), base, "player 1 pool refills to energy_per_character")
+	assert_eq(state.energy_of(p2), base, "player 2 pool refills independently")
 	assert_eq(state.turn_number, 1, "turn counter advances")
 
-	state.energy = 1
+	state.spend_energy(p1, base)
 	state.start_player_turn()
-	assert_eq(state.energy, 3, "refills again next turn, not accumulates")
+	assert_eq(state.energy_of(p1), base, "refills again next turn, not accumulates")
 
 
-func test_add_energy_tops_up_pool() -> void:
+func test_spend_energy_is_per_pool() -> void:
+	# ADR-0025: one character's spending never drains the other's pool.
 	var state := _state(3)
-	state.energy = 2
-	state.add_energy(2)
-	assert_eq(state.energy, 4, "gain_energy adds on top of the pool")
+	var p1 := _add_player(state, 30)
+	var p2 := _add_player(state, 30)
+	state.start_player_turn()
+	var base: int = state.config.energy_per_character
+	assert_true(state.spend_energy(p1, 1), "affordable spend succeeds")
+	assert_eq(state.energy_of(p1), base - 1, "spender's pool debited")
+	assert_eq(state.energy_of(p2), base, "the OTHER pool is untouched")
+	assert_false(state.spend_energy(p1, base), "overdraft refused")
+	assert_eq(state.energy_of(p1), base - 1, "refused spend debits nothing")
+
+
+func test_add_energy_tops_up_a_pool() -> void:
+	var state := _state(3)
+	var p1 := _add_player(state, 30)
+	state.start_player_turn()
+	var base: int = state.config.energy_per_character
+	state.add_energy(2, p1)
+	assert_eq(state.energy_of(p1), base + 2, "gain_energy adds on top of the pool")
+	state.add_energy(1)  # source-less: credits the first living player
+	assert_eq(state.energy_of(p1), base + 3, "source-less gain credits the first living player")
 
 
 # --- draw at turn start ------------------------------------------------------

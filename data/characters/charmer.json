@@ -1,0 +1,23 @@
+{
+  "id": "charmer",
+  "display_name": "Charmer",
+  "speed": 11,
+  "strength": 0,
+  "dexterity": 1,
+  "constitution": 0,
+  "intelligence": 2,
+  "attack_stat": "int",
+  "innate_actions": [
+    "strike",
+    "defend"
+  ],
+  "starting_deck": [
+    "magic_missile",
+    "hex",
+    "arcane_dodge",
+    "play_to_the_crowd"
+  ],
+  "tags": [
+    "caster"
+  ]
+}

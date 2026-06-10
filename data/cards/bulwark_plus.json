@@ -1,0 +1,24 @@
+{
+  "id": "bulwark_plus",
+  "display_name": "Bulwark+",
+  "description": "Gain 11 Block and 2 Strength. (Upgraded.)",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 11
+    },
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 2
+    }
+  ],
+  "upgrade_of": "bulwark"
+}

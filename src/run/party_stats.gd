@@ -15,7 +15,9 @@ extends RefCounted
 ## Effective max HP of `cid` for the current `run`. Falls back to the class base
 ## (or 0 if the character is unknown).
 static func effective_max_hp(db: ContentDatabase, run: RunState, cid: StringName) -> int:
-	var ch: CharacterData = db.get_character(cid)
+	if db.get_character(cid) == null and not run.party.has(cid):
+		return 0  # unknown id: neither a class-keyed legacy member nor in the party
+	var ch: CharacterData = PartyMember.character_for(db, run, cid)
 	if ch == null:
 		return 0
 	var cfg: BattleConfig = db.get_battle_config()

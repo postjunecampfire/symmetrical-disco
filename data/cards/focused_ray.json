@@ -1,0 +1,19 @@
+{
+  "id": "focused_ray",
+  "display_name": "Focused Ray",
+  "description": "Deal 3 + 150% INT damage to one target.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 1.5
+    }
+  ]
+}

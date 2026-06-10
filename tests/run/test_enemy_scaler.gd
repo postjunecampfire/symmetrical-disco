@@ -112,3 +112,24 @@ func _first_stacks(enemy: EnemyData, status: StringName) -> int:
 			if e.type == &"apply_status" and e.status == status:
 				return e.stacks
 	return -1
+
+
+# --- Lockstep guard (HANDOFF §5 DIRECTION / act-1-3-balance-proposal §7) ------
+
+func test_factor_is_linear_lockstep() -> void:
+	# The balance invariant: enemy-damage growth must keep pace with the player's
+	# linear DEX->block growth, i.e. the scale factor stays LINEAR in level
+	# (factor(L)/L constant). A convex curve here silently re-opens the
+	# high-DEX turtle at depth — this guard fails loudly if the exponent or
+	# factor shape ever changes.
+	var db := ContentDatabase.new()
+	db.load_from_dir("res://data")
+	var cfg: BattleConfig = db.get_battle_config()
+	var scaler := EnemyScaler.new(cfg)
+	var baseline: float = float(cfg.enemy_scale_baseline_level)
+	for level in [2, 5, 8, 18, 44, 105, 250, 1300]:
+		var expected: float = float(level) / baseline
+		assert_almost_eq(
+			scaler.factor(level), expected, 0.001,
+			"factor(%d) is linear in level (lockstep with DEX->block)" % level
+		)

@@ -1,0 +1,19 @@
+{
+  "id": "play_to_the_crowd_plus",
+  "display_name": "Play to the Crowd+",
+  "description": "Deal 8 damage. Apply Charm equal to unblocked damage. (Upgraded.)",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "charm_damage",
+      "amount": 8
+    }
+  ],
+  "upgrade_of": "play_to_the_crowd"
+}

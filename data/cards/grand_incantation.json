@@ -1,0 +1,19 @@
+{
+  "id": "grand_incantation",
+  "display_name": "Grand Incantation",
+  "description": "Apply 4 Charm to ALL enemies.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "charm",
+      "stacks": 4
+    }
+  ]
+}

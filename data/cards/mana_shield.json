@@ -1,0 +1,19 @@
+{
+  "id": "mana_shield",
+  "display_name": "Mana Shield",
+  "description": "Gain 3 + 150% DEX block.",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 3,
+      "stat_mult": 1.5
+    }
+  ]
+}

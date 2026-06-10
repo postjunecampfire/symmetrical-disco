@@ -1,0 +1,25 @@
+{
+  "id": "arcane_dodge_plus",
+  "display_name": "Arcane Dodge+",
+  "description": "Gain 9 Block. Add a Magic Missile to your hand. (Upgraded.)",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 9
+    },
+    {
+      "type": "add_card",
+      "params": {
+        "card_id": "magic_missile"
+      }
+    }
+  ],
+  "upgrade_of": "arcane_dodge"
+}

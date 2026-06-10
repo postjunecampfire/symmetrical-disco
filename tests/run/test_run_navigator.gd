@@ -122,14 +122,19 @@ func test_encounter_for_uses_payload_when_set() -> void:
 	assert_eq(nav.encounter_for(n), &"skirmish_01", "explicit payload wins")
 
 
-func test_encounter_for_picks_from_pool_by_type() -> void:
-	var nav := _nav(_run())
+func test_encounter_for_picks_from_the_acts_roster() -> void:
+	# ADR-0019 remainder: the CURRENT ACT's tier roster decides the pool; the
+	# global encounter_pool.json is only the fallback.
+	var run := _run()
+	var nav := _nav(run)
+	var act_cfg: ActConfig = _db.get_act(run.act)
+	assert_not_null(act_cfg, "act curve loaded")
 	var combat := nav.encounter_for(_node(&"c", &"combat", 0, []))
-	var pool := _db.get_encounters_for_type(&"combat")
-	assert_true(pool.has(combat), "combat node draws a combat-pool encounter: %s" % combat)
+	var act_pool_v: Variant = act_cfg.encounter_pool.get(&"combat", [])
+	assert_true((act_pool_v as Array).has(combat), "combat node draws from the act's tier roster: %s" % combat)
 
 	var boss := nav.encounter_for(_node(&"n_boss", &"boss", 0, []))
-	assert_true(_db.get_encounters_for_type(&"boss").has(boss), "boss node draws a boss encounter")
+	assert_true((act_cfg.encounter_pool.get(&"boss", []) as Array).has(boss), "boss node draws the act's boss")
 
 
 func test_encounter_for_is_deterministic_per_node() -> void:

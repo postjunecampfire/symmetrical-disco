@@ -1,0 +1,25 @@
+{
+  "id": "mana_surge_plus",
+  "display_name": "Mana Surge+",
+  "description": "Gain 3 energy and draw 3 cards. Exhaust. (Upgraded.)",
+  "character_tag": "mage",
+  "energy_cost": 0,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 3
+    },
+    {
+      "type": "draw",
+      "amount": 3
+    }
+  ],
+  "upgrade_of": "mana_surge"
+}

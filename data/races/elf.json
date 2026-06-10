@@ -1,9 +1,9 @@
 {
   "id": "elf",
   "display_name": "Elf",
-  "str_mod": 0,
-  "dex_mod": 2,
-  "con_mod": 0,
-  "int_mod": 2,
+  "strength": 2,
+  "dexterity": 5,
+  "constitution": 2,
+  "intelligence": 5,
   "custom_card": "elven_focus"
 }

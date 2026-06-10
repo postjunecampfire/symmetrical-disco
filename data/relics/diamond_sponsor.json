@@ -1,0 +1,9 @@
+{
+  "id": "diamond_sponsor",
+  "display_name": "Diamond Sponsor",
+  "description": "Each turn, gain 1 extra energy.",
+  "rarity": "boss",
+  "trigger": "turn_start",
+  "effect": "gain_energy",
+  "amount": 1
+}

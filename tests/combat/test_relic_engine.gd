@@ -32,7 +32,7 @@ func _battle(relics: Array[RelicData] = []) -> EncounterBattle:
 	return EncounterAssemblerScript.new().build(
 		_db.get_encounter(&"enc_combat_01"), _db,
 		[&"fighter", &"mage"] as Array[StringName], 1, {}, {},
-		[] as Array[StringName], {}, relics
+		{}, {}, relics
 	)
 
 
@@ -68,10 +68,14 @@ func test_max_hp_up_raises_max_and_current_hp() -> void:
 # --- RelicEngine: turn_start ------------------------------------------------
 
 func test_gain_energy_adds_energy() -> void:
+	# ADR-0025 provisional: a party-level energy relic credits the FIRST living
+	# player's pool (the origin character).
 	var battle := _battle()
-	battle.energy = 3
+	battle.start_player_turn()
+	var first: Combatant = battle.living_players()[0]
+	var base: int = battle.energy_of(first)
 	RelicEngineScript.new().apply_turn_start(battle, [_relic(&"turn_start", &"gain_energy", 2)])
-	assert_eq(battle.energy, 5, "turn_start energy relic adds energy")
+	assert_eq(battle.energy_of(first), base + 2, "turn_start energy relic adds to the first pool")
 
 
 func test_mismatched_trigger_is_ignored() -> void:
@@ -92,9 +96,12 @@ func test_assembler_applies_combat_start_relics() -> void:
 
 func test_encounter_battle_applies_turn_start_relics_each_turn() -> void:
 	var battle := _battle([_relic(&"turn_start", &"gain_energy", 2)] as Array[RelicData])
-	var base: int = _db.get_battle_config().energy_per_turn
+	var base: int = _db.get_battle_config().energy_per_character
 	battle.start_player_turn()
-	assert_eq(battle.energy, base + 2, "turn_start relic fires on top of the base energy refill")
+	assert_eq(
+		battle.energy_of(battle.living_players()[0]), base + 2,
+		"turn_start relic fires on top of the first pool's base refill (ADR-0025)"
+	)
 
 
 func test_passive_relic_raises_max_hp_via_assembler() -> void:
@@ -105,7 +112,7 @@ func test_passive_relic_raises_max_hp_via_assembler() -> void:
 		if d != null and d.id == &"fighter":
 			fighter = unit
 	assert_not_null(fighter, "fighter spawned")
-	assert_eq(fighter.max_hp, 34 + 6, "passive max_hp_up raised the fighter's max HP at assembly")
+	assert_eq(fighter.max_hp, _db.get_character(&"fighter").max_hp + 6, "passive max_hp_up raised the fighter's max HP at assembly")
 
 
 func test_authored_relics_load() -> void:

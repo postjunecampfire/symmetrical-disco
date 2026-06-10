@@ -1,0 +1,19 @@
+{
+  "id": "cleaving_blow",
+  "display_name": "Cleaving Blow",
+  "description": "Deal 4 + 150% STR damage.",
+  "character_tag": "fighter",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 1.5
+    }
+  ]
+}

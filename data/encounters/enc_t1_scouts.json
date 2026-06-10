@@ -1,0 +1,9 @@
+{
+  "id": "enc_t1_scouts",
+  "display_name": "Gnoll Scouts",
+  "enemies": [
+    "skirmisher",
+    "gremlin"
+  ],
+  "win_condition": "defeat_all"
+}

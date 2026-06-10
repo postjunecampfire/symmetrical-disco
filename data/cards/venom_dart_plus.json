@@ -1,0 +1,24 @@
+{
+  "id": "venom_dart_plus",
+  "display_name": "Venom Dart+",
+  "description": "Deal 6 damage and apply 5 Poison to a target at range. (Upgraded.)",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6
+    },
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 5
+    }
+  ],
+  "upgrade_of": "venom_dart"
+}

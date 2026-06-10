@@ -1,0 +1,19 @@
+{
+  "id": "field_dressing_plus",
+  "display_name": "Field Dressing+",
+  "description": "Restore 9 HP to a unit (yourself or an ally). (Upgraded.)",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "ally"
+  },
+  "effects": [
+    {
+      "type": "heal",
+      "amount": 9
+    }
+  ],
+  "upgrade_of": "field_dressing"
+}

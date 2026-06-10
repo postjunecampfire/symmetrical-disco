@@ -1,0 +1,21 @@
+{
+  "id": "elven_focus_plus",
+  "display_name": "Focus+",
+  "description": "Gain 2 energy. Exhaust. (Upgraded.)",
+  "character_tag": "neutral",
+  "energy_cost": 0,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 2
+    }
+  ],
+  "upgrade_of": "elven_focus"
+}

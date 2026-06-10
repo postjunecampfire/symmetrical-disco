@@ -79,7 +79,8 @@ func test_apply_relic_and_card_boons() -> void:
 	var run := _fresh_run()
 	MetaProgressScript.new(_db, m).apply_boons(run)
 	assert_true(run.relics.has(&"iron_brand"), "relic boon grants a starting relic")
-	assert_true(run.run_deck.has(&"field_dressing"), "card boon adds a starting card")
+	var first_coll: Variant = run.skill_collections.get(run.party[0], [])
+	assert_true((first_coll as Array).has(&"field_dressing"), "card boon adds a skill to the first member (ADR-0026)")
 
 
 func test_apply_stat_boon_to_every_member() -> void:

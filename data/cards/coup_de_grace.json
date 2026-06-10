@@ -1,0 +1,20 @@
+{
+  "id": "coup_de_grace",
+  "display_name": "Coup de Grace",
+  "description": "Deal damage equal to the target's Charm, then remove it all. Exhaust.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "consume_status_damage",
+      "status": "charm"
+    }
+  ]
+}

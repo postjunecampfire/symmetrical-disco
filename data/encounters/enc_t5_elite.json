@@ -1,0 +1,10 @@
+{
+  "id": "enc_t5_elite",
+  "display_name": "The Old Ooze",
+  "enemies": [
+    "elder_ooze",
+    "occultist",
+    "ooze"
+  ],
+  "win_condition": "defeat_all"
+}

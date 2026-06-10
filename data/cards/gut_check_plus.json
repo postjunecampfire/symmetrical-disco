@@ -1,0 +1,23 @@
+{
+  "id": "gut_check_plus",
+  "display_name": "Gut Check+",
+  "description": "Deal 6 damage. Gain 6 Block. (Upgraded.)",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6
+    },
+    {
+      "type": "self_block",
+      "amount": 6
+    }
+  ],
+  "upgrade_of": "gut_check"
+}

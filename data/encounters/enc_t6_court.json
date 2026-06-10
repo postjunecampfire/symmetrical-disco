@@ -1,0 +1,10 @@
+{
+  "id": "enc_t6_court",
+  "display_name": "Warden's Court",
+  "enemies": [
+    "iron_warden",
+    "blademaster",
+    "coven_witch"
+  ],
+  "win_condition": "defeat_all"
+}

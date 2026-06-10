@@ -1,0 +1,10 @@
+{
+  "id": "enc_t4_marksmen",
+  "display_name": "Kill Zone",
+  "enemies": [
+    "sharpshooter",
+    "marksman",
+    "footman"
+  ],
+  "win_condition": "defeat_all"
+}

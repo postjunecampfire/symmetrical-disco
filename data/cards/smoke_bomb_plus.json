@@ -1,0 +1,20 @@
+{
+  "id": "smoke_bomb_plus",
+  "display_name": "Smoke Bomb+",
+  "description": "Apply 2 Weak to ALL enemies. (Upgraded.)",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ],
+  "upgrade_of": "smoke_bomb"
+}

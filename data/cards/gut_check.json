@@ -1,0 +1,22 @@
+{
+  "id": "gut_check",
+  "display_name": "Gut Check",
+  "description": "Deal 4 damage. Gain 4 Block.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4
+    },
+    {
+      "type": "self_block",
+      "amount": 4
+    }
+  ]
+}

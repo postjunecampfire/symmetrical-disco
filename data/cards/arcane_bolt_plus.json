@@ -1,0 +1,19 @@
+{
+  "id": "arcane_bolt_plus",
+  "display_name": "Arcane Bolt+",
+  "description": "Deal 8 damage. (Upgraded.)",
+  "character_tag": "mage",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 8
+    }
+  ],
+  "upgrade_of": "arcane_bolt"
+}

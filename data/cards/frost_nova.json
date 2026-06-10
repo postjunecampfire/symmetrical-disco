@@ -1,7 +1,7 @@
 {
   "id": "frost_nova",
   "display_name": "Frost Nova",
-  "description": "Deal 4 damage and apply 1 Weak to all enemies. Exhaust.",
+  "description": "Deal 4 damage and apply 1 Weak to all enemies. Exhaust. Hits ALL, at reduced stat scaling.",
   "character_tag": "mage",
   "energy_cost": 2,
   "keywords": [
@@ -14,7 +14,8 @@
   "effects": [
     {
       "type": "damage",
-      "amount": 4
+      "amount": 4,
+      "stat_mult": 0.6
     },
     {
       "type": "apply_status",

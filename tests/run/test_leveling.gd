@@ -99,8 +99,12 @@ func test_allocate_spends_points_into_chosen_stat() -> void:
 	assert_true(lv.allocate_point(run, &"hero", &"con"), "spends a point into CON")
 	assert_eq(lv.unspent(run, &"hero"), 1, "two of three points spent")
 	var alloc: Dictionary = run.allocated_stats[&"hero"]
-	assert_eq(int(alloc[&"str"]), 1, "STR recorded")
-	assert_eq(int(alloc[&"con"]), 1, "CON recorded")
+	# One level-up granted auto_stats_per_level (1) to EVERY stat (owner,
+	# 2026-06-10); the two spent points stack on top of that floor.
+	var auto: int = _config().auto_stats_per_level
+	assert_eq(int(alloc[&"str"]), auto + 1, "STR = auto growth + spent point")
+	assert_eq(int(alloc[&"con"]), auto + 1, "CON = auto growth + spent point")
+	assert_eq(int(alloc[&"dex"]), auto, "DEX rose by the automatic growth alone")
 
 
 func test_allocate_fails_without_points() -> void:

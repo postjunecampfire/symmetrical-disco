@@ -1,0 +1,9 @@
+{
+  "id": "enc_t1_ooze",
+  "display_name": "Something Wet",
+  "enemies": [
+    "ooze",
+    "ooze"
+  ],
+  "win_condition": "defeat_all"
+}

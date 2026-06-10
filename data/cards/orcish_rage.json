@@ -5,7 +5,7 @@
   "character_tag": "neutral",
   "energy_cost": 1,
   "keywords": [],
-  "rarity": "common",
+  "rarity": "uncommon",
   "target": {
     "target_type": "self"
   },

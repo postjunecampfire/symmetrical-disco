@@ -12,7 +12,7 @@
       "trash_level": 2,
       "elite_level": 4,
       "map": {
-        "rows": 7,
+        "rows": 17,
         "width_min": 2,
         "width_max": 3,
         "branchiness": 0.5,
@@ -20,10 +20,14 @@
           "combat": 6,
           "elite": 1,
           "rest": 2,
-          "event": 2
+          "event": 2,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "low"
       },
@@ -36,7 +40,7 @@
       "trash_level": 5,
       "elite_level": 9,
       "map": {
-        "rows": 8,
+        "rows": 17,
         "width_min": 2,
         "width_max": 3,
         "branchiness": 0.5,
@@ -44,10 +48,14 @@
           "combat": 6,
           "elite": 1,
           "rest": 2,
-          "event": 2
+          "event": 2,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "low"
       },
@@ -60,7 +68,7 @@
       "trash_level": 8,
       "elite_level": 14,
       "map": {
-        "rows": 8,
+        "rows": 17,
         "width_min": 2,
         "width_max": 3,
         "branchiness": 0.5,
@@ -68,10 +76,14 @@
           "combat": 6,
           "elite": 1,
           "rest": 2,
-          "event": 2
+          "event": 2,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "low"
       },
@@ -84,7 +96,7 @@
       "trash_level": 13,
       "elite_level": 22,
       "map": {
-        "rows": 9,
+        "rows": 17,
         "width_min": 2,
         "width_max": 3,
         "branchiness": 0.5,
@@ -92,10 +104,14 @@
           "combat": 6,
           "elite": 1,
           "rest": 2,
-          "event": 2
+          "event": 2,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "low_med"
       },
@@ -108,7 +124,7 @@
       "trash_level": 16,
       "elite_level": 29,
       "map": {
-        "rows": 9,
+        "rows": 17,
         "width_min": 2,
         "width_max": 3,
         "branchiness": 0.5,
@@ -116,10 +132,14 @@
           "combat": 7,
           "elite": 2,
           "rest": 2,
-          "event": 2
+          "event": 2,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "med"
       },
@@ -132,7 +152,7 @@
       "trash_level": 20,
       "elite_level": 35,
       "map": {
-        "rows": 10,
+        "rows": 17,
         "width_min": 2,
         "width_max": 3,
         "branchiness": 0.5,
@@ -140,10 +160,14 @@
           "combat": 7,
           "elite": 2,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "med"
       },
@@ -156,7 +180,7 @@
       "trash_level": 28,
       "elite_level": 50,
       "map": {
-        "rows": 10,
+        "rows": 17,
         "width_min": 2,
         "width_max": 4,
         "branchiness": 0.5,
@@ -164,10 +188,14 @@
           "combat": 7,
           "elite": 2,
           "rest": 2,
-          "event": 2
+          "event": 2,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "med"
       },
@@ -180,7 +208,7 @@
       "trash_level": 37,
       "elite_level": 66,
       "map": {
-        "rows": 11,
+        "rows": 17,
         "width_min": 2,
         "width_max": 4,
         "branchiness": 0.5,
@@ -188,10 +216,14 @@
           "combat": 7,
           "elite": 2,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "med"
       },
@@ -204,7 +236,7 @@
       "trash_level": 47,
       "elite_level": 84,
       "map": {
-        "rows": 11,
+        "rows": 17,
         "width_min": 3,
         "width_max": 4,
         "branchiness": 0.5,
@@ -212,10 +244,14 @@
           "combat": 8,
           "elite": 3,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "med_high"
       },
@@ -228,7 +264,7 @@
       "trash_level": 68,
       "elite_level": 120,
       "map": {
-        "rows": 12,
+        "rows": 17,
         "width_min": 3,
         "width_max": 4,
         "branchiness": 0.5,
@@ -236,10 +272,14 @@
           "combat": 9,
           "elite": 3,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "high"
       },
@@ -252,7 +292,7 @@
       "trash_level": 89,
       "elite_level": 158,
       "map": {
-        "rows": 12,
+        "rows": 17,
         "width_min": 3,
         "width_max": 4,
         "branchiness": 0.5,
@@ -260,10 +300,14 @@
           "combat": 9,
           "elite": 3,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "high"
       },
@@ -276,7 +320,7 @@
       "trash_level": 112,
       "elite_level": 200,
       "map": {
-        "rows": 13,
+        "rows": 17,
         "width_min": 3,
         "width_max": 4,
         "branchiness": 0.5,
@@ -284,10 +328,14 @@
           "combat": 9,
           "elite": 3,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "high"
       },
@@ -300,7 +348,7 @@
       "trash_level": 162,
       "elite_level": 288,
       "map": {
-        "rows": 13,
+        "rows": 17,
         "width_min": 3,
         "width_max": 5,
         "branchiness": 0.5,
@@ -308,10 +356,14 @@
           "combat": 9,
           "elite": 3,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "high"
       },
@@ -324,7 +376,7 @@
       "trash_level": 209,
       "elite_level": 372,
       "map": {
-        "rows": 14,
+        "rows": 17,
         "width_min": 3,
         "width_max": 5,
         "branchiness": 0.5,
@@ -332,10 +384,14 @@
           "combat": 9,
           "elite": 4,
           "rest": 2,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "high"
       },
@@ -348,7 +404,7 @@
       "trash_level": 261,
       "elite_level": 464,
       "map": {
-        "rows": 14,
+        "rows": 17,
         "width_min": 3,
         "width_max": 5,
         "branchiness": 0.5,
@@ -356,10 +412,14 @@
           "combat": 10,
           "elite": 4,
           "rest": 1,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "very_high"
       },
@@ -372,7 +432,7 @@
       "trash_level": 369,
       "elite_level": 656,
       "map": {
-        "rows": 15,
+        "rows": 17,
         "width_min": 3,
         "width_max": 5,
         "branchiness": 0.5,
@@ -380,10 +440,14 @@
           "combat": 10,
           "elite": 4,
           "rest": 1,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "very_high"
       },
@@ -396,7 +460,7 @@
       "trash_level": 472,
       "elite_level": 840,
       "map": {
-        "rows": 15,
+        "rows": 17,
         "width_min": 3,
         "width_max": 5,
         "branchiness": 0.5,
@@ -404,10 +468,14 @@
           "combat": 10,
           "elite": 4,
           "rest": 1,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "very_high"
       },
@@ -420,7 +488,7 @@
       "trash_level": 585,
       "elite_level": 1040,
       "map": {
-        "rows": 16,
+        "rows": 17,
         "width_min": 3,
         "width_max": 5,
         "branchiness": 0.5,
@@ -428,10 +496,14 @@
           "combat": 10,
           "elite": 5,
           "rest": 1,
-          "event": 1
+          "event": 1,
+          "shop": 1,
+          "treasure": 1
         },
         "guarantees": {
-          "rest_before_boss": true
+          "rest_before_boss": true,
+          "shop": true,
+          "treasure": true
         },
         "late_row_bias": "very_high"
       },

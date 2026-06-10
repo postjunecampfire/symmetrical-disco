@@ -92,30 +92,25 @@ func test_assembled_spawns_players_and_enemies() -> void:
 		assert_true(spawned_ids.has(enemy_id), "enemy '%s' was spawned" % enemy_id)
 
 
-func test_deck_assembled_from_party_and_excludes_innate() -> void:
+func test_each_member_gets_a_derived_deck_with_basics(  ) -> void:
+	# ADR-0026: each member fights with their OWN deck, derived from their kit;
+	# Strike/Defend are ordinary commons that pad the deck to the floor (the
+	# ADR-0005 innate model is reversed).
 	var battle: EncounterBattle = _build()
-	var vanguard: CharacterData = _db.get_character(&"fighter")
-	var mage: CharacterData = _db.get_character(&"mage")
-
-	var expected: int = 0
-	for character in [vanguard, mage]:
-		for card_id in character.starting_deck:
-			var card: CardData = _db.get_card(card_id)
-			if card != null and not card.innate:
-				expected += 1
-
-	assert_gt(expected, 0, "the party contributes a non-empty starting deck")
-	assert_eq(
-		battle.deck.total_in_cycle(), expected,
-		"deck holds exactly the party's non-innate starting cards"
-	)
-
-	for card in battle.deck.all_cards():
-		assert_false(card.innate, "no innate card '%s' is in the deck" % card.id)
-		assert_false(
-			card.id == &"strike" or card.id == &"defend",
-			"innate '%s' is excluded from the deck" % card.id
-		)
+	var floor_n: int = _db.get_battle_config().derived_deck_floor
+	for unit in battle.living_players():
+		var deck: Deck = battle.deck_of(unit)
+		assert_gte(deck.total_in_cycle(), floor_n, "member deck meets the %d-card floor" % floor_n)
+		var has_basic: bool = false
+		for card in deck.all_cards():
+			if card.id == &"strike" or card.id == &"defend":
+				has_basic = true
+				break
+		assert_true(has_basic, "auto-fill basics are present in the derived deck")
+	# The two members' decks are independent objects.
+	var players := battle.living_players()
+	if players.size() >= 2:
+		assert_ne(battle.deck_of(players[0]), battle.deck_of(players[1]), "per-member decks are distinct (ADR-0026)")
 
 
 # ============================================================================

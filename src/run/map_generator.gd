@@ -15,6 +15,8 @@ const _COMBAT: StringName = &"combat"
 const _ELITE: StringName = &"elite"
 const _REST: StringName = &"rest"
 const _EVENT: StringName = &"event"
+const _SHOP: StringName = &"shop"
+const _TREASURE: StringName = &"treasure"
 const _BOSS: StringName = &"boss"
 
 const _BOSS_ID: StringName = &"n_boss"
@@ -108,6 +110,12 @@ func generate(config: MapGenConfig, gen_seed: int) -> MapGraph:
 	# Guarantee a sane distribution: at least one rest and one elite exist.
 	_ensure_type_present(nodes, row_ids, rows, _REST, rest_before_boss, rng)
 	_ensure_type_present(nodes, row_ids, rows, _ELITE, rest_before_boss, rng)
+	# Shop / treasure guarantees (ADR-0023): when an act's config asks for them,
+	# at least one of each exists even if the weighted roll missed.
+	if bool(config.guarantees.get(&"shop", false)):
+		_ensure_type_present(nodes, row_ids, rows, _SHOP, rest_before_boss, rng)
+	if bool(config.guarantees.get(&"treasure", false)):
+		_ensure_type_present(nodes, row_ids, rows, _TREASURE, rest_before_boss, rng)
 
 	# 4b) Selective fog (ADR-0023): mark some nodes as "blind" (render as "?").
 	_apply_fog(nodes, row_ids, rows, rng)

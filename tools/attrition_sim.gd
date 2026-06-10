@@ -17,17 +17,45 @@ extends SceneTree
 ## avg surviving HP, and a death-node histogram — the read that informs the
 ## owner-led balance pass. NOT a gate (lives in tools/, not tests/).
 ##
-## Run:  godot --headless --script res://tools/attrition_sim.gd [seeds]
+## Run:  godot --headless --script res://tools/attrition_sim.gd [seeds] [act]
+## `act` (default 1) scales every fight to that act's level bands via the
+## EnemyScaler — the act-parameterization of act-1-3-balance-proposal §7. Pass
+## act 0 for the legacy UNSCALED read (authored blocks).
 
 const DATA_DIR := "res://data"
 const DEFAULT_SEEDS := 40
 
-## A representative act of rising difficulty (Basic A→Hard, elite, boss). Both
-## cohorts face this identical ladder so attrition is comparable.
+## Legacy fixed ladder, used only for the UNSCALED (act 0) read. Banded runs
+## build their ladder from the act's authored tier roster (ADR-0019).
 const ACT: Array[StringName] = [
 	&"enc_combat_01", &"enc_combat_02", &"enc_combat_03", &"enc_combat_04",
 	&"enc_elite_01", &"enc_boss_01",
 ]
+
+
+## The 6-fight ladder for the configured act: the act roster's combats (cycled
+## to 4) + its first elite + its first boss. Falls back to the legacy ladder.
+func _act_ladder() -> Array[StringName]:
+	if _act <= 0:
+		return ACT
+	var cfg: ActConfig = _db.get_act(_act)
+	if cfg == null or cfg.encounter_pool.is_empty():
+		return ACT
+	var combats: Array[StringName] = []
+	var c_v: Variant = cfg.encounter_pool.get(&"combat", [])
+	if c_v is Array:
+		for item: Variant in c_v:
+			combats.append(StringName(String(item)))
+	if combats.is_empty():
+		return ACT
+	var out: Array[StringName] = []
+	for i in range(4):
+		out.append(combats[i % combats.size()])
+	var e_v: Variant = cfg.encounter_pool.get(&"elite", [])
+	out.append(StringName(String((e_v as Array)[0])) if e_v is Array and not (e_v as Array).is_empty() else &"enc_elite_01")
+	var b_v: Variant = cfg.encounter_pool.get(&"boss", [])
+	out.append(StringName(String((b_v as Array)[0])) if b_v is Array and not (b_v as Array).is_empty() else &"enc_boss_01")
+	return out
 ## Granted to BOTH cohorts after the elite, so the relic path is exercised without
 ## biasing the comparison.
 const ELITE_RELIC: StringName = &"iron_brand"
@@ -35,6 +63,8 @@ const PARTY: Array[StringName] = [&"fighter", &"mage"]
 const RACES := {&"fighter": &"orc", &"mage": &"elf"}
 
 var _db: ContentDatabase
+## The act whose level bands scale every fight (§7). 0 = unscaled legacy read.
+var _act: int = 1
 
 
 func _initialize() -> void:
@@ -49,6 +79,8 @@ func _initialize() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	if args.size() > 0 and args[0].is_valid_int():
 		seeds = args[0].to_int()
+	if args.size() > 1 and args[1].is_valid_int():
+		_act = args[1].to_int()
 
 	var greedy: Dictionary = _run_cohort("greedy", seeds)
 	var defensive: Dictionary = _run_cohort("defensive", seeds)
@@ -63,6 +95,41 @@ func _initialize() -> void:
 
 # --- Cohort run -------------------------------------------------------------
 
+## Emulate the progression a real party carries INTO act N (§7): roughly one
+## level per cleared act (3 pts × 2 members), auto-allocated by the cohort's
+## policy stat — without this, deep-act reads test a level-1 party that cannot
+## exist there. Drafted skills are NOT emulated (kit decks only): reads at
+## act > 1 are therefore a lower bound.
+func _prelevel(rc: RunController, mode: String) -> void:
+	var acts_cleared: int = _act - 1
+	if acts_cleared <= 0:
+		return
+	var pts: int = 3 * acts_cleared
+	var primary := {"greedy": &"str", "defensive": &"con", "turtle": &"con", "dex-turtle": &"dex"}
+	for cid in PARTY:
+		var stat: StringName = primary.get(mode, &"con")
+		if cid == &"mage" and stat == &"str":
+			stat = &"int"
+		var alloc: Dictionary = rc.run.allocated_stats.get(cid, {&"str": 0, &"dex": 0, &"con": 0, &"int": 0})
+		alloc[stat] = int(alloc.get(stat, 0)) + (pts * 2 / 3)
+		alloc[&"con"] = int(alloc.get(&"con", 0)) + (pts - pts * 2 / 3)
+		rc.run.allocated_stats[cid] = alloc
+		rc.run.party_hp[cid] = PartyStats.effective_max_hp(_db, rc.run, cid)
+
+
+## The act band an encounter id belongs to (§7): elite/boss by name, else trash.
+## Empty when running unscaled (act 0).
+func _band_for(enc_id: StringName) -> StringName:
+	if _act <= 0:
+		return &""
+	var s_id := String(enc_id)
+	if s_id.contains("elite"):
+		return &"elite"
+	if s_id.contains("boss"):
+		return &"boss"
+	return &"trash"
+
+
 func _run_cohort(mode: String, seeds: int) -> Dictionary:
 	var wins: int = 0
 	var cleared_total: int = 0
@@ -72,6 +139,9 @@ func _run_cohort(mode: String, seeds: int) -> Dictionary:
 	for s in range(seeds):
 		var rc := RunController.new(_db)
 		rc.start_run(PARTY, s, RACES)
+		if _act > 0:
+			rc.run.act = _act
+			_prelevel(rc, mode)
 		var policy: Callable
 		match mode:
 			"greedy":
@@ -82,8 +152,8 @@ func _run_cohort(mode: String, seeds: int) -> Dictionary:
 				policy = func(b: Variant, cp: Variant) -> void: _defensive_turn(b, cp)
 
 		var cleared: int = 0
-		for enc_id in ACT:
-			var outcome: int = rc.resolve_combat(enc_id, policy)
+		for enc_id in _act_ladder():
+			var outcome: int = rc.resolve_combat(enc_id, policy, 80, _band_for(enc_id))
 			if outcome != BattleState.Outcome.WIN:
 				deaths[enc_id] = int(deaths.get(enc_id, 0)) + 1
 				break
@@ -136,7 +206,7 @@ func _party_hp_sum(rc: RunController) -> int:
 ## living enemy. Never blocks.
 func _greedy_turn(battle: Variant, cp: Variant) -> void:
 	var guard: int = 0
-	while battle.energy > 0 and guard < 40:
+	while battle.total_energy() > 0 and guard < 40:
 		guard += 1
 		var enemies: Array[Combatant] = battle.living_enemies()
 		if enemies.is_empty():
@@ -150,7 +220,7 @@ func _greedy_turn(battle: Variant, cp: Variant) -> void:
 func _defensive_turn(battle: Variant, cp: Variant) -> void:
 	_play_one_defense(battle, cp)
 	var guard: int = 0
-	while battle.energy > 0 and guard < 40:
+	while battle.total_energy() > 0 and guard < 40:
 		guard += 1
 		var enemies: Array[Combatant] = battle.living_enemies()
 		if enemies.is_empty():
@@ -162,16 +232,14 @@ func _defensive_turn(battle: Variant, cp: Variant) -> void:
 ## Try one offensive play (a damage card, else innate Strike). Returns true if
 ## something was played (so the caller keeps spending).
 func _play_one_offense(battle: Variant, cp: Variant, target: Combatant) -> bool:
-	for card in battle.deck.hand.duplicate():
-		if card.energy_cost > battle.energy or not _is_offensive(card):
-			continue
-		var actor: Combatant = _actor_for_card(battle, card)
-		if actor != null and cp.play_card(actor, card, _resolve_tgt(card, actor, target)).ok:
-			return true
-	var strike: CardData = _db.get_card(&"strike")
+	# ADR-0026: each member plays from their OWN hand (Strike is a deck card now).
 	for actor in battle.living_players():
-		if strike != null and strike.energy_cost <= battle.energy:
-			if cp.play_innate(actor, strike, target).ok:
+		for card in battle.deck_of(actor).hand.duplicate():
+			if not _is_offensive(card):
+				continue
+			if card.energy_cost > battle.energy_of(actor):
+				continue
+			if cp.play_card(actor, card, _resolve_tgt(card, actor, target)).ok:
 				return true
 	return false
 
@@ -180,7 +248,7 @@ func _play_one_offense(battle: Variant, cp: Variant, target: Combatant) -> bool:
 ## out on purpose — the enemy Strength ramp should make this bleed.
 func _turtle_turn(battle: Variant, cp: Variant) -> void:
 	var guard: int = 0
-	while battle.energy > 1 and guard < 40:
+	while battle.total_energy() > 1 and guard < 40:
 		guard += 1
 		if not _play_one_defense(battle, cp):
 			break
@@ -192,16 +260,14 @@ func _turtle_turn(battle: Variant, cp: Variant) -> void:
 ## Play one block/defend (self) action if affordable: a block card from hand, else
 ## innate Defend. Returns true if something was played.
 func _play_one_defense(battle: Variant, cp: Variant) -> bool:
-	for card in battle.deck.hand.duplicate():
-		if card.energy_cost > battle.energy or not _is_defensive(card):
-			continue
-		var actor: Combatant = _actor_for_card(battle, card)
-		if actor != null and cp.play_card(actor, card, actor).ok:
-			return true
-	var defend: CardData = _db.get_card(&"defend")
+	# ADR-0026: Defend is a deck card; block comes from each member's own hand.
 	for actor in battle.living_players():
-		if defend != null and defend.energy_cost <= battle.energy:
-			if cp.play_innate(actor, defend, actor).ok:
+		for card in battle.deck_of(actor).hand.duplicate():
+			if not _is_defensive(card):
+				continue
+			if card.energy_cost > battle.energy_of(actor):
+				continue
+			if cp.play_card(actor, card, actor).ok:
 				return true
 	return false
 
@@ -257,8 +323,9 @@ func _print_report(cohorts: Array, seeds: int) -> void:
 	print("\n========================================================")
 	print("  ATTRITION READ — full loop (run decks + leveling + relics)")
 	print("========================================================")
-	print("Act: %d fights %s" % [ACT.size(), str(ACT)])
+	print("Ladder: %s" % str(_act_ladder()))
 	print("Party: Fighter(Orc) + Mage(Elf).  Relic after elite: %s.  Seeds: %d" % [ELITE_RELIC, seeds])
+	print("Act: %s" % ("UNSCALED (authored blocks)" if _act <= 0 else "%d (band-scaled via EnemyScaler, §7)" % _act))
 	print("--------------------------------------------------------")
 	print("%-11s %7s %12s %12s" % ["policy", "win%", "avgCleared", "avgFinalHP"])
 	for c in cohorts:

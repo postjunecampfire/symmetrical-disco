@@ -58,30 +58,59 @@ func build(
 	rng_seed: int = 0,
 	carried_hp: Dictionary = {},
 	party_races: Dictionary = {},
-	run_deck: Array[StringName] = [],
+	member_decks: Dictionary = {},
 	allocated_stats: Dictionary = {},
 	relics: Array[RelicData] = [],
-	enemy_level: int = 0
+	enemy_level: int = 0,
+	party_data: Array[CharacterData] = []
 ) -> EncounterBattle:
 	var config: BattleConfig = db.get_battle_config()
 	if config == null:
 		config = BattleConfig.new()
 
-	var party: Array[CharacterData] = _resolve_party(db, party_ids)
+	# ADR-0024/0021-pt2: the run layer passes SYNTHESIZED member sheets
+	# (PartyMember.character_for — race base + optional class overlay); legacy
+	# callers resolve ids straight from the class registry.
+	var party: Array[CharacterData] = party_data if not party_data.is_empty() else _resolve_party(db, party_ids)
 
-	var deck: Deck = Deck.new(config, rng_seed)
-	if run_deck.is_empty():
-		deck.assemble(party, db.cards)
-	else:
-		deck.assemble_from_card_ids(run_deck, db.cards)
-
+	# ADR-0026: each member fights with their OWN deck, derived from their active
+	# skill loadout (member_decks: member_id -> Array of card ids). When the run
+	# layer supplies no decks (legacy/standalone callers), each member's deck is
+	# derived on the spot from their starting kit so the battle is always playable.
 	var ai: EnemyAI = EnemyAI.new(rng_seed)
-	var battle: EncounterBattle = EncounterBattle.new(config, deck, db.statuses, ai)
+	var battle: EncounterBattle = EncounterBattle.new(config, Deck.new(config, rng_seed), db.statuses, ai)
 	battle.win_condition = encounter.win_condition
 	battle.win_param = encounter.win_param
 	battle.enemy_db = db.enemies  # lets summoners spawn minions mid-fight (P2·12 kit)
+	battle.card_lookup = db.cards  # token generation (add_card, ADR-0028)
 
 	_spawn_players(battle, party)
+	# Per-member decks (ADR-0026), seeded per fight and SHUFFLED at assembly
+	# (start_battle — the initial-shuffle fix: draws no longer come off authoring
+	# order). Seed is offset per member so the two hands differ.
+	var member_i: int = 0
+	for unit in battle.combatants:
+		if not unit.is_player():
+			continue
+		var data := unit.source_data as CharacterData
+		if data == null:
+			continue
+		var ids_v: Variant = member_decks.get(data.id)
+		var ids: Array[StringName] = []
+		if ids_v is Array:
+			for item: Variant in ids_v:
+				ids.append(StringName(String(item)))
+		if ids.is_empty():
+			# Fallback: derive from the class starting kit + auto-fill.
+			var kit: Array[StringName] = []
+			for card_id in data.starting_deck:
+				kit.append(card_id)
+			ids = SkillLoadout.derive_deck(kit, db)
+		var member_deck: Deck = Deck.new(config, rng_seed + member_i * 7919)
+		member_deck.assemble_from_card_ids(ids, db.cards)
+		member_deck.start_battle()
+		battle.decks[unit] = member_deck
+		member_i += 1
 	# Race modifiers (ADR-0015) apply on top of the base class before carried HP,
 	# so race CON raises max HP and carried HP then sets current HP correctly.
 	if not party_races.is_empty():

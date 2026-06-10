@@ -1,0 +1,9 @@
+{
+  "id": "cat",
+  "display_name": "Cat",
+  "strength": 1,
+  "dexterity": 6,
+  "constitution": 2,
+  "intelligence": 5,
+  "custom_card": "pounce"
+}

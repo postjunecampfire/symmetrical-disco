@@ -1,0 +1,11 @@
+{
+  "id": "enc_t6_legion",
+  "display_name": "Captain's Legion",
+  "enemies": [
+    "warband_captain",
+    "ogre",
+    "hobgoblin",
+    "hexer"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "spell_weave",
+  "display_name": "Spell Weave",
+  "description": "Add 2 Magic Missiles to your hand.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "add_card",
+      "params": {
+        "card_id": "magic_missile"
+      }
+    },
+    {
+      "type": "add_card",
+      "params": {
+        "card_id": "magic_missile"
+      }
+    }
+  ]
+}

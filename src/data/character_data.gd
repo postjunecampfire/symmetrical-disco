@@ -27,3 +27,6 @@ extends Resource
 @export var starting_deck: Array[StringName] = []
 @export var tags: Array[StringName] = []
 @export var sprite: Texture2D
+## Ascension (ADR-0022): a flat stat_mult STEP added to every card this member
+## plays (set on the synthesized member sheet at Act 15; 0 = not ascended).
+@export var ascension_mult: float = 0.0

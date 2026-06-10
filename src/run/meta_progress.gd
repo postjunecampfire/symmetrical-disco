@@ -50,7 +50,8 @@ func cash_out(boon_id: StringName) -> bool:
 
 
 ## Apply every banked boon to a freshly-started `run` (call right after start_run):
-##   relic -> run.relics; card -> run.run_deck; stat -> each member's allocated_stats
+##   relic -> run.relics; card -> the first member's skill collection (ADR-0026);
+##   stat -> each member's allocated_stats
 ##   (so it flows through the assembler / effective-HP); unlock -> no run effect yet.
 func apply_boons(run: RunState) -> void:
 	for boon_id in meta.boons:
@@ -63,7 +64,15 @@ func apply_boons(run: RunState) -> void:
 					run.relics.append(boon.target)
 			&"card":
 				if boon.target != &"":
-					run.run_deck.append(boon.target)
+					if not run.party.is_empty():
+						var first: StringName = run.party[0]
+						if not (run.skill_collections.get(first) is Array):
+							run.skill_collections[first] = []
+						if not (run.active_loadouts.get(first) is Array):
+							run.active_loadouts[first] = []
+						(run.skill_collections[first] as Array).append(boon.target)
+						if (run.active_loadouts[first] as Array).size() < 10:
+							(run.active_loadouts[first] as Array).append(boon.target)
 			&"stat":
 				for cid in run.party:
 					if not run.allocated_stats.has(cid):

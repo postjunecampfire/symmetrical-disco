@@ -58,7 +58,8 @@ func _make_run() -> RunState:
 	state.party = [&"knight", &"mage"] as Array[StringName]
 	state.party_hp = {&"knight": 28, &"mage": 15}
 	state.downed = [&"mage"] as Array[StringName]
-	state.run_deck = [&"strike", &"strike", &"shield_bash", &"frost_nova"] as Array[StringName]
+	state.skill_collections = {&"fighter": ["shield_bash", "frost_nova"], &"mage": ["arcane_bolt"]}
+	state.active_loadouts = {&"fighter": ["shield_bash"], &"mage": ["arcane_bolt"]}
 	state.relics = [&"lucky_coin"] as Array[StringName]
 	state.map = _make_map()
 	state.position = &"n_rest"
@@ -94,9 +95,9 @@ func test_save_and_load_round_trips_every_field() -> void:
 	assert_eq(loaded.party, [&"knight", &"mage"] as Array[StringName], "party round-trips")
 	assert_eq(loaded.downed, [&"mage"] as Array[StringName], "downed round-trips")
 	assert_eq(
-		loaded.run_deck,
-		[&"strike", &"strike", &"shield_bash", &"frost_nova"] as Array[StringName],
-		"run_deck round-trips (order + duplicates preserved)"
+		loaded.skill_collections.get(&"fighter", []),
+		[&"shield_bash", &"frost_nova"] as Array[StringName],
+		"skill collections round-trip per member (ADR-0026)"
 	)
 	assert_eq(loaded.relics, [&"lucky_coin"] as Array[StringName], "relics round-trips")
 	assert_eq(loaded.cleared, [&"n_start"] as Array[StringName], "cleared round-trips")
