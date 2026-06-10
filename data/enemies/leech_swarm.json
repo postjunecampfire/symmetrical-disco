@@ -1,0 +1,64 @@
+{
+  "id": "leech_swarm",
+  "display_name": "Leech Swarm",
+  "max_hp": 30,
+  "speed": 12,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "leech_latch",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 4
+        },
+        {
+          "type": "apply_status",
+          "status": "bleed",
+          "stacks": 2
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "leech_drain",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "bleed",
+          "stacks": 3
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "leech_scatter",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 5
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/leech_swarm.png"
+}

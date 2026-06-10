@@ -26,9 +26,12 @@ extends RefCounted
 ## Determinism: a single seeded RNG, advanced only on weighted picks, so a fixed
 ## seed reproduces an entire enemy phase.
 
-## Telegraph icons that mean "act on self" — block/buff/debuff intents target the
-## caster. Offensive icons (attack) home in on the lowest-HP player.
-const SELF_TELEGRAPHS: Array[StringName] = [&"block", &"buff", &"debuff"]
+## TargetSpec kinds that aim at the OPPOSING side. Offensiveness is decided by the
+## intent's TargetSpec — not its telegraph icon — so a `debuff` intent authored with
+## target_type "enemy" lands on a PLAYER (the icon is presentation, the spec is
+## semantics). Before the M3 tier pass the icon decided, which made every debuff
+## intent (hexer's Frail, the Warden's hex) target the CASTER — a self-jinx bug.
+const OFFENSIVE_TARGET_TYPES: Array[StringName] = [&"enemy", &"all_enemies", &"random_enemy"]
 
 
 ## A single enemy's pending decision: the intent it will perform and the primary
@@ -140,9 +143,12 @@ func get_telegraphed_intent(enemy: Combatant) -> IntentData:
 
 
 ## True if `enemy`'s telegraphed intent is offensive (targets a player) rather
-## than a self/buff intent.
+## than a self/buff intent. Read off the intent's TargetSpec: enemy-facing kinds
+## are offensive; self/ally/all_allies (and a missing spec) act on the caster.
 func _is_offensive(intent: IntentData) -> bool:
-	return intent != null and not SELF_TELEGRAPHS.has(intent.telegraph)
+	if intent == null or intent.target == null:
+		return false
+	return OFFENSIVE_TARGET_TYPES.has(intent.target.target_type)
 
 
 # ============================================================================

@@ -1,0 +1,10 @@
+{
+  "id": "enc_t2_hexes",
+  "display_name": "Imp and Hex",
+  "enemies": [
+    "hexer",
+    "dread_imp",
+    "ember_wisp"
+  ],
+  "win_condition": "defeat_all"
+}

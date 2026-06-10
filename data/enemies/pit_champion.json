@@ -1,0 +1,59 @@
+{
+  "id": "pit_champion",
+  "display_name": "Pit Champion",
+  "max_hp": 66,
+  "speed": 8,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "champion_cleave",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 11
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "champion_war_trance",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "enrage",
+          "stacks": 2
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "champion_guard",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 10
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/pit_champion.png"
+}

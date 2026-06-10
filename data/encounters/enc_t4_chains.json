@@ -1,0 +1,9 @@
+{
+  "id": "enc_t4_chains",
+  "display_name": "Chains and Whispers",
+  "enemies": [
+    "chain_warden",
+    "mind_leech"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "thorns",
+  "display_name": "Thorns",
+  "stacking": "intensity",
+  "decays_each_turn": false
+}

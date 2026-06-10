@@ -1,0 +1,9 @@
+{
+  "id": "enc_t5_brambles",
+  "display_name": "Bramble Hollow",
+  "enemies": [
+    "bramble_fiend",
+    "bramble_fiend"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "enc_t5_pit",
+  "display_name": "Pit Fighters",
+  "enemies": [
+    "pit_champion",
+    "blood_zealot"
+  ],
+  "win_condition": "defeat_all"
+}

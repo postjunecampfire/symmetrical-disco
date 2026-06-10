@@ -1,0 +1,9 @@
+{
+  "id": "enc_t1_beetles",
+  "display_name": "Under the Floor",
+  "enemies": [
+    "burrow_beetle",
+    "tunnel_rat"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,64 @@
+{
+  "id": "dread_imp",
+  "display_name": "Dread Imp",
+  "max_hp": 26,
+  "speed": 11,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "imp_claw",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 4
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "imp_misery",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "frail",
+          "stacks": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 1
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "imp_cackle",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 5
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/dread_imp.png"
+}

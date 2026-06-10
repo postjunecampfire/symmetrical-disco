@@ -52,5 +52,5 @@ The owner-anchored curve (Act 12 = 250). Tiers scale ~2.3–2.4× capstone-to-ca
 
 - The exact **level→enemy-stat** function (linear vs. mild-exponential HP/damage growth) — set during balancing in data.
 - Where **meta cash-out** should sit now that depth is 18 (currently `meta_cash_out_acts: 9`).
-- Whether tier gates also introduce **mechanical** modifiers (e.g. new statuses, act modifiers) on top of stat scaling — deferred.
-- **Act rosters** (which enemies per act/tier) — deferred to content authoring, out of scope for this ADR.
+- Whether tier gates also introduce **mechanical** modifiers (e.g. new statuses, act modifiers) on top of stat scaling — ~~deferred~~ **implemented (M3)**: each tier has a mechanical identity and its own boss kit — see [act-progression.md §4b](../systems/act-progression.md).
+- **Act rosters** (which enemies per act/tier) — ~~deferred~~ **implemented (M3)** via `tier_pools` in `data/acts/act_progression.json`.

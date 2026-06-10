@@ -1,0 +1,78 @@
+{
+  "id": "broodmother",
+  "display_name": "The Broodmother",
+  "max_hp": 150,
+  "speed": 8,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "brood_skitter_strike",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 12
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "brood_web",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "frail",
+          "stacks": 2
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "brood_devour",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 16
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "brood_chitin",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 12
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "broodling",
+  "summon_every": 3,
+  "summon_max": 4,
+  "sprite": "res://assets/sprites/enemies/broodmother.png"
+}

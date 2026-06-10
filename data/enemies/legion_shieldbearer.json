@@ -1,0 +1,63 @@
+{
+  "id": "legion_shieldbearer",
+  "display_name": "Legion Shieldbearer",
+  "max_hp": 70,
+  "speed": 6,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "shieldbearer_phalanx",
+      "telegraph": "block",
+      "target": {
+        "target_type": "all_allies"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 6
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "shieldbearer_slam",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 7
+        },
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 1
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "shieldbearer_bulwark",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 12
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/legion_shieldbearer.png"
+}

@@ -37,6 +37,9 @@ const EFFECT_TYPES: Array[StringName] = [
 	&"inflict_curse",          # shuffle curse `params.card_id` into the target PLAYER's discard; persists to the run after combat
 	&"cleanse",                # remove all stacks of each status in `params.statuses` from the target (antidote)
 	&"gain_gold",              # bank `amount` run gold (credited by finish_combat; lucky_coin)
+	# M3 per-tier enemy mechanics (ADR-0019 deferred tier modifiers):
+	&"pierce_damage",          # damage that IGNORES block (anti-turtle intents; authored raw, no stat fold)
+	&"revive_allies",          # raise the caster's dead allies to `amount` HP, once per source per battle
 ]
 
 ## ADR-0029: the card-kind discriminator values (`card_kind` on CardData).

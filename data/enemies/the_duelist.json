@@ -1,0 +1,102 @@
+{
+  "id": "the_duelist",
+  "display_name": "The Duelist",
+  "max_hp": 145,
+  "speed": 11,
+  "intent_pattern": "sequence",
+  "intents": [
+    {
+      "id": "duelist_en_garde",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 8
+        },
+        {
+          "type": "apply_status",
+          "status": "thorns",
+          "stacks": 5
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "duelist_riposte_stance",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "enrage",
+          "stacks": 2
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "duelist_quarry_mark",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "mark",
+          "stacks": 5
+        },
+        {
+          "type": "apply_status",
+          "status": "vulnerable",
+          "stacks": 1
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "duelist_lunge",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 14
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "duelist_twin_flurry",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 7
+        },
+        {
+          "type": "damage",
+          "amount": 7
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/the_duelist.png"
+}

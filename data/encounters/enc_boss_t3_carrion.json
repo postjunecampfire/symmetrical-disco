@@ -1,0 +1,10 @@
+{
+  "id": "enc_boss_t3_carrion",
+  "display_name": "The Carrion King",
+  "enemies": [
+    "carrion_king",
+    "leech_swarm",
+    "rot_priest"
+  ],
+  "win_condition": "defeat_all"
+}

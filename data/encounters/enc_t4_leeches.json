@@ -1,0 +1,9 @@
+{
+  "id": "enc_t4_leeches",
+  "display_name": "Thought Eaters",
+  "enemies": [
+    "mind_leech",
+    "mind_leech"
+  ],
+  "win_condition": "defeat_all"
+}

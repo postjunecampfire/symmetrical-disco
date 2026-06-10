@@ -1,0 +1,10 @@
+{
+  "id": "enc_t4_elite",
+  "display_name": "Warden of the Pit Graves",
+  "enemies": [
+    "gravecaller",
+    "chain_warden",
+    "bone_servant"
+  ],
+  "win_condition": "defeat_all"
+}

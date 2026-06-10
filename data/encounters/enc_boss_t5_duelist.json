@@ -1,0 +1,8 @@
+{
+  "id": "enc_boss_t5_duelist",
+  "display_name": "The Duelist",
+  "enemies": [
+    "the_duelist"
+  ],
+  "win_condition": "defeat_all"
+}

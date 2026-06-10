@@ -1,0 +1,10 @@
+{
+  "id": "enc_t4_gravecall",
+  "display_name": "The Gravecall",
+  "enemies": [
+    "gravecaller",
+    "bone_servant",
+    "bone_servant"
+  ],
+  "win_condition": "defeat_all"
+}

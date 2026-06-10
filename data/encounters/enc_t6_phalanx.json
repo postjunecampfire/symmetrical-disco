@@ -1,0 +1,11 @@
+{
+  "id": "enc_t6_phalanx",
+  "display_name": "The Unbroken Phalanx",
+  "enemies": [
+    "legion_shieldbearer",
+    "legion_shieldbearer",
+    "legion_bannerman",
+    "legion_blade"
+  ],
+  "win_condition": "defeat_all"
+}

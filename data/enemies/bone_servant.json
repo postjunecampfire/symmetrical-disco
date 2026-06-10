@@ -1,0 +1,44 @@
+{
+  "id": "bone_servant",
+  "display_name": "Bone Servant",
+  "max_hp": 12,
+  "speed": 8,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "servant_claw",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 4
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "servant_rattle",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 3
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/bone_servant.png"
+}

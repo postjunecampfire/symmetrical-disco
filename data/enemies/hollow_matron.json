@@ -1,0 +1,105 @@
+{
+  "id": "hollow_matron",
+  "display_name": "The Hollow Matron",
+  "max_hp": 140,
+  "speed": 9,
+  "intent_pattern": "sequence",
+  "intents": [
+    {
+      "id": "matron_veil",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 12
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "matron_lament",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "inflict_curse",
+          "params": {
+            "card_id": "doubt"
+          }
+        },
+        {
+          "type": "apply_status",
+          "status": "frail",
+          "stacks": 2
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "matron_ember_shroud",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 10
+        },
+        {
+          "type": "apply_status",
+          "status": "burn",
+          "stacks": 3
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "matron_grief",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "inflict_curse",
+          "params": {
+            "card_id": "burden"
+          }
+        },
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 2
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "matron_cold_embrace",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 15
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 1,
+  "ramp_every": 0,
+  "ramp_passive": true,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/hollow_matron.png"
+}

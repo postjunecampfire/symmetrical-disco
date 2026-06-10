@@ -1,0 +1,59 @@
+{
+  "id": "tunnel_rat",
+  "display_name": "Tunnel Rat",
+  "max_hp": 14,
+  "speed": 12,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "rat_bite",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 3
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "rat_nip",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 1
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "rat_scurry",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 3
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/tunnel_rat.png"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "enc_t2_chanters",
+  "display_name": "Funeral Procession",
+  "enemies": [
+    "grave_chanter",
+    "dread_imp"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -24,6 +24,18 @@ func deal_damage(_target: Variant, _amount: int) -> void:
 	push_error("BattleContext.deal_damage() not implemented")
 
 
+## Deal `amount` damage to `target` that IGNORES block — straight to HP
+## (effect.type == "pierce_damage", M3 tier mechanics: the anti-turtle intent).
+func deal_unblockable(_target: Variant, _amount: int) -> void:
+	push_error("BattleContext.deal_unblockable() not implemented")
+
+
+## Revive `source`'s DEAD allies to `amount` HP, once per source per battle
+## (effect.type == "revive_allies", M3 tier-6 legion mechanics).
+func revive_allies(_source: Variant, _amount: int) -> void:
+	push_error("BattleContext.revive_allies() not implemented")
+
+
 ## Grant `amount` block to `target`. (effect.type == "block")
 func add_block(_target: Variant, _amount: int) -> void:
 	push_error("BattleContext.add_block() not implemented")

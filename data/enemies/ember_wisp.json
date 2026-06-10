@@ -1,0 +1,64 @@
+{
+  "id": "ember_wisp",
+  "display_name": "Ember Wisp",
+  "max_hp": 18,
+  "speed": 12,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "wisp_flicker",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 3
+        },
+        {
+          "type": "apply_status",
+          "status": "burn",
+          "stacks": 1
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "wisp_ignite",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "burn",
+          "stacks": 3
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "wisp_fade",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 4
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/ember_wisp.png"
+}

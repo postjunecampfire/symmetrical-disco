@@ -42,6 +42,10 @@ const HANDLED_TYPES: Array[StringName] = [
 	&"inflict_curse",
 	&"cleanse",
 	&"gain_gold",
+	# M3 per-tier enemy mechanics (ADR-0019 deferred tier modifiers): the
+	# block-piercing attack and the legion resurrection.
+	&"pierce_damage",
+	&"revive_allies",
 ]
 
 
@@ -113,6 +117,15 @@ func resolve(effect: Effect, source: Variant, target: Variant, context: BattleCo
 		&"gain_gold":
 			# ADR-0029: found gold — banked on the context, credited post-combat.
 			context.add_gold(effect.amount)
+		&"pierce_damage":
+			# M3 tier mechanics: damage that IGNORES block (the anti-turtle attack
+			# — same routing as a poison tick, but as a telegraphed intent). No
+			# strength/stat fold: the pierce is authored raw, like self_damage.
+			context.deal_unblockable(target, effect.amount)
+		&"revive_allies":
+			# M3 tier-6 legion mechanics: raise the caster's dead allies to
+			# `amount` HP. Once per source per battle — the context owns the latch.
+			context.revive_allies(source, effect.amount)
 		_:
 			return ResolveResult.new(
 				"EffectResolver: unknown effect.type '%s'" % effect.type

@@ -437,5 +437,101 @@
       },
       "boss_payload": ""
     }
-  ]
+  ],
+  "tier_pools": {
+    "1": {
+      "combat": [
+        "enc_t1_rats",
+        "enc_t1_scouts",
+        "enc_t1_ooze",
+        "enc_t1_ambush",
+        "enc_t1_vermin",
+        "enc_t1_beetles"
+      ],
+      "elite": [
+        "enc_t1_elite"
+      ],
+      "boss": [
+        "enc_boss_01"
+      ]
+    },
+    "2": {
+      "combat": [
+        "enc_combat_02",
+        "enc_t2_warband",
+        "enc_t2_embers",
+        "enc_t2_chanters",
+        "enc_t2_hexes"
+      ],
+      "elite": [
+        "enc_t2_elite",
+        "enc_elite_01"
+      ],
+      "boss": [
+        "enc_boss_t2_matron"
+      ]
+    },
+    "3": {
+      "combat": [
+        "enc_t3_hunters",
+        "enc_t3_rot",
+        "enc_t3_leeches",
+        "enc_t3_siege",
+        "enc_combat_03"
+      ],
+      "elite": [
+        "enc_t3_pestilence",
+        "enc_t3_elite"
+      ],
+      "boss": [
+        "enc_boss_t3_carrion"
+      ]
+    },
+    "4": {
+      "combat": [
+        "enc_t4_brutes",
+        "enc_t4_marksmen",
+        "enc_t4_gravecall",
+        "enc_t4_leeches",
+        "enc_t4_chains"
+      ],
+      "elite": [
+        "enc_t4_elite",
+        "enc_elite_01"
+      ],
+      "boss": [
+        "enc_boss_t4_brood"
+      ]
+    },
+    "5": {
+      "combat": [
+        "enc_t5_ogres",
+        "enc_t5_brambles",
+        "enc_t5_pit",
+        "enc_t5_hunt"
+      ],
+      "elite": [
+        "enc_t5_arena",
+        "enc_t5_elite"
+      ],
+      "boss": [
+        "enc_boss_t5_duelist"
+      ]
+    },
+    "6": {
+      "combat": [
+        "enc_t6_court",
+        "enc_t6_legion",
+        "enc_t6_vanguard",
+        "enc_t6_heralds"
+      ],
+      "elite": [
+        "enc_t6_phalanx",
+        "enc_t6_court"
+      ],
+      "boss": [
+        "enc_boss_t6_legion"
+      ]
+    }
+  }
 }

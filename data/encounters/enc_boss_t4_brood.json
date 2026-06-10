@@ -1,0 +1,10 @@
+{
+  "id": "enc_boss_t4_brood",
+  "display_name": "The Broodmother",
+  "enemies": [
+    "broodmother",
+    "broodling",
+    "broodling"
+  ],
+  "win_condition": "defeat_all"
+}

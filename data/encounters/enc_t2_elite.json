@@ -1,0 +1,9 @@
+{
+  "id": "enc_t2_elite",
+  "display_name": "The Witch's Brazier",
+  "enemies": [
+    "coven_witch",
+    "cinder_acolyte"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,59 @@
+{
+  "id": "gravecaller",
+  "display_name": "Gravecaller",
+  "max_hp": 44,
+  "speed": 9,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "gravecaller_soul_bolt",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 7
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "gravecaller_chill",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "frail",
+          "stacks": 2
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "gravecaller_ward",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 8
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "bone_servant",
+  "summon_every": 3,
+  "summon_max": 2,
+  "sprite": "res://assets/sprites/enemies/gravecaller.png"
+}

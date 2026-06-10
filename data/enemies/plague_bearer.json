@@ -1,0 +1,59 @@
+{
+  "id": "plague_bearer",
+  "display_name": "Plague Bearer",
+  "max_hp": 48,
+  "speed": 7,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "bearer_strike",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 7
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "bearer_miasma",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "all_enemies"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "poison",
+          "stacks": 2
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "bearer_congeal",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 9
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 1,
+  "ramp_every": 4,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/plague_bearer.png"
+}

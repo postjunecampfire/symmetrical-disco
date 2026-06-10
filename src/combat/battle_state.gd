@@ -60,6 +60,20 @@ const CHARM_PROC_STACKS: int = 2
 const STATUS_BURN: StringName = &"burn"
 const STATUS_BLEED: StringName = &"bleed"
 const STATUS_MARK: StringName = &"mark"
+## M3 per-tier enemy mechanics (ADR-0019 deferred tier modifiers):
+##   Thorns — when an ATTACK (damage / charm_damage with a source) hits the
+##            holder, the attacker takes the holder's Thorns stacks as plain
+##            (blockable) damage. DoT ticks and source-less damage never sting.
+##   Enrage — whenever a DEBUFF lands on the holder, it gains Strength equal to
+##            its Enrage stacks. Punishes debuff-stacking the wrong target.
+const STATUS_THORNS: StringName = &"thorns"
+const STATUS_ENRAGE: StringName = &"enrage"
+## The statuses Enrage reads as "a debuff landed on me". Block/strength/thorns/
+## enrage are buffs; everything hostile in the registry is here.
+const DEBUFF_STATUSES: Array[StringName] = [
+	&"weak", &"vulnerable", &"frail", &"poison", &"burn", &"bleed", &"mark",
+	&"stun", &"charm",
+]
 
 ## Effect types that act globally on the acting side rather than on a target
 ## (so they are applied once per card/intent, not once per resolved target).
@@ -149,6 +163,11 @@ var cards_played_this_turn: int = 0
 ## once-per-combat below-half-HP trigger. Keyed by Combatant; never reset
 ## mid-fight (the trigger is "the FIRST time each combat").
 var _low_hp_fired: Dictionary = {}
+
+## revive_allies latch (M3 tier mechanics): sources that have already spent their
+## once-per-battle resurrection. Keyed by Combatant; a repeat cast is a no-op
+## (the boss wastes the turn — the player's reward for forcing the cycle).
+var _revives_done: Dictionary = {}
 
 
 ## `battle_config` is the injected world; `battle_deck` is the shared deck (a
@@ -328,6 +347,21 @@ func add_block(target: Variant, amount: int) -> void:
 	unit.set_status(STATUS_BLOCK, unit.block)
 
 
+## revive_allies (M3 tier mechanics): raise every DEAD unit on `source`'s team to
+## `amount` HP (clamped to max_hp), ONCE per source per battle. Dead units stay in
+## `combatants` (hp == 0, references valid), so revival is just restoring hp — the
+## unit re-enters living_on_team() naturally from the next query. The latch makes
+## a repeat cast a wasted action, never a loop.
+func revive_allies(source: Variant, amount: int) -> void:
+	var caster: Combatant = _resolve_unit(source)
+	if caster == null or amount <= 0 or _revives_done.has(caster):
+		return
+	_revives_done[caster] = true
+	for unit in combatants:
+		if unit.team == caster.team and not unit.is_alive():
+			unit.hp = clampi(amount, 1, unit.max_hp)
+
+
 ## Restore `amount` HP to `target`, clamped to max_hp. The dead are not healed.
 func heal(target: Variant, amount: int) -> void:
 	var unit: Combatant = _resolve_unit(target)
@@ -357,6 +391,11 @@ func apply_status(target: Variant, status_id: StringName, stacks: int) -> void:
 		_:
 			# duration / flag: refresh rather than sum.
 			unit.set_status(status_id, max(unit.status_stacks(status_id), stacks))
+	# Enrage (M3 tier mechanics): a debuff landing on an enraged unit feeds it
+	# Strength equal to its Enrage stacks. Added DIRECTLY (add_status_stacks, not
+	# apply_status) so the gain can never re-enter this hook.
+	if stacks > 0 and DEBUFF_STATUSES.has(status_id) and unit.has_status(STATUS_ENRAGE):
+		unit.add_status_stacks(STATUS_STRENGTH, unit.status_stacks(STATUS_ENRAGE))
 	# M3 on_status_applied relics: amplify a landed debuff. The hook adds its
 	# bonus via add_status_stacks directly (never back through apply_status), so
 	# amplification cannot re-trigger itself.
@@ -588,6 +627,23 @@ func deal_damage_from(attacker: Combatant, target: Combatant, amount: int) -> vo
 		dmg = int(floor(float(dmg) * VULNERABLE_MULT))
 	dmg = _mark_amplified(target, dmg)
 	deal_damage(target, dmg)
+	if dmg > 0:
+		_sting_thorns(attacker, target)
+
+
+## Thorns (M3 tier mechanics): after an ATTACK with a known source lands on a
+## bristling target, the attacker takes the target's Thorns stacks as plain
+## (blockable) damage. Source-less damage and DoT ticks route through bare
+## deal_damage / deal_unblockable and never sting; the thorns hit itself is bare
+## deal_damage, so two thorn-bearers cannot recurse. A dead target still stings
+## (the blow that killed it still landed on the bristles).
+func _sting_thorns(attacker: Combatant, target: Variant) -> void:
+	var unit: Combatant = _resolve_unit(target)
+	if unit == null or attacker == null or attacker == unit:
+		return
+	var stacks: int = unit.status_stacks(STATUS_THORNS)
+	if stacks > 0 and attacker.is_alive():
+		deal_damage(attacker, stacks)
 
 
 ## Mark (M3): a marked target takes +stacks FLAT damage on an attack hit, added
@@ -653,6 +709,9 @@ func apply_effects(source: Combatant, target: Variant, effects: Array, scale_wit
 				if e.type == &"damage" and source != null and source.is_player():
 					modified.amount += _combo_damage_bonus()
 				_resolver.resolve(modified, source, t, self)
+				# Thorns (M3): a landed attack stings its attacker back.
+				if modified.amount > 0:
+					_sting_thorns(source, t)
 			elif e.type == &"block":
 				var mb := e.duplicate() as Effect
 				mb.amount = modified_block(source, e.amount, scale_with_stats, e.stat_mult + mult_step)

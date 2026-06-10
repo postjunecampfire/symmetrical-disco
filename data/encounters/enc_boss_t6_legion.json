@@ -1,0 +1,11 @@
+{
+  "id": "enc_boss_t6_legion",
+  "display_name": "The Legion King",
+  "enemies": [
+    "legion_king",
+    "legion_shieldbearer",
+    "legion_bannerman",
+    "legion_blade"
+  ],
+  "win_condition": "defeat_all"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "enc_t3_pestilence",
+  "display_name": "Pestilence Choir",
+  "enemies": [
+    "rot_priest",
+    "plague_bearer",
+    "leech_swarm"
+  ],
+  "win_condition": "defeat_all"
+}

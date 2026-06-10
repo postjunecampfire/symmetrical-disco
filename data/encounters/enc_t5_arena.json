@@ -1,0 +1,10 @@
+{
+  "id": "enc_t5_arena",
+  "display_name": "Arena of Thorns",
+  "enemies": [
+    "pit_champion",
+    "huntmaster",
+    "bramble_fiend"
+  ],
+  "win_condition": "defeat_all"
+}

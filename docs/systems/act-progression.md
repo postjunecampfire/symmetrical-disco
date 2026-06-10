@@ -117,6 +117,39 @@ Within an act, enemies sit in a band keyed to the boss level. These bands are th
 
 ---
 
+## 4b. Tier mechanical identities (the ADR-0019 deferred tier modifiers)
+
+Stat scaling alone makes Acts 7–18 a stat-check treadmill, so each tier also has a
+**mechanical identity**: the enemy kits in its `tier_pools` lean on a distinct set of
+mechanics, escalating from "learn the basics" to "multi-enemy synergy". Every enemy
+still follows the Attack·Debuff·Defend kit convention (enemy_design_review.xlsx);
+the identity is *which* debuff/defend tools the tier's roster carries. Each tier
+also has its **own boss kit** — the Iron Warden is the Tier-1 boss only.
+
+| Tier | Acts | Identity | Signature mechanics | New roster | Boss (kit) |
+|:----:|:----:|----------|---------------------|------------|------------|
+| 1 | 1–3 | **Tutorial** | plain attack/debuff/block kits | tunnel_rat, burrow_beetle | **Iron Warden** — block/crush/hex/stun sequence, passive ramp |
+| 2 | 4–6 | **Debuff escalation** | curse infliction (`inflict_curse`), frail/weak stacking, first **burn** | ember_wisp, cinder_acolyte, dread_imp, grave_chanter | **The Hollow Matron** — curse-weaver: stacks doubt/burden + burn; post-fight curse-removal sink |
+| 3 | 7–9 | **Attrition** | bleed/poison stacking, ally **heals**, block-piercing attacks (`pierce_damage`) | leech_swarm, rot_priest, plague_bearer, wall_breaker | **The Carrion King** — DoT layering + self-heal + pierce; punishes turtling |
+| 4 | 10–12 | **Action economy** | mid-fight **summons**, hand disruption (wound curses), stun | bone_servant, gravecaller, mind_leech, chain_warden | **The Broodmother** — broodling waves (1 per 3 turns, max 4 — killable by single-target play) |
+| 5 | 13–15 | **Punish patterns** | **thorns** (retaliate), **enrage** (strength per debuff taken), mark | bramble_fiend, pit_champion, huntmaster, blood_zealot | **The Duelist** — thorns stance → enrage → mark → burst; a solo duel |
+| 6 | 16–18 | **Legion** | ally strength buffs, ally block (shield-bearers), AoE dread, combo casters | legion_bannerman, legion_shieldbearer, legion_blade, void_herald | **The Legion King** — buffs minions, shield walls, raises the fallen ONCE |
+
+Supporting engine vocabulary added for this pass: effect kinds `pierce_damage`
+(block-ignoring intent damage) and `revive_allies` (once-per-battle resurrection,
+latched per caster); statuses `thorns` (attacker takes stacks on hit) and `enrage`
+(holder gains Strength per debuff landed on it). **Energy drain was considered and
+skipped**: the enemy phase resolves after the player has spent, and pools refill at
+the next turn start, so a drain needs a player-side "reduced refill" hook — too
+invasive for this pass.
+
+Enemies are authored at the `enemy_scale_baseline_level` (8) stat band like the
+original roster; the EnemyScaler provides all depth scaling, and the scaler treats
+`pierce_damage` / `heal` / `revive_allies` amounts as magnitudes (scaled) while
+status stacks stay control (unscaled).
+
+---
+
 ## 5. Data contract — `ActProgression`
 
 The 18-act curve is authored content. Proposed shape (mirrors `MapGenConfig`; lives in `/data/acts/`):
@@ -151,4 +184,6 @@ This is additive to ADR-0012's flow — the per-act map generation and combat as
 
 **In scope (this doc):** the 18-act shape, the boss-level curve anchored at A12=250, per-act structure escalation, enemy level bands, the `ActProgression` data contract, and the act-advance flow.
 
-**Deferred:** the level→enemy-stat function (balancing); act **rosters** (content authoring); tier-gate *mechanical* modifiers beyond stat scaling; re-tuning `meta_cash_out_acts` for depth 18; intra-act intra-row level ramping curve (currently "rises toward the boss", exact shape TBD).
+**Deferred:** the level→enemy-stat function (balancing); re-tuning `meta_cash_out_acts` for depth 18; intra-act intra-row level ramping curve (currently "rises toward the boss", exact shape TBD); enemy-side energy drain (needs a player-side refill hook, see §4b).
+
+**Done since v1:** act rosters via `tier_pools` (M3); tier-gate *mechanical* modifiers — per-tier enemy mechanics + per-tier bosses (§4b, M3).

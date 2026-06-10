@@ -1,0 +1,59 @@
+{
+  "id": "bramble_fiend",
+  "display_name": "Bramble Fiend",
+  "max_hp": 58,
+  "speed": 7,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "bramble_thrash",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 9
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "bramble_bristle",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "thorns",
+          "stacks": 4
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "bramble_root_guard",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 9
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/bramble_fiend.png"
+}

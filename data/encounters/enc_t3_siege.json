@@ -1,0 +1,9 @@
+{
+  "id": "enc_t3_siege",
+  "display_name": "Wall Breakers",
+  "enemies": [
+    "wall_breaker",
+    "brute"
+  ],
+  "win_condition": "defeat_all"
+}

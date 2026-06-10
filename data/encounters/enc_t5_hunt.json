@@ -1,0 +1,9 @@
+{
+  "id": "enc_t5_hunt",
+  "display_name": "The Wild Hunt",
+  "enemies": [
+    "huntmaster",
+    "blood_zealot"
+  ],
+  "win_condition": "defeat_all"
+}

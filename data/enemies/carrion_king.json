@@ -1,0 +1,83 @@
+{
+  "id": "carrion_king",
+  "display_name": "The Carrion King",
+  "max_hp": 160,
+  "speed": 7,
+  "intent_pattern": "sequence",
+  "intents": [
+    {
+      "id": "carrion_feast",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "amount": 14
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "carrion_rotting_bite",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 12
+        },
+        {
+          "type": "apply_status",
+          "status": "poison",
+          "stacks": 3
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "carrion_sunder_rot",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "pierce_damage",
+          "amount": 9
+        },
+        {
+          "type": "apply_status",
+          "status": "bleed",
+          "stacks": 2
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "carrion_royal_miasma",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "all_enemies"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "poison",
+          "stacks": 3
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 1,
+  "ramp_every": 0,
+  "ramp_passive": true,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/carrion_king.png"
+}

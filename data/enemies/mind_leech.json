@@ -1,0 +1,75 @@
+{
+  "id": "mind_leech",
+  "display_name": "Mind Leech",
+  "max_hp": 36,
+  "speed": 10,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "mindleech_lash",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 6
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "mindleech_numb",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "inflict_curse",
+          "params": {
+            "card_id": "wound"
+          }
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "mindleech_stupor",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "stun",
+          "stacks": 1
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "mindleech_membrane",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 7
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/mind_leech.png"
+}

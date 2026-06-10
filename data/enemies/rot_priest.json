@@ -1,0 +1,78 @@
+{
+  "id": "rot_priest",
+  "display_name": "Rot Priest",
+  "max_hp": 45,
+  "speed": 9,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "priest_rot_touch",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 6
+        },
+        {
+          "type": "apply_status",
+          "status": "poison",
+          "stacks": 2
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "priest_mend_flesh",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "all_allies"
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "amount": 7
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "priest_blight",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "poison",
+          "stacks": 4
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "priest_ward",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 8
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 1,
+  "ramp_every": 4,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/rot_priest.png"
+}

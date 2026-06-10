@@ -1,0 +1,9 @@
+{
+  "id": "enc_t3_rot",
+  "display_name": "Rot Tenders",
+  "enemies": [
+    "rot_priest",
+    "plague_bearer"
+  ],
+  "win_condition": "defeat_all"
+}

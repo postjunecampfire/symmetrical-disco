@@ -1,0 +1,10 @@
+{
+  "id": "enc_t6_heralds",
+  "display_name": "Herald's Escort",
+  "enemies": [
+    "void_herald",
+    "legion_blade",
+    "legion_shieldbearer"
+  ],
+  "win_condition": "defeat_all"
+}

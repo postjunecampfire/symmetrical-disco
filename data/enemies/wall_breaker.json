@@ -1,0 +1,58 @@
+{
+  "id": "wall_breaker",
+  "display_name": "Wall Breaker",
+  "max_hp": 55,
+  "speed": 6,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "breaker_sunder",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "pierce_damage",
+          "amount": 7
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "breaker_crush",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 10
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "breaker_brace",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 9
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 1,
+  "ramp_every": 4,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/wall_breaker.png"
+}

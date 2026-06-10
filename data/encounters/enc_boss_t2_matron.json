@@ -1,0 +1,10 @@
+{
+  "id": "enc_boss_t2_matron",
+  "display_name": "The Hollow Matron",
+  "enemies": [
+    "hollow_matron",
+    "dread_imp",
+    "dread_imp"
+  ],
+  "win_condition": "defeat_all"
+}

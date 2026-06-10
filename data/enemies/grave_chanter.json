@@ -1,0 +1,80 @@
+{
+  "id": "grave_chanter",
+  "display_name": "Grave Chanter",
+  "max_hp": 38,
+  "speed": 9,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "chanter_dirge_bolt",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 5
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "chanter_funeral_dirge",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "inflict_curse",
+          "params": {
+            "card_id": "burden"
+          }
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "chanter_wail",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "weak",
+          "stacks": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "frail",
+          "stacks": 1
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "chanter_ward",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 8
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/grave_chanter.png"
+}

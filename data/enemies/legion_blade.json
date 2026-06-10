@@ -1,0 +1,64 @@
+{
+  "id": "legion_blade",
+  "display_name": "Legion Blade",
+  "max_hp": 60,
+  "speed": 10,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "legionblade_cut",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 11
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "legionblade_expose",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "vulnerable",
+          "stacks": 2
+        },
+        {
+          "type": "apply_status",
+          "status": "mark",
+          "stacks": 2
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "legionblade_parry",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 10
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 2,
+  "ramp_every": 4,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/legion_blade.png"
+}

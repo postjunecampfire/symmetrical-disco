@@ -1,0 +1,10 @@
+{
+  "id": "enc_t2_embers",
+  "display_name": "Cinder Circle",
+  "enemies": [
+    "cinder_acolyte",
+    "ember_wisp",
+    "ember_wisp"
+  ],
+  "win_condition": "defeat_all"
+}

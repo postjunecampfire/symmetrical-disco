@@ -1,0 +1,10 @@
+{
+  "id": "enc_t6_vanguard",
+  "display_name": "Legion Vanguard",
+  "enemies": [
+    "legion_blade",
+    "legion_shieldbearer",
+    "legion_bannerman"
+  ],
+  "win_condition": "defeat_all"
+}

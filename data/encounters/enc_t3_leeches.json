@@ -1,0 +1,10 @@
+{
+  "id": "enc_t3_leeches",
+  "display_name": "Bled Dry",
+  "enemies": [
+    "leech_swarm",
+    "leech_swarm",
+    "wall_breaker"
+  ],
+  "win_condition": "defeat_all"
+}

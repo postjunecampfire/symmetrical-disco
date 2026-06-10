@@ -1,0 +1,69 @@
+{
+  "id": "blood_zealot",
+  "display_name": "Blood Zealot",
+  "max_hp": 48,
+  "speed": 10,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "zealot_flay",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 8
+        },
+        {
+          "type": "apply_status",
+          "status": "bleed",
+          "stacks": 2
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "zealot_fervor",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "enrage",
+          "stacks": 1
+        },
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 1
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "zealot_ward",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 6
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/blood_zealot.png"
+}

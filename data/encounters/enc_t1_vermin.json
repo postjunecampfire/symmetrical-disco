@@ -1,0 +1,10 @@
+{
+  "id": "enc_t1_vermin",
+  "display_name": "Rat Pack",
+  "enemies": [
+    "tunnel_rat",
+    "tunnel_rat",
+    "tunnel_rat"
+  ],
+  "win_condition": "defeat_all"
+}

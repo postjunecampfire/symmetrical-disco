@@ -21,3 +21,7 @@ extends Resource
 @export var map: MapGenConfig
 ## Optional fixed boss encounter id; empty => chosen from a pool at resolve time.
 @export var boss_payload: StringName = &""
+## Per-act encounter roster (ADR-0019 content remainder): node_type ->
+## Array[StringName] of encounter ids, resolved from the act curve's per-TIER
+## pools at load. Empty => fall back to the global encounter_pool.json.
+@export var encounter_pool: Dictionary = {}

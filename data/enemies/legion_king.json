@@ -1,0 +1,73 @@
+{
+  "id": "legion_king",
+  "display_name": "The Legion King",
+  "max_hp": 170,
+  "speed": 8,
+  "intent_pattern": "sequence",
+  "intents": [
+    {
+      "id": "king_decree",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "all_allies"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 2
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "king_crownfall",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 16
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "king_raise_fallen",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "revive_allies",
+          "amount": 20
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "king_shield_wall",
+      "telegraph": "block",
+      "target": {
+        "target_type": "all_allies"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 10
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 1,
+  "ramp_every": 0,
+  "ramp_passive": true,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/legion_king.png"
+}

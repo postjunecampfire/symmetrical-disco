@@ -1,0 +1,59 @@
+{
+  "id": "legion_bannerman",
+  "display_name": "Legion Bannerman",
+  "max_hp": 50,
+  "speed": 9,
+  "intent_pattern": "random_weighted",
+  "intents": [
+    {
+      "id": "bannerman_rally",
+      "telegraph": "buff",
+      "target": {
+        "target_type": "all_allies"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "status": "strength",
+          "stacks": 2
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "bannerman_strike",
+      "telegraph": "attack",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 8
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "bannerman_guard",
+      "telegraph": "block",
+      "target": {
+        "target_type": "self"
+      },
+      "effects": [
+        {
+          "type": "block",
+          "amount": 8
+        }
+      ],
+      "weight": 1
+    }
+  ],
+  "ramp_amount": 0,
+  "ramp_every": 0,
+  "ramp_passive": false,
+  "summon_id": "",
+  "summon_every": 0,
+  "summon_max": 0,
+  "sprite": "res://assets/sprites/enemies/legion_bannerman.png"
+}

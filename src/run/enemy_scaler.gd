@@ -23,6 +23,12 @@ extends RefCounted
 
 const EFFECT_DAMAGE: StringName = &"damage"
 const EFFECT_BLOCK: StringName = &"block"
+## M3 tier mechanics: pierce/heal/revive are MAGNITUDES like damage/block (an
+## unscaled self-heal or pierce would vanish against deep-act HP pools), so they
+## ride the same factor. Status STACKS stay control and stay unscaled.
+const SCALED_EFFECT_TYPES: Array[StringName] = [
+	&"damage", &"block", &"pierce_damage", &"heal", &"revive_allies",
+]
 
 var _baseline_level: int = 1
 var _exponent: float = 1.0
@@ -71,7 +77,7 @@ func apply_to(enemy: EnemyData, level: int) -> EnemyData:
 			if e == null:
 				continue
 			var ec := e.duplicate() as Effect
-			if ec.type == EFFECT_DAMAGE or ec.type == EFFECT_BLOCK:
+			if SCALED_EFFECT_TYPES.has(ec.type):
 				ec.amount = maxi(0, int(round(float(ec.amount) * f)))
 			new_effects.append(ec)
 		ic.effects = new_effects
