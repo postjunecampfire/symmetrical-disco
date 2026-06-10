@@ -8,6 +8,7 @@
     "exhaust"
   ],
   "rarity": "rare",
+  "signature": true,
   "target": {
     "target_type": "all_enemies"
   },

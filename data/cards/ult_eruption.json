@@ -1,0 +1,22 @@
+{
+  "id": "ult_eruption",
+  "display_name": "Eruption",
+  "description": "ULT \u2014 massive single-target nuke. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6,
+      "stat_mult": 3.0
+    }
+  ]
+}

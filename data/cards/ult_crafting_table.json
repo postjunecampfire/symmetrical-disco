@@ -1,0 +1,25 @@
+{
+  "id": "ult_crafting_table",
+  "display_name": "Crafting Table",
+  "description": "ULT \u2014 Draw 3 cards and gain 2 Energy. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 3
+    },
+    {
+      "type": "gain_energy",
+      "amount": 2
+    }
+  ]
+}

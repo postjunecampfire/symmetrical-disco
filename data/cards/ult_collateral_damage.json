@@ -1,0 +1,22 @@
+{
+  "id": "ult_collateral_damage",
+  "display_name": "Collateral Damage",
+  "description": "ULT \u2014 Deal 7 damage to ALL enemies at high stat scaling. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 7,
+      "stat_mult": 1.5
+    }
+  ]
+}

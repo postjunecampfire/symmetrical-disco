@@ -14,6 +14,13 @@ extends Resource
 @export var effects: Array[Effect] = []
 @export var art: Texture2D
 @export var upgrade_of: StringName = &""
+## ADR-0020 crossover gate (M3 pool hygiene): earliest act this card may appear
+## in draft/shop offers (CardReward.eligible_pool). 0 = no gate. Authored on
+## big-multiplier cards (stat_mult >= 2.0) so they cannot be drafted before the
+## tier where the player's stat makes them better than flat cards; rarity alone
+## was not enough (rares weigh in from tier 2). Direct grants (signatures,
+## ults, events) bypass it.
+@export var min_act: int = 0
 ## Tree-signature skill (M3): granted only by a progression-node pick
 ## (`unlock_cards` on a data/progression node). Signature cards are EXCLUDED
 ## from the draft/shop pools (CardReward.eligible_pool), like _plus variants.

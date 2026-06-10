@@ -50,6 +50,14 @@ extends Resource
 ## Treasure-node gold pile bounds (ADR-0023).
 @export var treasure_gold_min: int = 25
 @export var treasure_gold_max: int = 60
+## Elite/treasure relic-roll rarity weights (M3 pool hygiene): a roll first
+## picks a rarity bucket by these weights (among buckets with un-owned relics
+## left), then uniform within the bucket — commons land first, rares stay
+## prizes. The shop shelf stays a uniform pick; it already prices by rarity.
+## Boss rarity never reaches these rolls (Sponsor Box only, ADR-0028).
+@export var relic_weight_common: int = 50
+@export var relic_weight_uncommon: int = 35
+@export var relic_weight_rare: int = 15
 @export var max_hand: int = 10
 @export var reshuffle_discard: bool = true
 ## HP granted per point of CON (ADR-0014: CON -> max HP). A character's max_hp is

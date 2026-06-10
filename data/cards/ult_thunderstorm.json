@@ -1,0 +1,22 @@
+{
+  "id": "ult_thunderstorm",
+  "display_name": "Thunderstorm",
+  "description": "ULT \u2014 chain lightning. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 1.5
+    }
+  ]
+}

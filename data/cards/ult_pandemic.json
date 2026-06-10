@@ -1,0 +1,22 @@
+{
+  "id": "ult_pandemic",
+  "display_name": "Pandemic",
+  "description": "ULT \u2014 max poison all, ignores block. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 8
+    }
+  ]
+}

@@ -627,6 +627,12 @@ func _parse_card(d: Dictionary, source: String) -> Dictionary:
 	c.effects = _parse_effects(d.get("effects"), source, "card '%s'" % c.id)
 	c.upgrade_of = _sn(d.get("upgrade_of"), &"")
 	c.signature = _bool(d.get("signature"), false)
+	# ADR-0020 crossover gate (M3 pool hygiene): earliest draftable act.
+	c.min_act = _int(d.get("min_act"), 0)
+	if c.min_act < 0:
+		_result.add_error(
+			"card '%s' in %s has a negative min_act (%d)" % [c.id, source, c.min_act]
+		)
 	# ADR-0029: injected-layer discriminator + curse when-drawn downside.
 	c.card_kind = _sn(d.get("card_kind"), &"skill")
 	if not CARD_KINDS.has(c.card_kind):
@@ -795,6 +801,9 @@ func _load_battle_config(path: String) -> void:
 	bc.shop_act_scale = _float(d.get("shop_act_scale"), 0.15)
 	bc.treasure_gold_min = _int(d.get("treasure_gold_min"), 25)
 	bc.treasure_gold_max = _int(d.get("treasure_gold_max"), 60)
+	bc.relic_weight_common = _int(d.get("relic_weight_common"), 50)
+	bc.relic_weight_uncommon = _int(d.get("relic_weight_uncommon"), 35)
+	bc.relic_weight_rare = _int(d.get("relic_weight_rare"), 15)
 	bc.max_hand = _int(d.get("max_hand"), 10)
 	bc.reshuffle_discard = _bool(d.get("reshuffle_discard"), true)
 	bc.hp_per_con = _int(d.get("hp_per_con"), 2)

@@ -1,0 +1,26 @@
+{
+  "id": "ult_banner_of_war",
+  "display_name": "Banner of War",
+  "description": "ULT \u2014 party-wide Strength + block. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 8
+    },
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 3
+    }
+  ]
+}

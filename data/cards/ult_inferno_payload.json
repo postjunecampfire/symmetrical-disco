@@ -1,0 +1,27 @@
+{
+  "id": "ult_inferno_payload",
+  "display_name": "Inferno Payload",
+  "description": "ULT \u2014 Deal 5 damage and apply 2 Vulnerable to ALL enemies. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 5,
+      "stat_mult": 1.0
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ]
+}

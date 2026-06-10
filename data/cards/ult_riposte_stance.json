@@ -1,0 +1,27 @@
+{
+  "id": "ult_riposte_stance",
+  "display_name": "Riposte Stance",
+  "description": "ULT \u2014 counter stance. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 6,
+      "stat_mult": 2.0
+    },
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 2
+    }
+  ]
+}

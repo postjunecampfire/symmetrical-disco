@@ -1,0 +1,32 @@
+{
+  "id": "ult_missile_storm",
+  "display_name": "Missile Storm",
+  "description": "ULT \u2014 Deal 3 damage three times to ALL enemies. Exhaust. (Upgraded by Ascension.) Hits ALL, at reduced stat scaling.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    }
+  ]
+}

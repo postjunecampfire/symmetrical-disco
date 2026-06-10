@@ -1,0 +1,23 @@
+{
+  "id": "demolition_charge",
+  "display_name": "Demolition Charge",
+  "description": "Deal 8 damage to ALL enemies. Take 3 damage (your Block absorbs it). Hits ALL, at reduced stat scaling.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 8,
+      "stat_mult": 0.6
+    },
+    {
+      "type": "self_damage",
+      "amount": 3
+    }
+  ]
+}

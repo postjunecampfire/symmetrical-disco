@@ -1,0 +1,27 @@
+{
+  "id": "ult_death_mark",
+  "display_name": "Death Mark",
+  "description": "ULT \u2014 execute strike. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 2.5
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    }
+  ]
+}

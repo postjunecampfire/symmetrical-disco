@@ -1,0 +1,27 @@
+{
+  "id": "ult_doom",
+  "display_name": "Doom",
+  "description": "ULT \u2014 escalating curse damage. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "poison",
+      "stacks": 10
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 3
+    }
+  ]
+}

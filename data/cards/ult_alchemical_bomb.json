@@ -1,0 +1,27 @@
+{
+  "id": "ult_alchemical_bomb",
+  "display_name": "Alchemical Bomb",
+  "description": "ULT \u2014 AoE Vulnerable + Frail. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "frail",
+      "stacks": 2
+    }
+  ]
+}

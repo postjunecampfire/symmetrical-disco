@@ -665,9 +665,9 @@ func grant_relic(relic_id: StringName, source: String = "") -> bool:
 
 ## Relic ids the run does not yet own (acquisition candidates), sorted for
 ## deterministic selection by a caller. BOSS-rarity relics are excluded — they
-## arrive only via the Sponsor Box at an act boss (ADR-0028), the one rarity
-## gate the relic economy has (M3; elite/shop/treasure rolls are otherwise a
-## uniform pick over the un-owned pool).
+## arrive only via the Sponsor Box at an act boss (ADR-0028). Elite/treasure
+## rolls over this pool go through roll_relic (rarity-weighted, M3 pool
+## hygiene); the shop shelf stays a uniform pick — it already prices by rarity.
 func available_relics() -> Array[StringName]:
 	var out: Array[StringName] = []
 	for key: Variant in db.relics.keys():
@@ -680,6 +680,14 @@ func available_relics() -> Array[StringName]:
 		out.append(rid)
 	out.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
 	return out
+
+
+## One rarity-weighted relic roll over the un-owned pool (M3 pool hygiene:
+## common 50 / uncommon 35 / rare 15 via BattleConfig relic_weight_*). The
+## elite-reward pick the UI reads; deterministic for a given rng state.
+## Returns &"" when every relic is owned.
+func roll_relic(rng: RandomNumberGenerator) -> StringName:
+	return Shop.weighted_relic_pick(db, available_relics(), rng)
 
 
 # --- Rest nodes (run-structure.md §5 / P2·07) -------------------------------

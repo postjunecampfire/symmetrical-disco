@@ -1,11 +1,12 @@
 {
   "id": "sage_insight",
   "display_name": "Insight",
-  "description": "",
+  "description": "Draw 2 cards and gain 1 Energy.",
   "character_tag": "mage",
   "energy_cost": 1,
   "keywords": [],
   "rarity": "rare",
+  "signature": true,
   "target": {
     "target_type": "self"
   },

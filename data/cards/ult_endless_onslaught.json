@@ -1,0 +1,22 @@
+{
+  "id": "ult_endless_onslaught",
+  "display_name": "Endless Onslaught",
+  "description": "ULT \u2014 hit all enemies. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 1.5
+    }
+  ]
+}

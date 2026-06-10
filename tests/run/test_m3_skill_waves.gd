@@ -138,6 +138,127 @@ func test_signature_cards_excluded_from_draft_pool() -> void:
 	assert_does_not_have(ids, &"sig_brigand", "tree signature is NOT draftable")
 
 
+# --- Pool hygiene invariants (M3 rarity audit, 2026-06-10) -------------------
+
+## Mirrors CardReward.eligible_pool's draftability shape (any party/act).
+func _is_draft_shaped(card: CardData) -> bool:
+	return (
+		card.upgrade_of == &"" and not card.signature and not card.innate
+		and card.card_kind == &"skill"
+	)
+
+
+func _max_stat_mult(card: CardData) -> float:
+	var out: float = 1.0
+	for e: Effect in card.effects:
+		out = maxf(out, e.stat_mult)
+	return out
+
+
+func test_no_draftable_high_multiplier_below_rare_or_ungated() -> void:
+	# ADR-0020 crossover gating: every draftable stat_mult >= 2.0 card must be
+	# rare AND carry a min_act at/after its crossover tier (2.0 -> act 7 / T3,
+	# 2.5 -> act 10 / T4, 3.0+ -> act 13 / T5). Rarity alone was NOT sufficient:
+	# rares weigh in from tier 2 (weights_for_act), two tiers early.
+	for key: Variant in _db.cards:
+		var card: CardData = _db.cards[key]
+		if not _is_draft_shaped(card):
+			continue
+		var mult: float = _max_stat_mult(card)
+		if mult < 2.0:
+			continue
+		assert_eq(card.rarity, &"rare", "'%s' (x%s) must be rare" % [card.id, mult])
+		var need: int = 7
+		if mult >= 3.0:
+			need = 13
+		elif mult >= 2.5:
+			need = 10
+		assert_gte(
+			card.min_act, need,
+			"'%s' (x%s) needs min_act >= %d (ADR-0020 crossover)" % [card.id, mult, need]
+		)
+
+
+func test_every_class_line_has_at_least_five_draftable_commons() -> void:
+	# Commons are the 3-copy backbone of derived decks (ADR-0026) and the only
+	# rarity tier-1 drafts offer (weights_for_act) — a line below 5 starves.
+	var lines: Array[StringName] = LINES.duplicate()
+	lines.append(&"neutral")
+	for line in lines:
+		var commons: int = 0
+		for key: Variant in _db.cards:
+			var card: CardData = _db.cards[key]
+			if _is_draft_shaped(card) and card.character_tag == line \
+					and card.rarity == &"common":
+				commons += 1
+		assert_gte(commons, 5, "line '%s' has >= 5 draftable commons" % line)
+
+
+func test_ults_and_promotion_signatures_are_not_draftable() -> void:
+	# Capstone ULTs arrive only via Ascension (ADR-0022) and promotion
+	# signatures only via take_promotion — both leaked into draft pools until
+	# the 2026-06-10 audit flagged them signature.
+	for key: Variant in _db.cards:
+		var card: CardData = _db.cards[key]
+		if String(card.id).begins_with("ult_"):
+			assert_true(card.signature, "ULT '%s' is signature-flagged" % card.id)
+	for pid: Variant in _db.promotions:
+		var promo: PromotionData = _db.promotions[pid]
+		if promo.signature_card == &"":
+			continue
+		var card: CardData = _db.get_card(promo.signature_card)
+		assert_not_null(card, "promotion signature '%s' resolves" % promo.signature_card)
+		if card != null:
+			assert_true(
+				card.signature,
+				"promotion signature '%s' is signature-flagged" % card.id
+			)
+
+
+func test_full_party_draft_pool_contains_only_clean_skills() -> void:
+	# The eligible pool for a party spanning every class line, at the deepest
+	# act: never a signature/curse/consumable/innate/_plus/ungated-multiplier.
+	var run := RunState.new()
+	run.seed = 7
+	run.act = 18
+	run.party = [&"h1", &"h2", &"h3", &"h4", &"h5"] as Array[StringName]
+	run.member_classes = {
+		&"h1": &"fighter", &"h2": &"rogue", &"h3": &"mage",
+		&"h4": &"brawler", &"h5": &"charmer",
+	}
+	var pool: Array[CardData] = CardReward.new(_db).eligible_pool(run)
+	assert_gt(pool.size(), 50, "the full-party act-18 pool is broad")
+	for card in pool:
+		assert_eq(card.card_kind, &"skill", "'%s' is a skill" % card.id)
+		assert_false(card.signature, "'%s' is not signature" % card.id)
+		assert_false(card.innate, "'%s' is not innate" % card.id)
+		assert_eq(card.upgrade_of, &"", "'%s' is not an upgrade variant" % card.id)
+
+
+func test_high_multiplier_rares_absent_from_early_acts() -> void:
+	# Real-data spot check of the min_act gate: a x2.5 rare is not in a tier-2
+	# (act 4) pool but is in a tier-4 (act 10) pool for the same party.
+	var run := RunState.new()
+	run.seed = 7
+	run.party = [&"h1"] as Array[StringName]
+	run.member_classes = {&"h1": &"fighter"}
+	var reward := CardReward.new(_db)
+
+	run.act = 4
+	var early: Array[StringName] = []
+	for card in reward.eligible_pool(run):
+		early.append(card.id)
+	assert_does_not_have(early, &"executioners_swing", "x2.5 rare gated out of act 4")
+	assert_does_not_have(early, &"crimson_harvest", "x2.0 rare gated out of act 4")
+
+	run.act = 10
+	var late: Array[StringName] = []
+	for card in reward.eligible_pool(run):
+		late.append(card.id)
+	assert_has(late, &"executioners_swing", "x2.5 rare draftable from act 10")
+	assert_has(late, &"crimson_harvest", "x2.0 rare draftable from act 7 on")
+
+
 func test_unlock_cards_granted_on_node_pick() -> void:
 	var rc: RunController = RunControllerScript.new(_db)
 	rc.start_run([&"hero_1"] as Array[StringName], 5, {&"hero_1": &"orc"})

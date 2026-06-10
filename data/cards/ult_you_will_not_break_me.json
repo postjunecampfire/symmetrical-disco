@@ -1,0 +1,26 @@
+{
+  "id": "ult_you_will_not_break_me",
+  "display_name": "You Will Not Break Me",
+  "description": "ULT \u2014 Gain 18 Block and 3 Strength. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 18
+    },
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 3
+    }
+  ]
+}

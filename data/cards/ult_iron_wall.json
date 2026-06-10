@@ -1,0 +1,22 @@
+{
+  "id": "ult_iron_wall",
+  "display_name": "Iron Wall",
+  "description": "ULT \u2014 team gains big block. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4,
+      "stat_mult": 2.0
+    }
+  ]
+}

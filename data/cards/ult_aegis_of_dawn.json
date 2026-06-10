@@ -1,0 +1,25 @@
+{
+  "id": "ult_aegis_of_dawn",
+  "display_name": "Aegis of Dawn",
+  "description": "ULT \u2014 party heal + block. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_allies"
+  },
+  "effects": [
+    {
+      "type": "heal",
+      "amount": 10
+    },
+    {
+      "type": "block",
+      "amount": 8
+    }
+  ]
+}

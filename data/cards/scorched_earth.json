@@ -1,0 +1,25 @@
+{
+  "id": "scorched_earth",
+  "display_name": "Scorched Earth",
+  "description": "Deal 13 damage to ALL enemies. Take 4 damage (your Block absorbs it). Exhaust. Hits ALL, at reduced stat scaling.",
+  "character_tag": "brawler",
+  "energy_cost": 3,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 13,
+      "stat_mult": 0.7
+    },
+    {
+      "type": "self_damage",
+      "amount": 4
+    }
+  ]
+}

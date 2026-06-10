@@ -1,0 +1,26 @@
+{
+  "id": "ult_soul_harvest",
+  "display_name": "Soul Harvest",
+  "description": "ULT \u2014 drain all, refund energy. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 2,
+      "stat_mult": 1.0
+    },
+    {
+      "type": "gain_energy",
+      "amount": 2
+    }
+  ]
+}

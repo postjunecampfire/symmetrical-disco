@@ -1,20 +1,22 @@
 {
   "id": "pyromancer_firestorm",
   "display_name": "Firestorm",
-  "description": "",
+  "description": "Deal 8 damage to ALL enemies. Exhaust. Hits ALL, at reduced stat scaling.",
   "character_tag": "mage",
   "energy_cost": 2,
   "keywords": [
     "exhaust"
   ],
   "rarity": "rare",
+  "signature": true,
   "target": {
     "target_type": "all_enemies"
   },
   "effects": [
     {
       "type": "damage",
-      "amount": 8
+      "amount": 8,
+      "stat_mult": 0.6
     }
   ]
 }

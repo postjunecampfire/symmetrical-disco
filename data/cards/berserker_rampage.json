@@ -1,13 +1,14 @@
 {
   "id": "berserker_rampage",
   "display_name": "Rampage",
-  "description": "",
+  "description": "Deal 16 damage. Exhaust.",
   "character_tag": "fighter",
   "energy_cost": 2,
   "keywords": [
     "exhaust"
   ],
   "rarity": "rare",
+  "signature": true,
   "target": {
     "target_type": "enemy"
   },

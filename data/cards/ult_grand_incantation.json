@@ -1,0 +1,27 @@
+{
+  "id": "ult_grand_incantation",
+  "display_name": "Grand Incantation Prime",
+  "description": "ULT \u2014 Deal 4 damage and apply 4 Charm to ALL enemies. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 1.0
+    },
+    {
+      "type": "apply_status",
+      "status": "charm",
+      "stacks": 4
+    }
+  ]
+}

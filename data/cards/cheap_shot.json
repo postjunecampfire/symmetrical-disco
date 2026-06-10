@@ -1,0 +1,23 @@
+{
+  "id": "cheap_shot",
+  "display_name": "Cheap Shot",
+  "description": "Deal 3 damage and apply 1 Vulnerable.",
+  "character_tag": "brawler",
+  "energy_cost": 0,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 1
+    }
+  ]
+}

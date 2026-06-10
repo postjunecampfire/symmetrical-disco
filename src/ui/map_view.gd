@@ -501,15 +501,14 @@ func _boss_preview_name() -> String:
 	return ""
 
 
-## Award a not-yet-owned relic (deterministic pick) and tell the player. No-op if
-## every relic is already owned.
+## Award a not-yet-owned relic (deterministic, rarity-weighted pick — M3 pool
+## hygiene) and tell the player. No-op if every relic is already owned.
 func _grant_relic(source: String) -> void:
-	var pool: Array[StringName] = _controller.available_relics()
-	if pool.is_empty():
-		return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = run_seed ^ hash(_controller.run.cleared.size())
-	var rid: StringName = pool[rng.randi_range(0, pool.size() - 1)]
+	var rid: StringName = _controller.roll_relic(rng)
+	if rid == &"":
+		return
 	if _controller.grant_relic(rid, source):
 		var relic: RelicData = _db.get_relic(rid)
 		_status_label.text = "Relic acquired: %s — %s" % [relic.display_name, relic.description]
@@ -551,14 +550,14 @@ func _show_rewards_popup(node: MapNode) -> void:
 	if node.node_type == &"elite":
 		var relic_btn := Button.new()
 		relic_btn.custom_minimum_size = Vector2(360, 44)
-		var pool: Array[StringName] = _controller.available_relics()
-		if pool.is_empty():
+		# M3 pool hygiene: elite relic rolls are rarity-weighted, not uniform.
+		var rng := RandomNumberGenerator.new()
+		rng.seed = run_seed ^ hash(_controller.run.cleared.size())
+		var rid: StringName = _controller.roll_relic(rng)
+		if rid == &"":
 			relic_btn.text = "Relic (none left)"
 			relic_btn.disabled = true
 		else:
-			var rng := RandomNumberGenerator.new()
-			rng.seed = run_seed ^ hash(_controller.run.cleared.size())
-			var rid: StringName = pool[rng.randi_range(0, pool.size() - 1)]
 			var relic: RelicData = _db.get_relic(rid)
 			relic_btn.text = "Relic: %s" % (relic.display_name if relic != null else String(rid))
 			var relic_icon: Texture2D = UiAssets.relic_icon(rid)

@@ -1,11 +1,12 @@
 {
   "id": "duelist_riposte",
   "display_name": "Riposte",
-  "description": "",
+  "description": "Deal 8 damage and apply 2 Weak.",
   "character_tag": "rogue",
   "energy_cost": 1,
   "keywords": [],
   "rarity": "rare",
+  "signature": true,
   "target": {
     "target_type": "enemy"
   },

@@ -1,0 +1,26 @@
+{
+  "id": "ult_smoke_mirrors",
+  "display_name": "Smoke & Mirrors",
+  "description": "ULT \u2014 full evasion. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 8,
+      "stat_mult": 2.5
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

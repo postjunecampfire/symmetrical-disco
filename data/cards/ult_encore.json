@@ -1,0 +1,25 @@
+{
+  "id": "ult_encore",
+  "display_name": "Encore",
+  "description": "ULT \u2014 gain 3 Energy and draw 3 cards. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "gain_energy",
+      "amount": 3
+    },
+    {
+      "type": "draw",
+      "amount": 3
+    }
+  ]
+}

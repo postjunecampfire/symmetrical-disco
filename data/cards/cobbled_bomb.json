@@ -1,0 +1,23 @@
+{
+  "id": "cobbled_bomb",
+  "display_name": "Cobbled Bomb",
+  "description": "Deal 4 damage to ALL enemies. Take 3 damage (your Block absorbs it). Hits ALL, at reduced stat scaling.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 4,
+      "stat_mult": 0.6
+    },
+    {
+      "type": "self_damage",
+      "amount": 3
+    }
+  ]
+}

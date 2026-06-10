@@ -1,0 +1,29 @@
+{
+  "id": "xistera",
+  "display_name": "Xistera",
+  "description": "Deal 3 damage three times. At reduced stat scaling.",
+  "character_tag": "brawler",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.4
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.4
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.4
+    }
+  ]
+}

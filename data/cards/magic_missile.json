@@ -1,0 +1,21 @@
+{
+  "id": "magic_missile",
+  "display_name": "Magic Missile",
+  "description": "Deal 3 damage. Exhaust. At reduced stat scaling.",
+  "character_tag": "charmer",
+  "energy_cost": 0,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    }
+  ]
+}

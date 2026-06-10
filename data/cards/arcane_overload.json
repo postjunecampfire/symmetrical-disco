@@ -1,0 +1,22 @@
+{
+  "id": "arcane_overload",
+  "display_name": "Arcane Overload",
+  "description": "Deal 250% INT damage to one target. Exhaust.",
+  "character_tag": "mage",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "min_act": 10,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 0,
+      "stat_mult": 2.5
+    }
+  ]
+}

@@ -29,6 +29,53 @@ func _init(db: ContentDatabase) -> void:
 	_db = db
 
 
+## Rarity-weighted relic roll (M3 pool hygiene): pick a rarity bucket by the
+## BattleConfig relic_weight_* knobs (only buckets that still have un-owned
+## relics count), then uniform within the bucket. Replaces the uniform pick on
+## elite/treasure rolls — with a rare-heavy relic spread a uniform roll handed
+## out rares as often as commons. Deterministic for a given rng state; falls
+## back to a uniform pick if every represented rarity weighs 0 (a roll never
+## stalls). The shop SHELF stays a uniform pick: it already prices by rarity.
+static func weighted_relic_pick(
+	db: ContentDatabase, pool: Array[StringName], rng: RandomNumberGenerator
+) -> StringName:
+	if pool.is_empty():
+		return &""
+	var cfg: BattleConfig = db.get_battle_config()
+	# Fixed rarity order keeps the roll deterministic regardless of Dictionary
+	# iteration; pool arrives sorted, so buckets are stable too.
+	var order: Array[StringName] = [&"common", &"uncommon", &"rare"]
+	var weights: Dictionary = {
+		&"common": cfg.relic_weight_common,
+		&"uncommon": cfg.relic_weight_uncommon,
+		&"rare": cfg.relic_weight_rare,
+	}
+	var buckets: Dictionary = {}  # rarity -> Array[StringName]
+	for rid: StringName in pool:
+		var relic: RelicData = db.get_relic(rid)
+		var rarity: StringName = relic.rarity if relic != null else &"common"
+		if not buckets.has(rarity):
+			var empty: Array[StringName] = []
+			buckets[rarity] = empty
+		(buckets[rarity] as Array[StringName]).append(rid)
+	var total: int = 0
+	for rarity: StringName in order:
+		if buckets.has(rarity):
+			total += int(weights[rarity])
+	if total <= 0:
+		return pool[rng.randi_range(0, pool.size() - 1)]
+	var roll: int = rng.randi_range(0, total - 1)
+	var acc: int = 0
+	for rarity: StringName in order:
+		if not buckets.has(rarity):
+			continue
+		acc += int(weights[rarity])
+		if roll < acc:
+			var bucket: Array[StringName] = buckets[rarity]
+			return bucket[rng.randi_range(0, bucket.size() - 1)]
+	return pool[rng.randi_range(0, pool.size() - 1)]
+
+
 ## The act-scaled price for one skill card (by rarity) in `act`.
 func skill_price(card: CardData, act: int) -> int:
 	var cfg: BattleConfig = _db.get_battle_config()
@@ -185,7 +232,8 @@ func treasure_roll(run: RunState, node_id: StringName) -> Dictionary:
 	var relics: Array[StringName] = _available_relics(run)
 	var roll: float = rng.randf()
 	if not relics.is_empty() and roll < 0.4:
-		return {"kind": &"relic", "id": relics[rng.randi_range(0, relics.size() - 1)], "amount": 0}
+		# M3 pool hygiene: treasure relics roll rarity-weighted, not uniform.
+		return {"kind": &"relic", "id": weighted_relic_pick(_db, relics, rng), "amount": 0}
 	var items: Array[StringName] = _consumable_pool()
 	if not items.is_empty() and roll < 0.55:
 		return {"kind": &"consumable", "id": items[rng.randi_range(0, items.size() - 1)], "amount": 0}

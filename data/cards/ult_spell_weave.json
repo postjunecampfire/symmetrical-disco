@@ -1,0 +1,25 @@
+{
+  "id": "ult_spell_weave",
+  "display_name": "Spell Weave",
+  "description": "ULT \u2014 Draw 4 cards and gain 4 Block. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 4
+    },
+    {
+      "type": "block",
+      "amount": 4
+    }
+  ]
+}

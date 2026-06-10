@@ -1,0 +1,25 @@
+{
+  "id": "ult_flurry",
+  "display_name": "Flurry",
+  "description": "ULT \u2014 extra actions / free cards. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "draw",
+      "amount": 3
+    },
+    {
+      "type": "gain_energy",
+      "amount": 2
+    }
+  ]
+}

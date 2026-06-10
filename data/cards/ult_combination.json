@@ -1,0 +1,37 @@
+{
+  "id": "ult_combination",
+  "display_name": "Combination",
+  "description": "ULT \u2014 Deal 3 damage four times. Exhaust. (Upgraded by Ascension.) At reduced stat scaling.",
+  "character_tag": "brawler",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.8
+    }
+  ]
+}

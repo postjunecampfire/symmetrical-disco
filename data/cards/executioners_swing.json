@@ -1,0 +1,22 @@
+{
+  "id": "executioners_swing",
+  "display_name": "Executioner's Swing",
+  "description": "Deal 250% STR damage. Exhaust.",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "min_act": 10,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 0,
+      "stat_mult": 2.5
+    }
+  ]
+}

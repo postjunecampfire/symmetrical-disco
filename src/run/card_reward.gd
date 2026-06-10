@@ -86,6 +86,8 @@ func eligible_pool(run_state: RunState) -> Array[CardData]:
 			continue
 		if card.card_kind != &"skill":
 			continue  # ADR-0029: curses/consumables NEVER enter reward pools
+		if card.min_act > 0 and run_state.act < card.min_act:
+			continue  # ADR-0020 crossover gate: big multipliers wait for their tier
 		if card.character_tag == NEUTRAL_TAG or party.has(card.character_tag):
 			pool.append(card)
 

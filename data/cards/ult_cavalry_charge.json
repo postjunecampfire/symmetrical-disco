@@ -1,0 +1,22 @@
+{
+  "id": "ult_cavalry_charge",
+  "display_name": "Cavalry Charge",
+  "description": "ULT \u2014 trample, hits all. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6,
+      "stat_mult": 1.25
+    }
+  ]
+}

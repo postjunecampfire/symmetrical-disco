@@ -1,0 +1,27 @@
+{
+  "id": "ult_enthrall",
+  "display_name": "Mass Enthrall",
+  "description": "ULT \u2014 apply 1 Stun and 2 Weak to ALL enemies. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    },
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    }
+  ]
+}

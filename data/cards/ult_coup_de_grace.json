@@ -1,0 +1,26 @@
+{
+  "id": "ult_coup_de_grace",
+  "display_name": "Coup de Grace",
+  "description": "ULT \u2014 Deal damage equal to 18 + the target's Charm, then remove it all. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6,
+      "stat_mult": 3.0
+    },
+    {
+      "type": "consume_status_damage",
+      "status": "charm"
+    }
+  ]
+}

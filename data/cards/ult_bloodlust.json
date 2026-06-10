@@ -1,0 +1,22 @@
+{
+  "id": "ult_bloodlust",
+  "display_name": "Bloodlust",
+  "description": "ULT \u2014 massive single strike. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 0,
+      "stat_mult": 3.5
+    }
+  ]
+}

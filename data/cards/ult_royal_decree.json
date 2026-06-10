@@ -1,0 +1,32 @@
+{
+  "id": "ult_royal_decree",
+  "display_name": "Royal Decree",
+  "description": "ULT \u2014 apply 2 Weak, 2 Vulnerable and 1 Stun to ALL enemies. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "all_enemies"
+  },
+  "effects": [
+    {
+      "type": "apply_status",
+      "status": "weak",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "vulnerable",
+      "stacks": 2
+    },
+    {
+      "type": "apply_status",
+      "status": "stun",
+      "stacks": 1
+    }
+  ]
+}

@@ -8,6 +8,7 @@
     "exhaust"
   ],
   "rarity": "rare",
+  "min_act": 10,
   "target": {
     "target_type": "enemy"
   },

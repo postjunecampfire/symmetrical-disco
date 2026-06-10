@@ -1,0 +1,26 @@
+{
+  "id": "ult_vanish",
+  "display_name": "Vanish",
+  "description": "ULT \u2014 untargetable + setup. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 4,
+      "stat_mult": 2.5
+    },
+    {
+      "type": "draw",
+      "amount": 2
+    }
+  ]
+}

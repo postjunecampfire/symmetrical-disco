@@ -1,0 +1,27 @@
+{
+  "id": "ult_last_bastion",
+  "display_name": "Last Bastion",
+  "description": "ULT \u2014 massive self block + strength. Exhaust. (Upgraded by Ascension.)",
+  "character_tag": "fighter",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "signature": true,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 10,
+      "stat_mult": 2.5
+    },
+    {
+      "type": "apply_status",
+      "status": "strength",
+      "stacks": 2
+    }
+  ]
+}

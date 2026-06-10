@@ -1,0 +1,29 @@
+{
+  "id": "missile_barrage",
+  "display_name": "Missile Barrage",
+  "description": "Deal 3 damage three times. At reduced stat scaling.",
+  "character_tag": "charmer",
+  "energy_cost": 2,
+  "keywords": [],
+  "rarity": "uncommon",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    },
+    {
+      "type": "damage",
+      "amount": 3,
+      "stat_mult": 0.5
+    }
+  ]
+}

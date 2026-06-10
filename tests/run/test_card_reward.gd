@@ -6,7 +6,7 @@ extends GutTest
 ## into a plain Dictionary registry (card_id -> CardData), and a RunState carries
 ## just the `party` the draft filters against. Tests assert the eligible-pool
 ## rules (party tag or neutral, never innate), N-distinct seeded drafts,
-## determinism (same seed -> same offer), pick/skip effects on run_deck, and the
+## determinism (same seed -> same offer), pick/skip effects on skill collections (ADR-0026), and the
 ## small-pool degradation (fewer than N eligible -> as many as exist, no error).
 
 # --- Fixture builders ---
@@ -142,23 +142,27 @@ func test_rarity_weighted_draft_is_deterministic() -> void:
 func test_pick_appends_exactly_one_id() -> void:
 	var reward := CardReward.new(_make_registry())
 	var run: RunState = _make_run()
-	run.run_deck = [&"strike", &"defend"] as Array[StringName]
+	run.skill_collections = {&"fighter": ["shield_bash"], &"mage": []}
+	run.active_loadouts = {&"fighter": ["shield_bash"], &"mage": []}
 
 	var appended: bool = reward.pick(run, &"frost_nova")
 	assert_true(appended, "pick reports success")
-	assert_eq(run.run_deck.size(), 3, "exactly one id was appended")
-	assert_eq(run.run_deck[2], &"frost_nova", "the picked id is appended last")
+	# frost_nova is mage-tagged -> it joins the MAGE's collection (ADR-0026).
+	var mage_coll: Array = run.skill_collections[&"mage"]
+	assert_eq(mage_coll.size(), 1, "exactly one skill was granted")
+	assert_eq(StringName(String(mage_coll[0])), &"frost_nova", "the picked skill joins its owner's collection")
 
 
-func test_skip_leaves_run_deck_unchanged() -> void:
+func test_skip_leaves_collections_unchanged() -> void:
 	var reward := CardReward.new(_make_registry())
 	var run: RunState = _make_run()
-	run.run_deck = [&"strike", &"defend"] as Array[StringName]
+	run.skill_collections = {&"fighter": ["shield_bash"], &"mage": []}
+	run.active_loadouts = {&"fighter": ["shield_bash"], &"mage": []}
 
 	reward.skip(run)
 	assert_eq(
-		run.run_deck,
-		[&"strike", &"defend"] as Array[StringName],
+		run.skill_collections[&"fighter"],
+		["shield_bash"],
 		"skip adds nothing to the run deck"
 	)
 
@@ -186,3 +190,43 @@ func test_empty_pool_returns_empty_offer() -> void:
 	var run: RunState = _make_run()
 	var offer: Array[CardData] = reward.draft(run, 3, run.seed)
 	assert_eq(offer.size(), 0, "an empty registry yields an empty offer without error")
+
+
+# --- min_act crossover gate (ADR-0020 / M3 pool hygiene) ---------------------
+
+func test_min_act_gates_card_out_of_early_pools() -> void:
+	var registry: Dictionary = _make_registry()
+	var gated: CardData = _make_card(&"big_multiplier", &"knight", false, &"rare")
+	gated.min_act = 10
+	registry[gated.id] = gated
+	var reward := CardReward.new(registry)
+	var run: RunState = _make_run()
+
+	run.act = 1
+	assert_does_not_have(
+		_ids(reward.eligible_pool(run)), &"big_multiplier",
+		"a min_act 10 card is not draftable at act 1"
+	)
+	run.act = 9
+	assert_does_not_have(
+		_ids(reward.eligible_pool(run)), &"big_multiplier",
+		"…nor at act 9 (gate is inclusive of its act)"
+	)
+	run.act = 10
+	assert_has(
+		_ids(reward.eligible_pool(run)), &"big_multiplier",
+		"the card unlocks exactly at its min_act"
+	)
+	run.act = 18
+	assert_has(
+		_ids(reward.eligible_pool(run)), &"big_multiplier",
+		"…and stays draftable below it"
+	)
+
+
+func test_min_act_zero_is_ungated() -> void:
+	var reward := CardReward.new(_make_registry())
+	var run: RunState = _make_run()
+	run.act = 1
+	# Every fixture card has the default min_act 0 -> the act-1 pool is intact.
+	assert_eq(reward.eligible_pool(run).size(), 5, "min_act 0 cards draft from act 1")

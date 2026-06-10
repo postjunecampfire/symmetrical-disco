@@ -1,0 +1,22 @@
+{
+  "id": "cats_grace",
+  "display_name": "Cat's Grace",
+  "description": "Gain 5 Block. Draw 1 card.",
+  "character_tag": "charmer",
+  "energy_cost": 1,
+  "keywords": [],
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 5
+    },
+    {
+      "type": "draw",
+      "amount": 1
+    }
+  ]
+}

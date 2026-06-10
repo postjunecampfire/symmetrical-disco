@@ -1,0 +1,22 @@
+{
+  "id": "ghost_guard",
+  "display_name": "Ghost Guard",
+  "description": "Gain 250% DEX block. Exhaust.",
+  "character_tag": "rogue",
+  "energy_cost": 2,
+  "keywords": [
+    "exhaust"
+  ],
+  "rarity": "rare",
+  "min_act": 10,
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 0,
+      "stat_mult": 2.5
+    }
+  ]
+}
