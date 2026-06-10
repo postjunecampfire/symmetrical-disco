@@ -11,6 +11,11 @@ extends Resource
 ##   max_hp_up    (passive)      — +amount max HP (and current) to each member.
 ##   gain_energy  (turn_start)   — +amount energy each player turn.
 ##   draw_extra   (turn_start)   — draw +amount cards each player turn.
+##   floor_reduction (passive)   — lower the derived-deck auto-fill floor by
+##                                 `amount` (ADR-0029; clamped at
+##                                 BattleConfig.derived_deck_floor_min). Consumed
+##                                 at DECK DERIVATION (RunController -> SkillLoadout
+##                                 via RelicEngine.floor_reduction_total), not in combat.
 ## Extend by adding a handler in RelicEngine, like the combat EffectResolver.
 ## (on_kill is a reserved trigger; no v1 effect maps to it yet.)
 
@@ -19,6 +24,7 @@ extends Resource
 const TRIGGERS: Array[StringName] = [&"combat_start", &"turn_start", &"passive", &"on_kill"]
 const EFFECTS: Array[StringName] = [
 	&"gain_block", &"add_strength", &"max_hp_up", &"gain_energy", &"draw_extra",
+	&"floor_reduction",
 ]
 
 @export var id: StringName = &""

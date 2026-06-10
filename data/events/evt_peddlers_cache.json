@@ -1,0 +1,27 @@
+{
+  "id": "evt_peddlers_cache",
+  "title": "The Peddler's Cache",
+  "body": "A dead peddler's pack lies half-buried by the trail. Inside: bottles, powders, and a small silver charm that smells of incense.",
+  "choices": [
+    {
+      "label": "Take the bottles",
+      "outcomes": [
+        { "kind": "add_consumable", "id": "healing_draught" },
+        { "kind": "add_consumable", "id": "fire_bomb" }
+      ]
+    },
+    {
+      "label": "Burn the charm as an offering",
+      "outcomes": [
+        { "kind": "remove_curse" },
+        { "kind": "damage_party", "amount": 2 }
+      ]
+    },
+    {
+      "label": "Leave the dead their things",
+      "outcomes": [
+        { "kind": "nothing" }
+      ]
+    }
+  ]
+}

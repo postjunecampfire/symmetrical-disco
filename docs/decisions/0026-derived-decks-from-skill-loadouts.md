@@ -75,7 +75,7 @@ The loadout can be edited at **rest nodes** and at **progression beats** (class 
 - Whether slot count itself grows across the run (e.g., +1 slot at tier walls) or stays fixed at 10.
 - Auto-fill composition beyond 1:1 Strike/Defend (race-flavored basics?).
 - Whether the two Act-1 pole identities (physical/caster) each feel distinct when decks are ~70% identical fill — may motivate race-flavored basic variants.
-- **Injected non-skill card layer.** As decided, every card is a projection of a skill — clean but monochrome, and it removes StS-style deck-management pressure. Candidate fix: a card layer injected into the derived deck *after* derivation, outside the loadout:
+- **Injected non-skill card layer.** *Resolved by [ADR-0029](0029-injected-card-layer.md): curses count toward the floor (displacing fill basics), consumables inject on top, and relic `floor_reduction` is the earned floor path.* As decided, every card is a projection of a skill — clean but monochrome, and it removes StS-style deck-management pressure. Candidate fix: a card layer injected into the derived deck *after* derivation, outside the loadout:
   - **Curses/wounds/statuses** — forced in by enemies/events, can't be deactivated, must be *removed* (removal becomes a resource; shops/events get something to sell). Sub-question: do injected cards count toward the 20-card minimum (junk displaces fill) or sit on top (deck swells past the cap)?
   - **Consumable item cards** — found/bought cards that exhaust on use; one-run texture without touching the skill system.
   - **Derivation modifiers** — relics/boons that change projection rules ("+1 copy of a chosen skill," "Uncommons count as Common").

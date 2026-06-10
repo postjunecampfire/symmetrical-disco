@@ -1,0 +1,13 @@
+{
+  "id": "wound",
+  "display_name": "Wound",
+  "description": "Unplayable. An open gash that crowds your hand.",
+  "character_tag": "neutral",
+  "card_kind": "curse",
+  "energy_cost": 0,
+  "keywords": ["unplayable"],
+  "rarity": "common",
+  
+  "target": { "target_type": "self" },
+  "effects": []
+}

@@ -1,0 +1,14 @@
+{
+  "id": "second_wind",
+  "display_name": "Second Wind",
+  "description": "ALL allies heal 5. Exhaust.",
+  "character_tag": "neutral",
+  "card_kind": "consumable",
+  "energy_cost": 1,
+  "keywords": ["exhaust"],
+  "rarity": "common",
+  "target": { "target_type": "all_allies" },
+  "effects": [
+    { "type": "heal", "amount": 5 }
+  ]
+}

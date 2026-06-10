@@ -38,6 +38,18 @@ func apply_passive(battle: BattleState, relics: Array) -> void:
 				unit.hp += relic.amount
 
 
+## Total derived-deck floor reduction the run's relics grant (ADR-0029, the
+## `floor_reduction` passive effect). Consumed at deck DERIVATION — RunController
+## sums it here and hands it to SkillLoadout.derive_deck, which clamps at
+## BattleConfig.derived_deck_floor_min. Static: no battle is involved.
+static func floor_reduction_total(relics: Array) -> int:
+	var total: int = 0
+	for relic in relics:
+		if relic != null and relic.effect == &"floor_reduction":
+			total += maxi(0, relic.amount)
+	return total
+
+
 ## turn_start relics: gain_energy / draw_extra, applied after the base
 ## start_player_turn has refilled energy and drawn the hand.
 func apply_turn_start(battle: BattleState, relics: Array) -> void:
@@ -46,6 +58,9 @@ func apply_turn_start(battle: BattleState, relics: Array) -> void:
 			continue
 		match relic.effect:
 			&"gain_energy":
+				# ADR-0025 provisional: a party-level energy relic credits the
+				# FIRST living player (the origin character) until relics get
+				# holders — crediting every pool would double its value.
 				battle.add_energy(relic.amount)
 			&"draw_extra":
 				battle.draw_cards(relic.amount)

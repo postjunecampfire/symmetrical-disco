@@ -1,0 +1,13 @@
+{
+  "id": "cowardice",
+  "display_name": "Cowardice",
+  "description": "Unplayable. Your feet want to run.",
+  "character_tag": "neutral",
+  "card_kind": "curse",
+  "energy_cost": 0,
+  "keywords": ["unplayable"],
+  "rarity": "common",
+  
+  "target": { "target_type": "self" },
+  "effects": []
+}

@@ -74,6 +74,11 @@ func play_card(unit: Combatant, card: CardData, target: Variant) -> PlayResult:
 
 	_spend_and_resolve(unit, card, target)
 	battle.deck_of(unit).play_from_hand(card)
+	# ADR-0029: a played consumable is CONSUMED — record it so the run layer
+	# (finish_combat) removes one copy from the party inventory. The card itself
+	# was just routed to exhaust by its `exhaust` keyword.
+	if card.card_kind == &"consumable":
+		battle.consumed_items.append(card.id)
 	return PlayResult.new()
 
 
@@ -109,6 +114,10 @@ func play_innate(unit: Combatant, card: CardData, target: Variant) -> PlayResult
 ## the first failure, or an ok PlayResult when every gate passes. No state is
 ## mutated here — validation is pure so callers can pre-check a play.
 func _validate(unit: Combatant, card: CardData, target: Variant) -> PlayResult:
+	# ADR-0029: `unplayable` (curses) — a dead draw unless the card says
+	# otherwise. Gated before anything is spent, mirroring the hand-UI guard.
+	if card.keywords.has(&"unplayable"):
+		return PlayResult.new("CardPlay: '%s' is unplayable" % card.id)
 	if not _tag_allows(unit, card):
 		return PlayResult.new(
 			"CardPlay: %s may not play '%s' (tag '%s')"

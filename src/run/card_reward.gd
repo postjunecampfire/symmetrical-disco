@@ -84,6 +84,8 @@ func eligible_pool(run_state: RunState) -> Array[CardData]:
 			continue  # tree signatures arrive via progression unlock_cards only
 		if card.innate:
 			continue
+		if card.card_kind != &"skill":
+			continue  # ADR-0029: curses/consumables NEVER enter reward pools
 		if card.character_tag == NEUTRAL_TAG or party.has(card.character_tag):
 			pool.append(card)
 

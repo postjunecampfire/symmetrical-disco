@@ -39,11 +39,49 @@ func apply_status(_target: Variant, _status_id: StringName, _stacks: int) -> voi
 	push_error("BattleContext.apply_status() not implemented")
 
 
-## Draw `n` cards for the active side. (effect.type == "draw")
-func draw_cards(_n: int) -> void:
+## Draw `n` cards (effect.type == "draw"). `unit` selects whose deck/hand
+## (ADR-0026); null = implementation default (first living player).
+func draw_cards(_n: int, _unit: Combatant = null) -> void:
 	push_error("BattleContext.draw_cards() not implemented")
 
 
-## Add `n` energy to the shared pool this turn. (effect.type == "gain_energy")
-func add_energy(_n: int) -> void:
+## Add `n` energy to a pool (effect.type == "gain_energy"). `unit` selects whose
+## pool (ADR-0025); null = implementation default (first living player).
+func add_energy(_n: int, _unit: Combatant = null) -> void:
 	push_error("BattleContext.add_energy() not implemented")
+
+
+## Deal `amount` damage that applies Charm equal to the UNBLOCKED portion
+## (effect.type == "charm_damage", ADR-0028).
+func charm_strike(_target: Variant, _amount: int) -> void:
+	push_error("BattleContext.charm_strike() not implemented")
+
+
+## Deal damage equal to the target's stacks of `status_id`, then remove them all
+## (effect.type == "consume_status_damage", ADR-0028).
+func consume_status_damage(_target: Variant, _status_id: StringName) -> void:
+	push_error("BattleContext.consume_status_damage() not implemented")
+
+
+## Add the card `card_id` to `unit`'s hand (effect.type == "add_card", ADR-0028).
+## null unit = implementation default (first living player).
+func add_card_to_hand(_card_id: StringName, _unit: Combatant = null) -> void:
+	push_error("BattleContext.add_card_to_hand() not implemented")
+
+
+## Shuffle curse card `card_id` into the target PLAYER's discard pile and record
+## it for run persistence (effect.type == "inflict_curse", ADR-0029).
+func inflict_curse(_card_id: StringName, _target: Variant) -> void:
+	push_error("BattleContext.inflict_curse() not implemented")
+
+
+## Remove all stacks of each status in `statuses` from `target`
+## (effect.type == "cleanse", ADR-0029).
+func cleanse(_target: Variant, _statuses: Variant) -> void:
+	push_error("BattleContext.cleanse() not implemented")
+
+
+## Bank `amount` run gold, credited after the fight (effect.type == "gain_gold",
+## ADR-0029).
+func add_gold(_amount: int) -> void:
+	push_error("BattleContext.add_gold() not implemented")

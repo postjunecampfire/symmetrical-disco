@@ -1,0 +1,9 @@
+{
+  "id": "travel_light",
+  "display_name": "Travel Light",
+  "description": "Your derived decks auto-fill to a floor 4 lower (never below the hard minimum). Pack only what cuts.",
+  "rarity": "rare",
+  "trigger": "passive",
+  "effect": "floor_reduction",
+  "amount": 4
+}

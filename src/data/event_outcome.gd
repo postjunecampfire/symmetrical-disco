@@ -10,12 +10,17 @@ extends Resource
 ##   add_card      — append card `id` to the run deck.
 ##   remove_card   — remove one copy of card `id` from the run deck.
 ##   add_relic     — append relic `id` to the run's relics.
+##   add_curse     — inflict curse card `id` on the FIRST party member (ADR-0029).
+##   remove_curse  — remove one copy of curse `id` from whichever member carries
+##                   it; an empty id removes the first curse found (party order).
+##   add_consumable— append consumable card `id` to the party inventory (ADR-0029).
 ##   nothing       — no effect (a "walk away" choice).
 
 ## The full outcome vocabulary. The loader validates `kind` against this set and
 ## EventResolver dispatches on it; keeping it here puts the contract on the data.
 const KINDS: Array[StringName] = [
-	&"heal", &"damage_party", &"add_card", &"remove_card", &"add_relic", &"nothing",
+	&"heal", &"damage_party", &"add_card", &"remove_card", &"add_relic",
+	&"add_curse", &"remove_curse", &"add_consumable", &"nothing",
 ]
 
 @export var kind: StringName = &"nothing"

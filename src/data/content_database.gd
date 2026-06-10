@@ -33,7 +33,14 @@ const EFFECT_TYPES: Array[StringName] = [
 	&"charm_damage",           # attack that applies Charm equal to UNBLOCKED damage dealt
 	&"consume_status_damage",  # deal damage equal to the target's stacks of `status`, then remove them (Coup de Grace)
 	&"add_card",               # add the card `params.card_id` to the caster's hand (token generation)
+	# ADR-0029 (injected card layer) extensions:
+	&"inflict_curse",          # shuffle curse `params.card_id` into the target PLAYER's discard; persists to the run after combat
+	&"cleanse",                # remove all stacks of each status in `params.statuses` from the target (antidote)
+	&"gain_gold",              # bank `amount` run gold (credited by finish_combat; lucky_coin)
 ]
+
+## ADR-0029: the card-kind discriminator values (`card_kind` on CardData).
+const CARD_KINDS: Array[StringName] = [&"skill", &"curse", &"consumable"]
 
 ## Reserved character_tag meaning "any unit can play" (data-schemas.md §3).
 const NEUTRAL_TAG: StringName = &"neutral"
@@ -564,6 +571,13 @@ func _parse_card(d: Dictionary, source: String) -> Dictionary:
 	c.effects = _parse_effects(d.get("effects"), source, "card '%s'" % c.id)
 	c.upgrade_of = _sn(d.get("upgrade_of"), &"")
 	c.signature = _bool(d.get("signature"), false)
+	# ADR-0029: injected-layer discriminator + curse when-drawn downside.
+	c.card_kind = _sn(d.get("card_kind"), &"skill")
+	if not CARD_KINDS.has(c.card_kind):
+		_result.add_error(
+			"card '%s' in %s uses unknown card_kind '%s'" % [c.id, source, c.card_kind]
+		)
+	c.on_draw_damage = _int(d.get("on_draw_damage"), 0)
 	return {"id": c.id, "value": c}
 
 
@@ -711,6 +725,7 @@ func _load_battle_config(path: String) -> void:
 	bc.copies_uncommon = _int(d.get("copies_uncommon"), 2)
 	bc.copies_rare = _int(d.get("copies_rare"), 1)
 	bc.derived_deck_floor = _int(d.get("derived_deck_floor"), 20)
+	bc.derived_deck_floor_min = _int(d.get("derived_deck_floor_min"), 12)
 	bc.gold_per_combat = _int(d.get("gold_per_combat"), 12)
 	bc.gold_per_elite = _int(d.get("gold_per_elite"), 25)
 	bc.gold_per_boss = _int(d.get("gold_per_boss"), 40)
@@ -719,6 +734,8 @@ func _load_battle_config(path: String) -> void:
 	bc.shop_price_rare = _int(d.get("shop_price_rare"), 140)
 	bc.shop_price_relic = _int(d.get("shop_price_relic"), 120)
 	bc.shop_price_heal = _int(d.get("shop_price_heal"), 35)
+	bc.shop_price_consumable = _int(d.get("shop_price_consumable"), 40)
+	bc.shop_price_curse_removal = _int(d.get("shop_price_curse_removal"), 75)
 	bc.shop_act_scale = _float(d.get("shop_act_scale"), 0.15)
 	bc.treasure_gold_min = _int(d.get("treasure_gold_min"), 25)
 	bc.treasure_gold_max = _int(d.get("treasure_gold_max"), 60)
@@ -1019,6 +1036,8 @@ func _validate_references() -> void:
 
 	# event outcomes: add_card/remove_card -> card ids. (add_relic references the
 	# relic set, which is deferred — P2·12 — so relic ids are not validated yet.)
+	# ADR-0029: add_curse must name a curse card; add_consumable a consumable;
+	# remove_curse may carry an empty id ("remove the first curse found").
 	for id in events:
 		var ev: EventData = events[id]
 		for choice in ev.choices:
@@ -1027,6 +1046,19 @@ func _validate_references() -> void:
 					if outcome.id == &"" or not cards.has(outcome.id):
 						_result.add_error(
 							"event '%s' %s references unknown card '%s'" % [ev.id, outcome.kind, outcome.id]
+						)
+				elif outcome.kind == &"add_curse" or outcome.kind == &"add_consumable":
+					var want: StringName = &"curse" if outcome.kind == &"add_curse" else &"consumable"
+					var ref: CardData = cards.get(outcome.id, null)
+					if ref == null or ref.card_kind != want:
+						_result.add_error(
+							"event '%s' %s must reference a %s card (got '%s')" % [ev.id, outcome.kind, want, outcome.id]
+						)
+				elif outcome.kind == &"remove_curse" and outcome.id != &"":
+					var rc: CardData = cards.get(outcome.id, null)
+					if rc == null or rc.card_kind != &"curse":
+						_result.add_error(
+							"event '%s' remove_curse references non-curse card '%s'" % [ev.id, outcome.id]
 						)
 
 
@@ -1052,3 +1084,31 @@ func _validate_effect_statuses(effects: Array[Effect], owner_label: String) -> v
 				_result.add_error(
 					"%s add_card references unknown card '%s'" % [owner_label, token_id]
 				)
+		# ADR-0029: inflict_curse must name a real CURSE card.
+		if e.type == &"inflict_curse":
+			var curse_id := StringName(String(e.params.get("card_id", "")))
+			if curse_id == &"":
+				_result.add_error(
+					"%s has an inflict_curse effect with no params.card_id" % owner_label
+				)
+			elif not cards.has(curse_id):
+				_result.add_error(
+					"%s inflict_curse references unknown card '%s'" % [owner_label, curse_id]
+				)
+			elif (cards[curse_id] as CardData).card_kind != &"curse":
+				_result.add_error(
+					"%s inflict_curse references non-curse card '%s'" % [owner_label, curse_id]
+				)
+		# ADR-0029: cleanse must list known statuses.
+		if e.type == &"cleanse":
+			var listed: Variant = e.params.get("statuses", [])
+			if not (listed is Array) or (listed as Array).is_empty():
+				_result.add_error(
+					"%s has a cleanse effect with no params.statuses list" % owner_label
+				)
+			elif listed is Array:
+				for s_v: Variant in (listed as Array):
+					if not statuses.has(StringName(String(s_v))):
+						_result.add_error(
+							"%s cleanse references unknown status '%s'" % [owner_label, s_v]
+						)

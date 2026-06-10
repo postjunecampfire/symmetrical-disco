@@ -63,7 +63,7 @@ const STATUS_MARK: StringName = &"mark"
 
 ## Effect types that act globally on the acting side rather than on a target
 ## (so they are applied once per card/intent, not once per resolved target).
-const GLOBAL_EFFECTS: Array[StringName] = [&"draw", &"gain_energy", &"add_card"]
+const GLOBAL_EFFECTS: Array[StringName] = [&"draw", &"gain_energy", &"add_card", &"gain_gold"]
 ## Effect types that apply ONCE to the CASTER regardless of the card's target
 ## set (ADR-0028): the bomb self-damage tax and caster-side block riders.
 const SOURCE_EFFECTS: Array[StringName] = [&"self_damage", &"self_block"]
@@ -126,6 +126,20 @@ var band: StringName = &""
 ## Charm executions this battle (ADR-0028) — feeds the Fame "execute" trigger
 ## and telemetry.
 var charm_executes: int = 0
+
+## Curses inflicted on player members this battle (ADR-0029): entries of
+## {"member": StringName, "card": StringName}. RunController.finish_combat
+## persists them into RunState.member_curses — the battle layer stays
+## run-agnostic, like charm_executes.
+var inflicted_curses: Array[Dictionary] = []
+
+## Consumable card ids PLAYED this battle (ADR-0029). finish_combat removes one
+## inventory copy per entry; unplayed consumables persist to future combats.
+var consumed_items: Array[StringName] = []
+
+## Run gold found mid-combat (ADR-0029, `gain_gold` — lucky_coin). Credited to
+## RunState.currency by finish_combat.
+var gold_found: int = 0
 
 
 ## `battle_config` is the injected world; `battle_deck` is the shared deck (a
@@ -335,7 +349,7 @@ func draw_cards(n: int, unit: Combatant = null) -> void:
 	if who == null:
 		deck.draw(n)
 		return
-	deck_of(who).draw(n)
+	_apply_on_draw(who, deck_of(who).draw(n))
 
 
 ## Energy of `unit`'s own pool (ADR-0025). Unknown/null unit -> 0.
@@ -454,6 +468,41 @@ func add_card_to_hand(card_id: StringName, unit: Combatant = null) -> void:
 		d.hand.append(card)
 	else:
 		d.discard_pile.append(card)
+
+
+## inflict_curse (ADR-0029): shuffle the registry curse `card_id` into the target
+## PLAYER's discard pile (it joins the cycle this fight, StS-style) and record it
+## so the run layer can persist it onto the member. Enemy targets / unknown ids
+## no-op — curses are a player-side affliction.
+func inflict_curse(card_id: StringName, target: Variant) -> void:
+	var card: CardData = card_lookup.get(card_id, null)
+	var unit: Combatant = _resolve_unit(target)
+	if card == null or unit == null or not unit.is_player():
+		return
+	deck_of(unit).discard_pile.append(card)
+	var data := unit.source_data as CharacterData
+	var member: StringName = data.id if data != null else &""
+	inflicted_curses.append({"member": member, "card": card_id})
+
+
+## cleanse (ADR-0029): remove ALL stacks of each status named in `statuses` from
+## the target (the antidote item). Cleansing `block` also clears the block field.
+func cleanse(target: Variant, statuses: Variant) -> void:
+	var unit: Combatant = _resolve_unit(target)
+	if unit == null or not (statuses is Array):
+		return
+	for s_v: Variant in (statuses as Array):
+		var sid := StringName(String(s_v))
+		if sid == &"":
+			continue
+		if sid == STATUS_BLOCK:
+			unit.block = 0
+		unit.set_status(sid, 0)
+
+
+## gain_gold (ADR-0029): bank found run gold; finish_combat credits it.
+func add_gold(amount: int) -> void:
+	gold_found += maxi(0, amount)
 
 
 # ============================================================================
@@ -596,7 +645,20 @@ func start_player_turn() -> void:
 		deck.draw_for_turn()
 	else:
 		for unit in living_players():
-			deck_of(unit).draw_for_turn()
+			_apply_on_draw(unit, deck_of(unit).draw_for_turn())
+
+
+## When-drawn downsides (ADR-0029): a drawn card with `on_draw_damage` bites the
+## DRAWING unit (blockable, like any plain hit — block has usually just reset at
+## the owner's turn start, so it lands on HP). Applied wherever a unit draws into
+## its own hand (turn draw + the `draw` effect); the legacy shared-deck fixture
+## path has no owner and skips it.
+func _apply_on_draw(unit: Combatant, drawn: Array[CardData]) -> void:
+	if unit == null:
+		return
+	for card in drawn:
+		if card != null and card.on_draw_damage > 0:
+			deal_damage(unit, card.on_draw_damage)
 
 
 ## End the player turn: discard the hand back into the cycle, then run the enemy

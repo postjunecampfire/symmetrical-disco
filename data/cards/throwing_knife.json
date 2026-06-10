@@ -1,0 +1,14 @@
+{
+  "id": "throwing_knife",
+  "display_name": "Throwing Knife",
+  "description": "Deal 7 damage. Exhaust.",
+  "character_tag": "neutral",
+  "card_kind": "consumable",
+  "energy_cost": 0,
+  "keywords": ["exhaust"],
+  "rarity": "common",
+  "target": { "target_type": "enemy" },
+  "effects": [
+    { "type": "damage", "amount": 7, "stat_mult": 0.0 }
+  ]
+}

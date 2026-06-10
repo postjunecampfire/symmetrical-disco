@@ -1,0 +1,14 @@
+{
+  "id": "energy_philter",
+  "display_name": "Energy Philter",
+  "description": "Gain 2 Energy. Exhaust.",
+  "character_tag": "neutral",
+  "card_kind": "consumable",
+  "energy_cost": 0,
+  "keywords": ["exhaust"],
+  "rarity": "common",
+  "target": { "target_type": "self" },
+  "effects": [
+    { "type": "gain_energy", "amount": 2 }
+  ]
+}

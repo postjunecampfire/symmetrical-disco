@@ -47,6 +47,20 @@
         }
       ],
       "weight": 1
+    },
+    {
+      "id": "hexer_hex_mark",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "inflict_curse",
+          "params": { "card_id": "hex_mark" }
+        }
+      ],
+      "weight": 2
     }
   ],
   "ramp_amount": 0,

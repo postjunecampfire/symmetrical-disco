@@ -1,0 +1,13 @@
+{
+  "id": "doubt",
+  "display_name": "Doubt",
+  "description": "Unplayable. A whisper that you were never good enough.",
+  "character_tag": "neutral",
+  "card_kind": "curse",
+  "energy_cost": 0,
+  "keywords": ["unplayable"],
+  "rarity": "common",
+  
+  "target": { "target_type": "self" },
+  "effects": []
+}

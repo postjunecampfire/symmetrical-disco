@@ -1,0 +1,13 @@
+{
+  "id": "hex_mark",
+  "display_name": "Hex Mark",
+  "description": "Unplayable. When drawn, take 2 damage.",
+  "character_tag": "neutral",
+  "card_kind": "curse",
+  "energy_cost": 0,
+  "keywords": ["unplayable"],
+  "rarity": "common",
+  "on_draw_damage": 2,
+  "target": { "target_type": "self" },
+  "effects": []
+}

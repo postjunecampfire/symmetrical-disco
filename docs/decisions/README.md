@@ -30,6 +30,9 @@ Each file records one settled decision: its context, the choice, the alternative
 | [0024](0024-act-structured-squad-recruitment.md) | Act-structured squad recruitment — solo Act 1, RNG 1-of-3 race-only recruit at Act 2, both class at Act 3 | Accepted (supersedes one-race-for-the-pair rule of 0021) |
 | [0025](0025-per-character-decks-and-hands.md) | Per-character **energy** pools (supersedes shared energy of 0017) — *deck/hand question resolved by 0026* | Accepted |
 | [0026](0026-derived-decks-from-skill-loadouts.md) | Per-character derived decks from active skill loadouts — 10 slots, rarity→copies, 20-card min via basic auto-fill | Accepted (supersedes shared deck of 0004/0016; reverses 0005) |
+| [0027](0027-per-character-energy-base-three.md) | Per-character energy base = 3 | Draft (proposed, not accepted) |
+| [0028](0028-dcc-carl-donut-class-lines.md) | DCC adaptation — Brawler & Charmer class lines + Cat race | Accepted |
+| [0029](0029-injected-card-layer.md) | Injected non-skill card layer — per-member curses count toward the floor (displace fill), party consumables on top; relic floor reduction | Accepted — agent decision, owner to ratify (resolves 0026's injected-layer question) |
 
 **Status values:** Proposed → Accepted → (later) Deprecated / Superseded by ADR-NNNN.
 

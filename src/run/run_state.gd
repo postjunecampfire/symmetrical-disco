@@ -25,10 +25,40 @@ const DEFAULT_SAVE_PATH: String = "user://saves/run.json"
 ## run reapplies race mods (and so effective max-HP can be derived from RunState
 ## alone).
 @export var party_races: Dictionary = {}
-## Card ids in the run deck (starting decks + drafted cards).
-@export var run_deck: Array[StringName] = []
+## member_id -> class id chosen at the Act-3 pick (ADR-0021 pt2); &""/absent =
+## classless. Legacy class-keyed members record themselves here.
+@export var member_classes: Dictionary = {}
+## member_id -> Array of chosen tree node ids, in beat order (ADR-0022:
+## archetype @6, specialization @9, capstone @12).
+@export var member_progression: Dictionary = {}
+## member_id -> ascension stat_mult step (ADR-0022 Act-15 Ascension); absent =
+## not ascended.
+@export var ascended: Dictionary = {}
+## Per-member skill state (ADR-0026 — supersedes the shared run_deck). The deck
+## is no longer stored state: it is DERIVED per member from the active loadout
+## (SkillLoadout.derive_deck) at combat assembly.
+## member_id -> Array[StringName] of every skill (card id) acquired this run.
+@export var skill_collections: Dictionary = {}
+## member_id -> Array[StringName] of the ≤ skill_slots ACTIVE skill ids.
+@export var active_loadouts: Dictionary = {}
+## Injected card layer (ADR-0029). Curses are PER MEMBER (inflicted by enemy
+## intents / event outcomes on a specific member; removal is targeted): each
+## curse rides that member's derived deck, COUNTING toward the auto-fill floor
+## (junk displaces basics). member_id -> Array[StringName] of curse card ids.
+@export var member_curses: Dictionary = {}
+## Consumable item cards are a PARTY-LEVEL inventory (ADR-0029): injected ON TOP
+## of the floor at deck assembly, consumed from here when played; unplayed ones
+## persist to future combats. Duplicates allowed.
+@export var consumables: Array[StringName] = []
+## Run currency (ADR-0023 slice): earned from won combats, spent at future
+## shops. Display name "Gold" in the UI.
+@export var currency: int = 0
 ## Relic ids acquired this run (§7).
 @export var relics: Array[StringName] = []
+## Fame (ADR-0028): the per-act celebrity counter (0..50). Earned by combat
+## triggers (flawless wins, fast wins, elites, Charm executes); cashed out as a
+## Sponsor Box relic at the act boss, then reset for the next act.
+@export var fame: int = 0
 ## The generated map (§3).
 @export var map: MapGraph
 ## Current node id.
@@ -53,6 +83,23 @@ const DEFAULT_SAVE_PATH: String = "user://saves/run.json"
 ## character_id -> Array[StringName] of promotion ids taken (P3·06). Drives accrual
 ## (the Nth promotion needs level >= promotion_level * N).
 @export var party_promotions: Dictionary = {}
+
+
+# --- Injected card layer accessors (ADR-0029) -------------------------------
+
+## `cid`'s curse list as a typed LIVE reference into member_curses (mutations
+## stick). Creates (and stores) an empty list for an unseen member, so callers
+## never branch on key presence.
+func curses_of(cid: StringName) -> Array[StringName]:
+	var v: Variant = member_curses.get(cid)
+	if v is Array[StringName]:
+		return v
+	var out: Array[StringName] = []
+	if v is Array:
+		for item: Variant in v:
+			out.append(StringName(String(item)))
+	member_curses[cid] = out
+	return out
 
 
 # --- Persistence ---
@@ -113,13 +160,21 @@ func to_dict() -> Dictionary:
 		"party": _sn_array_to_strings(party),
 		"party_hp": hp_out,
 		"downed": _sn_array_to_strings(downed),
-		"run_deck": _sn_array_to_strings(run_deck),
+		"skill_collections": _sn_arrays_to_strings(skill_collections),
+		"active_loadouts": _sn_arrays_to_strings(active_loadouts),
+		"member_curses": _sn_arrays_to_strings(member_curses),
+		"consumables": _sn_array_to_strings(consumables),
+		"currency": currency,
 		"relics": _sn_array_to_strings(relics),
+		"fame": fame,
 		"map": map_out,
 		"position": String(position),
 		"cleared": _sn_array_to_strings(cleared),
 		"act": act,
 		"party_races": _sn_dict_to_strings(party_races),
+		"member_classes": _sn_dict_to_strings(member_classes),
+		"member_progression": _sn_arrays_to_strings(member_progression),
+		"ascended": ascended.duplicate(),
 		"party_level": _int_dict_to_strings(party_level),
 		"party_xp": _int_dict_to_strings(party_xp),
 		"unspent_points": _int_dict_to_strings(unspent_points),
@@ -136,8 +191,13 @@ static func from_dict(d: Dictionary) -> RunState:
 	state.seed = int(seed_v)
 	state.party = _strings_to_sn_array(d.get("party", []))
 	state.downed = _strings_to_sn_array(d.get("downed", []))
-	state.run_deck = _strings_to_sn_array(d.get("run_deck", []))
+	state.skill_collections = _strings_to_sn_arrays(d.get("skill_collections", {}))
+	state.active_loadouts = _strings_to_sn_arrays(d.get("active_loadouts", {}))
+	state.member_curses = _strings_to_sn_arrays(d.get("member_curses", {}))
+	state.consumables = _strings_to_sn_array(d.get("consumables", []))
+	state.currency = maxi(0, int(d.get("currency", 0)))
 	state.relics = _strings_to_sn_array(d.get("relics", []))
+	state.fame = int(d.get("fame", 0))
 	state.cleared = _strings_to_sn_array(d.get("cleared", []))
 	state.position = StringName(String(d.get("position", "")))
 	state.act = maxi(1, int(d.get("act", 1)))
@@ -155,6 +215,12 @@ static func from_dict(d: Dictionary) -> RunState:
 		if not map_dict.is_empty():
 			state.map = MapGraph.from_dict(map_dict)
 	state.party_races = _strings_to_sn_dict(d.get("party_races", {}))
+	state.member_classes = _strings_to_sn_dict(d.get("member_classes", {}))
+	state.member_progression = _strings_to_sn_arrays(d.get("member_progression", {}))
+	var asc_v: Variant = d.get("ascended", {})
+	if asc_v is Dictionary:
+		for k: Variant in asc_v:
+			state.ascended[StringName(String(k))] = float(asc_v[k])
 	state.party_level = _strings_to_int_dict(d.get("party_level", {}))
 	state.party_xp = _strings_to_int_dict(d.get("party_xp", {}))
 	state.unspent_points = _strings_to_int_dict(d.get("unspent_points", {}))

@@ -6,7 +6,7 @@
     {
       "label": "Seize its power",
       "outcomes": [
-        { "kind": "damage_party", "amount": 5 },
+        { "kind": "add_curse", "id": "burden" },
         { "kind": "add_relic", "id": "shrine_blessing" }
       ]
     },

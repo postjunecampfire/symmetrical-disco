@@ -5,8 +5,8 @@ extends Control
 ##   - left column: your party (HP / block / statuses), click to select the actor;
 ##   - right column: enemies (HP / block / statuses / telegraphed intent), click
 ##     to target;
-##   - bottom: the shared hand (click a card), the selected actor's innate
-##     Strike/Defend, the shared energy pool, and End Turn.
+##   - bottom: the SELECTED actor's hand (ADR-0026: per-member derived decks;
+##     click a party panel to switch hands), per-member energy (ADR-0025), End Turn.
 ##
 ## Flow: click a card or innate to ARM it. self / all_* effects resolve at once;
 ## enemy / ally effects wait for you to click a target. End Turn discards the
@@ -43,7 +43,8 @@ var telemetry: TelemetryLogger = null
 ## combat_result telemetry carries a real turn count (was hardcoded 0 from the UI).
 var _turns: int = 0
 
-const COL_BG := Color(0.12, 0.13, 0.17)
+const COL_BG := Color(0.07, 0.05, 0.045)       # dungeon wall (darker, owner 2026-06-10)
+const COL_FLOOR := Color(0.13, 0.115, 0.10)    # stone floor strip
 const COL_PANEL := Color(0.18, 0.20, 0.26)
 const COL_PANEL_SEL := Color(0.26, 0.34, 0.46)
 const COL_ENEMY := Color(0.30, 0.20, 0.22)
@@ -53,11 +54,13 @@ const COL_ACCENT := Color(0.40, 0.70, 0.95)
 
 var _db: ContentDatabase
 var _battle: EncounterBattle
+
+## Fire-and-forget sound effects (UiAssets-resolved; silent when assets absent).
+var _sfx: SfxPlayer
 var _card_play: CardPlay
 
 var _selected_actor: Combatant = null
 var _armed_card: CardData = null
-var _armed_innate: CardData = null
 var _armed_actor: Combatant = null
 var _await_target: StringName = &""   # "enemy" | "ally" | "" (none)
 
@@ -65,20 +68,23 @@ var _status_text: String = "Your turn."
 var _finished: bool = false
 
 # Built-once containers; repopulated each refresh.
-var _party_box: VBoxContainer
-var _enemy_box: VBoxContainer
+var _party_box: HBoxContainer
+var _enemy_box: HBoxContainer
 var _hand_box: HBoxContainer
-var _innate_box: HBoxContainer
 var _header: Label
+var _hand_label: Label
 var _banner: Label
 var _continue_btn: Button
 var _outcome_value: int = BattleState.Outcome.ONGOING
 
 
 func _ready() -> void:
+	_sfx = SfxPlayer.new()
+	add_child(_sfx)
 	_load_and_assemble()
 	_build_layout()
 	if _battle != null:
+		_sfx.play(&"card_shuffle")  # the battle deck was just assembled
 		_begin_player_turn()
 	_refresh()
 
@@ -111,7 +117,14 @@ func _load_and_assemble() -> void:
 
 func _begin_player_turn() -> void:
 	_turns += 1
+	# Detect the ADR-0006 cooldown reshuffle: if the discard pile empties into the
+	# draw pile during the turn-start draw, the cycle refreshed — sound it.
+	var discard_before: int = _battle.deck.discard_pile.size()
 	_battle.start_player_turn()
+	if discard_before > 0 and _battle.deck.discard_pile.is_empty():
+		_sfx.play(&"card_shuffle")
+	else:
+		_sfx.play(&"card_draw")
 	# Telegraph each enemy's next action for display.
 	if _battle.enemy_ai != null:
 		for enemy in _battle.living_enemies():
@@ -119,7 +132,7 @@ func _begin_player_turn() -> void:
 			if data != null:
 				_battle.enemy_ai.select_intent(enemy, data, _battle)
 	_clear_armed()
-	_status_text = "Your turn — energy %d." % _battle.energy
+	_status_text = "Your turn — energy %s." % _energy_summary()
 
 
 # --- Static layout ----------------------------------------------------------
@@ -130,6 +143,17 @@ func _build_layout() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+
+	# Stone-floor strip under the combatants (cheap StS-style depth).
+	var floor_rect := ColorRect.new()
+	floor_rect.color = COL_FLOOR
+	floor_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	floor_rect.anchor_top = 0.42
+	floor_rect.anchor_bottom = 0.68
+	floor_rect.offset_top = 0
+	floor_rect.offset_bottom = 0
+	floor_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(floor_rect)
 
 	var root := VBoxContainer.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -150,26 +174,18 @@ func _build_layout() -> void:
 	mid.add_theme_constant_override("separation", 24)
 	root.add_child(mid)
 
-	_party_box = _titled_column(mid, "PARTY")
-	_enemy_box = _titled_column(mid, "ENEMIES")
+	# Owner spec (2026-06-10, rev 2): PROTAGONISTS LEFT, ANTAGONISTS RIGHT.
+	_party_box = _titled_column(mid, "")
+	_enemy_box = _titled_column(mid, "")
 
-	# Bottom: innate bar + hand + end turn
-	var innate_row := HBoxContainer.new()
-	innate_row.add_theme_constant_override("separation", 8)
-	root.add_child(innate_row)
-	var innate_label := Label.new()
-	innate_label.text = "Innate:"
-	innate_row.add_child(innate_label)
-	_innate_box = HBoxContainer.new()
-	_innate_box.add_theme_constant_override("separation", 8)
-	innate_row.add_child(_innate_box)
-
-	var hand_label := Label.new()
-	hand_label.text = "Hand:"
-	root.add_child(hand_label)
+	# Bottom: the selected actor's hand (ADR-0026) + end turn.
+	_hand_label = Label.new()
+	_hand_label.text = "Hand:"
+	root.add_child(_hand_label)
 	_hand_box = HBoxContainer.new()
+	_hand_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_hand_box.add_theme_constant_override("separation", 8)
-	_hand_box.custom_minimum_size = Vector2(0, 110)
+	_hand_box.custom_minimum_size = Vector2(0, 168)
 	root.add_child(_hand_box)
 
 	var controls := HBoxContainer.new()
@@ -195,17 +211,15 @@ func _build_layout() -> void:
 	controls.add_child(_continue_btn)
 
 
-func _titled_column(parent: Control, title: String) -> VBoxContainer:
+func _titled_column(parent: Control, _title: String) -> HBoxContainer:
+	# A horizontal line of combatant figures (sprite + HP bar), StS-style.
 	var wrap := VBoxContainer.new()
 	wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	wrap.add_theme_constant_override("separation", 8)
+	wrap.alignment = BoxContainer.ALIGNMENT_CENTER
 	parent.add_child(wrap)
-	var t := Label.new()
-	t.text = title
-	t.add_theme_color_override("font_color", COL_ACCENT)
-	wrap.add_child(t)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 8)
+	var box := HBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 18)
 	wrap.add_child(box)
 	return box
 
@@ -216,54 +230,79 @@ func _refresh() -> void:
 	if _battle == null:
 		_header.text = _status_text
 		return
-	_header.text = "Turn %d   |   Energy %d   |   %s" % [
-		_battle.turn_number, _battle.energy, _status_text
+	_header.text = "Turn %d   |   Energy %s   |   %s" % [
+		_battle.turn_number, _energy_summary(), _status_text
 	]
 	_rebuild_party()
 	_rebuild_enemies()
-	_rebuild_innate()
 	_rebuild_hand()
 
 
 func _rebuild_party() -> void:
 	_clear(_party_box)
 	for unit in _battle.living_players():
-		var selectable := not _finished
-		var btn := _unit_panel(unit, false, unit == _selected_actor)
-		if selectable:
-			btn.pressed.connect(_on_party_clicked.bind(unit))
-		_party_box.add_child(btn)
+		var fig := _unit_figure(unit, false, unit == _selected_actor)
+		_party_box.add_child(fig)
 
 
 func _rebuild_enemies() -> void:
 	_clear(_enemy_box)
 	for unit in _battle.living_enemies():
-		var btn := _unit_panel(unit, true, false)
-		if not _finished:
+		var fig := _unit_figure(unit, true, false)
+		_enemy_box.add_child(fig)
+
+
+## A combatant rendered StS-style: sprite (clickable), HP bar UNDER the sprite,
+## then a small caption (block / statuses / intent / incoming).
+func _unit_figure(unit: Combatant, is_enemy: bool, selected: bool) -> VBoxContainer:
+	var fig := VBoxContainer.new()
+	fig.alignment = BoxContainer.ALIGNMENT_CENTER
+	fig.add_theme_constant_override("separation", 4)
+
+	var btn := _unit_panel(unit, is_enemy, selected)
+	if not _finished:
+		if is_enemy:
 			btn.pressed.connect(_on_enemy_clicked.bind(unit))
-		_enemy_box.add_child(btn)
+		else:
+			btn.pressed.connect(_on_party_clicked.bind(unit))
+	fig.add_child(btn)
+
+	# HP bar under the sprite (owner spec).
+	var bar := ProgressBar.new()
+	bar.custom_minimum_size = Vector2(110, 12)
+	bar.max_value = float(maxi(1, unit.max_hp))
+	bar.value = float(unit.hp)
+	bar.show_percentage = false
+	var bar_bg := StyleBoxFlat.new()
+	bar_bg.bg_color = Color(0.08, 0.06, 0.06)
+	bar_bg.set_corner_radius_all(3)
+	var bar_fill := StyleBoxFlat.new()
+	bar_fill.bg_color = Color(0.72, 0.15, 0.13)
+	bar_fill.set_corner_radius_all(3)
+	bar.add_theme_stylebox_override("background", bar_bg)
+	bar.add_theme_stylebox_override("fill", bar_fill)
+	fig.add_child(bar)
+
+	var hp_lab := Label.new()
+	hp_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hp_lab.add_theme_font_size_override("font_size", 12)
+	hp_lab.text = "%d/%d" % [unit.hp, unit.max_hp]
+	fig.add_child(hp_lab)
+
+	var caption := Label.new()
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption.autowrap_mode = TextServer.AUTOWRAP_WORD
+	caption.custom_minimum_size = Vector2(120, 0)
+	caption.add_theme_font_size_override("font_size", 11)
+	caption.add_theme_color_override("font_color", Color(0.85, 0.82, 0.75))
+	caption.text = _figure_caption(unit, is_enemy)
+	fig.add_child(caption)
+	return fig
 
 
-func _unit_panel(unit: Combatant, is_enemy: bool, selected: bool) -> Button:
-	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(240, 64)
-	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	btn.add_theme_color_override("font_color", Color.WHITE)
-	var col := COL_ENEMY if is_enemy else COL_PANEL
-	if selected:
-		col = COL_PANEL_SEL
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = col
-	sb.set_corner_radius_all(6)
-	sb.content_margin_left = 10
-	sb.content_margin_top = 6
-	sb.content_margin_right = 10
-	sb.content_margin_bottom = 6
-	btn.add_theme_stylebox_override("normal", sb)
-	btn.add_theme_stylebox_override("hover", sb)
-	btn.add_theme_stylebox_override("pressed", sb)
-	var parts: Array[String] = []
-	parts.append("%s   HP %d/%d" % [unit.display_name, unit.hp, unit.max_hp])
+## The small text under a figure: name, block, statuses, intent/incoming.
+func _figure_caption(unit: Combatant, is_enemy: bool) -> String:
+	var lines: Array[String] = [unit.display_name]
 	var second: Array[String] = []
 	if unit.block > 0:
 		second.append("BLK %d" % unit.block)
@@ -271,78 +310,124 @@ func _unit_panel(unit: Combatant, is_enemy: bool, selected: bool) -> Button:
 	if st != "":
 		second.append(st)
 	if is_enemy:
-		# A ramp/summon turn replaces the attack — telegraph it honestly.
 		var special := _battle.upcoming_special(unit)
 		if special == &"summon":
-			second.append("Intent: Reinforce ▲")
+			second.append("Reinforce ▲")
 		elif special == &"empower":
-			second.append("Intent: Empower ▲ (+STR)")
+			second.append("Empower ▲")
 		else:
 			var intent := _intent_summary(unit)
 			if intent != "":
-				second.append("Intent: " + intent)
+				second.append(intent)
 	else:
-		# Telegraph how much damage is aimed at THIS ally this turn, so blocking is
-		# a legible choice (the core balance lever — HANDOFF §5).
 		var incoming := _incoming_damage(unit)
 		if incoming > 0:
-			second.append("◀ Incoming %d" % incoming)
+			second.append("◀ %d" % incoming)
+		second.append("⚡ %d" % _battle.energy_of(unit))
 	if not second.is_empty():
-		parts.append("   ".join(second))
-	btn.text = "\n".join(parts)
+		lines.append("  ".join(second))
+	return "\n".join(lines)
+
+
+func _unit_panel(unit: Combatant, _is_enemy: bool, selected: bool) -> Button:
+	# The sprite itself is the click target (target/select). DCSS art is 32px —
+	# rendered at ~3x, pixel-crisp. Falls back to a named flat button.
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(110, 100)
+	var sprite: Texture2D = UiAssets.unit_sprite(unit)
+	if sprite != null:
+		btn.icon = sprite
+		btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		btn.add_theme_constant_override("icon_max_width", 96)
+		btn.expand_icon = true
+		btn.text = ""
+	else:
+		btn.text = unit.display_name
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0, 0, 0, 0)
+	sb.set_content_margin_all(2)
+	if selected:
+		sb.border_color = COL_ACCENT
+		sb.set_border_width_all(2)
+		sb.set_corner_radius_all(8)
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		btn.add_theme_stylebox_override(state, sb)
 	return btn
-
-
-func _rebuild_innate() -> void:
-	_clear(_innate_box)
-	if _selected_actor == null or _finished:
-		return
-	var data := _selected_actor.source_data as CharacterData
-	if data == null:
-		return
-	for innate_id in data.innate_actions:
-		var card: CardData = _db.get_card(innate_id)
-		if card == null:
-			continue
-		var btn := Button.new()
-		btn.text = "%s (%d)" % [card.display_name, card.energy_cost]
-		btn.custom_minimum_size = Vector2(0, 32)
-		btn.disabled = card.energy_cost > _battle.energy
-		btn.pressed.connect(_on_innate_pressed.bind(card, _selected_actor))
-		_innate_box.add_child(btn)
 
 
 func _rebuild_hand() -> void:
 	_clear(_hand_box)
-	for card in _battle.deck.hand:
+	if _selected_actor == null:
+		return
+	var deck: Deck = _battle.deck_of(_selected_actor)
+	_hand_label.text = "Hand — %s  (draw %d · discard %d):" % [
+		_selected_actor.display_name, deck.draw_pile.size(), deck.discard_pile.size()
+	]
+	for card in deck.hand:
 		_hand_box.add_child(_card_button(card))
 
 
 func _card_button(card: CardData) -> Button:
 	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(150, 100)
-	btn.clip_text = true
+	btn.custom_minimum_size = Vector2(128, 162)
+	btn.clip_text = false
 	btn.autowrap_mode = TextServer.AUTOWRAP_WORD
+	btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 	var actor := _actor_for_card(card)
-	var playable := actor != null and card.energy_cost <= _battle.energy and not _finished
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = COL_CARD if playable else COL_CARD_DIM
-	sb.set_corner_radius_all(6)
-	sb.content_margin_left = 8
-	sb.content_margin_top = 8
-	sb.content_margin_right = 8
-	sb.content_margin_bottom = 8
-	if _armed_card == card:
-		sb.border_color = COL_ACCENT
-		sb.set_border_width_all(2)
-	btn.add_theme_stylebox_override("normal", sb)
-	btn.add_theme_stylebox_override("hover", sb)
-	btn.add_theme_stylebox_override("pressed", sb)
-	btn.add_theme_stylebox_override("disabled", sb)
+	# ADR-0029: `unplayable` (curses) renders as a permanently dead card.
+	var dead_card := card.keywords.has(&"unplayable")
+	var playable := (
+		actor != null and not dead_card
+		and card.energy_cost <= _battle.energy_of(actor) and not _finished
+	)
+	# Card frame (P2·13 asset pass): a Kenney 9-slice frame tinted by playability;
+	# the armed highlight keeps the flat bordered style (StyleBoxTexture has no
+	# border). Missing frame asset -> the original flat stylebox.
+	var frame: Texture2D = UiAssets.texture(UiAssets.UI_CARD_FRAME)
+	if frame != null and _armed_card != card:
+		var sbt := StyleBoxTexture.new()
+		sbt.texture = frame
+		sbt.texture_margin_left = 8.0
+		sbt.texture_margin_top = 8.0
+		sbt.texture_margin_right = 8.0
+		sbt.texture_margin_bottom = 8.0
+		sbt.content_margin_left = 8.0
+		sbt.content_margin_top = 8.0
+		sbt.content_margin_right = 8.0
+		sbt.content_margin_bottom = 8.0
+		sbt.modulate_color = COL_CARD if playable else COL_CARD_DIM
+		btn.add_theme_stylebox_override("normal", sbt)
+		btn.add_theme_stylebox_override("hover", sbt)
+		btn.add_theme_stylebox_override("pressed", sbt)
+		btn.add_theme_stylebox_override("disabled", sbt)
+	else:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = COL_CARD if playable else COL_CARD_DIM
+		sb.set_corner_radius_all(6)
+		sb.content_margin_left = 8
+		sb.content_margin_top = 8
+		sb.content_margin_right = 8
+		sb.content_margin_bottom = 8
+		if _armed_card == card:
+			sb.border_color = COL_ACCENT
+			sb.set_border_width_all(2)
+		btn.add_theme_stylebox_override("normal", sb)
+		btn.add_theme_stylebox_override("hover", sb)
+		btn.add_theme_stylebox_override("pressed", sb)
+		btn.add_theme_stylebox_override("disabled", sb)
+	# Card icon (game-icons.net, resolved by card id; null -> text-only).
+	var icon: Texture2D = UiAssets.card_icon(card.id)
+	if icon != null:
+		btn.icon = icon
+		btn.add_theme_constant_override("icon_max_width", 56)
 	btn.add_theme_font_size_override("font_size", 12)
 	var owner_txt := "neutral" if card.character_tag == &"neutral" else String(card.character_tag)
-	btn.text = "%s  (%d)\n[%s]\n%s" % [
-		card.display_name, card.energy_cost, owner_txt, _card_effects_summary(card)
+	# ADR-0029: an unplayable curse shows "—" for its cost (it has none).
+	var cost_txt := "—" if dead_card else str(card.energy_cost)
+	btn.text = "%s  (%s)\n[%s]\n%s" % [
+		card.display_name, cost_txt, owner_txt, _card_effects_summary(card, actor)
 	]
 	btn.disabled = not playable
 	btn.pressed.connect(_on_card_pressed.bind(card))
@@ -353,7 +438,7 @@ func _card_button(card: CardData) -> Button:
 
 func _on_party_clicked(unit: Combatant) -> void:
 	if _await_target == &"ally":
-		_resolve_play(_armed_actor, _armed_card, _armed_innate, unit)
+		_resolve_play(_armed_actor, _armed_card, unit)
 		return
 	_selected_actor = unit
 	_status_text = "%s selected." % unit.display_name
@@ -362,7 +447,7 @@ func _on_party_clicked(unit: Combatant) -> void:
 
 func _on_enemy_clicked(unit: Combatant) -> void:
 	if _await_target == &"enemy":
-		_resolve_play(_armed_actor, _armed_card, _armed_innate, unit)
+		_resolve_play(_armed_actor, _armed_card, unit)
 	else:
 		_status_text = "Arm a card or Strike, then click an enemy."
 		_refresh()
@@ -374,26 +459,21 @@ func _on_card_pressed(card: CardData) -> void:
 		_status_text = "No one can play %s right now." % card.display_name
 		_refresh()
 		return
-	if card.energy_cost > _battle.energy:
-		_status_text = "Not enough energy for %s." % card.display_name
+	if card.energy_cost > _battle.energy_of(actor):
+		_status_text = "Not enough energy for %s (%s's pool)." % [card.display_name, actor.display_name]
 		_refresh()
 		return
-	_arm(card, null, actor)
+	_arm(card, actor)
 
 
-func _on_innate_pressed(card: CardData, actor: Combatant) -> void:
-	_arm(null, card, actor)
-
-
-func _arm(card: CardData, innate: CardData, actor: Combatant) -> void:
+func _arm(card: CardData, actor: Combatant) -> void:
 	_armed_card = card
-	_armed_innate = innate
 	_armed_actor = actor
-	var spec: TargetSpec = (card if card != null else innate).target
+	var spec: TargetSpec = card.target
 	var kind: StringName = spec.target_type if spec != null else &"enemy"
 	match kind:
 		&"self", &"all_allies", &"all_enemies", &"random_enemy":
-			_resolve_play(actor, card, innate, null if kind != &"self" else actor)
+			_resolve_play(actor, card, null if kind != &"self" else actor)
 		&"enemy":
 			_await_target = &"enemy"
 			_status_text = "Click an enemy target."
@@ -408,23 +488,20 @@ func _arm(card: CardData, innate: CardData, actor: Combatant) -> void:
 			_refresh()
 
 
-func _resolve_play(actor: Combatant, card: CardData, innate: CardData, target: Variant) -> void:
-	var result: CardPlay.PlayResult
-	if innate != null:
-		result = _card_play.play_innate(actor, innate, target)
-	else:
-		result = _card_play.play_card(actor, card, target)
+func _resolve_play(actor: Combatant, card: CardData, target: Variant) -> void:
+	var result: CardPlay.PlayResult = _card_play.play_card(actor, card, target)
 	if result.ok:
-		var played: CardData = innate if innate != null else card
+		var played: CardData = card
 		_status_text = "%s played %s." % [actor.display_name, played.display_name]
+		_play_card_sfx(played)
 		if telemetry != null:
 			var actor_data := actor.source_data as CharacterData
 			telemetry.log_event(&"card_played", {
 				"card": String(played.id),
 				"actor": String(actor_data.id) if actor_data != null else actor.display_name,
-				"innate": innate != null,
+
 				"turn": _turns,
-				"energy_left": _battle.energy,
+				"energy_left": _battle.energy_of(actor),
 			})
 	else:
 		_status_text = result.reason
@@ -466,7 +543,6 @@ func _actor_for_card(card: CardData) -> Combatant:
 
 func _clear_armed() -> void:
 	_armed_card = null
-	_armed_innate = null
 	_armed_actor = null
 	_await_target = &""
 
@@ -474,10 +550,14 @@ func _clear_armed() -> void:
 func _check_outcome() -> bool:
 	var outcome := _battle.check_outcome()
 	if outcome == BattleState.Outcome.WIN:
+		if not _finished:
+			_sfx.play(&"victory")
 		_finished = true
 		_banner.text = "VICTORY"
 		_status_text = "All enemies defeated."
 	elif outcome == BattleState.Outcome.LOSS:
+		if not _finished:
+			_sfx.play(&"defeat")
 		_finished = true
 		_banner.text = "DEFEAT"
 		_status_text = "Your party was wiped."
@@ -492,6 +572,29 @@ func _check_outcome() -> bool:
 ## standalone mode (no listener) the button simply does nothing further.
 func _on_continue() -> void:
 	combat_finished.emit(_outcome_value)
+
+
+## Card-play audio (P2·13): the cardstock sound always, plus a hit or a metal
+## clink layered on top when the card deals damage / grants block. All cues are
+## silent no-ops when audio assets are absent.
+func _play_card_sfx(played: CardData) -> void:
+	_sfx.play(&"card_play")
+	for e in played.effects:
+		if e is Effect and (e as Effect).type == &"damage":
+			_sfx.play(&"hit")
+			return
+	for e in played.effects:
+		if e is Effect and (e as Effect).type == &"block":
+			_sfx.play(&"block")
+			return
+
+
+## Per-character pools (ADR-0025), e.g. "Fighter 2 · Mage 1".
+func _energy_summary() -> String:
+	var bits: PackedStringArray = PackedStringArray()
+	for unit in _battle.living_players():
+		bits.append("%s %d" % [unit.display_name, _battle.energy_of(unit)])
+	return " · ".join(bits)
 
 
 func _status_summary(unit: Combatant) -> String:
@@ -570,18 +673,33 @@ func _intent_damage(intent: IntentData) -> int:
 	return total
 
 
-func _card_effects_summary(card: CardData) -> String:
+## Card text with DYNAMIC totals (owner, 2026-06-10): when `actor` is known
+## (the hand), damage/block show the REAL outgoing numbers — base + the actor's
+## attack stat / DEX (× stat_mult, ADR-0020) + Strength/Weak — via the exact
+## battle math, so the card reads what it will actually do. Actor-less contexts
+## (rewards, shop) keep the base number.
+func _card_effects_summary(card: CardData, actor: Combatant = null) -> String:
 	var bits: Array[String] = []
 	for e in card.effects:
 		if not (e is Effect):
 			continue
 		match e.type:
-			&"damage": bits.append("%d dmg" % e.amount)
-			&"block": bits.append("%d blk" % e.amount)
+			&"damage":
+				var dmg: int = e.amount
+				if actor != null:
+					dmg = _battle.modified_damage(actor, e.amount, true, e.stat_mult)
+				bits.append("%d dmg" % dmg)
+			&"block":
+				var blk: int = e.amount
+				if actor != null:
+					blk = _battle.modified_block(actor, e.amount, true, e.stat_mult)
+				bits.append("%d blk" % blk)
 			&"heal": bits.append("heal %d" % e.amount)
 			&"apply_status": bits.append("%d %s" % [e.stacks, e.status])
 			&"draw": bits.append("draw %d" % e.amount)
 			&"gain_energy": bits.append("+%d NRG" % e.amount)
+			&"cleanse": bits.append("cleanse")  # ADR-0029 (antidote)
+			&"gain_gold": bits.append("+%d gold" % e.amount)  # ADR-0029 (lucky coin)
 	var tt := card.target.target_type if card.target != null else &"enemy"
 	var line := ", ".join(bits)
 	if tt == &"all_enemies":

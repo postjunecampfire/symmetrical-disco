@@ -52,6 +52,20 @@
         }
       ],
       "weight": 1
+    },
+    {
+      "id": "coven_inflict_doubt",
+      "telegraph": "debuff",
+      "target": {
+        "target_type": "enemy"
+      },
+      "effects": [
+        {
+          "type": "inflict_curse",
+          "params": { "card_id": "doubt" }
+        }
+      ],
+      "weight": 1
     }
   ],
   "ramp_amount": 2,

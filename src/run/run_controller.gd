@@ -74,6 +74,8 @@ func start_run(party: Array[StringName], seed: int, races: Dictionary = {}) -> v
 	run.downed = []
 	run.skill_collections = {}
 	run.active_loadouts = {}
+	run.member_curses = {}
+	run.consumables = []
 	run.party_races = races.duplicate()
 	run.party_level = {}
 	run.party_xp = {}
@@ -130,9 +132,20 @@ func begin_combat(encounter_id: StringName, band: StringName = &"") -> Encounter
 			enemy_level = EnemyScaler.band_level(act_cfg, band)
 	# ADR-0026: each member's combat deck is DERIVED from their active skill
 	# loadout (copies by rarity + Strike/Defend auto-fill to the floor).
+	# ADR-0029 injected layer: each member's CURSES ride their own deck (counting
+	# toward the floor); the party CONSUMABLE inventory injects ON TOP into the
+	# FIRST member's deck (consumables are neutral, but decks are per-member —
+	# the first-member attribution mirrors party-level relic crediting); relic
+	# `floor_reduction` lowers the auto-fill floor (min derived_deck_floor_min).
 	var member_decks: Dictionary = {}
+	var floor_red: int = RelicEngine.floor_reduction_total(_active_relics())
 	for cid in run.party:
-		member_decks[cid] = SkillLoadout.derive_deck(loadout_of(cid), db)
+		var items: Array[StringName] = []
+		if cid == run.party[0]:
+			items = run.consumables
+		member_decks[cid] = SkillLoadout.derive_deck(
+			loadout_of(cid), db, run.curses_of(cid), items, floor_red
+		)
 	# Per-fight seed: the run seed stays the run's identity, but each fight
 	# shuffles/rolls differently (act + encounter + progress salt) — fixes the
 	# repeated-draw-order bug (same run.seed reused every fight).
@@ -469,6 +482,19 @@ func finish_combat(encounter_id: StringName, battle: BattleState, turns: int = 0
 		hp_end_of_fight[cid] = unit.hp
 		damage_taken[cid] = int(hp_before.get(cid, unit.hp)) - unit.hp
 	_write_back_hp(battle, outcome)
+	# ADR-0029: settle the injected card layer regardless of outcome — inflicted
+	# curses stick to their members, played consumables leave the inventory, and
+	# gold found mid-fight is banked.
+	for entry in battle.inflicted_curses:
+		var member := StringName(String(entry.get("member", "")))
+		var curse_id := StringName(String(entry.get("card", "")))
+		if member != &"" and curse_id != &"":
+			run.curses_of(member).append(curse_id)
+	for item_id in battle.consumed_items:
+		var item_idx: int = run.consumables.find(item_id)
+		if item_idx != -1:
+			run.consumables.remove_at(item_idx)
+	run.currency += battle.gold_found
 	var fame_gained: int = 0
 	if outcome == BattleState.Outcome.WIN:
 		_award_combat_xp()

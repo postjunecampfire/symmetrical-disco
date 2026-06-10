@@ -31,6 +31,17 @@ const HANDLED_TYPES: Array[StringName] = [
 	&"apply_status",
 	&"draw",
 	&"gain_energy",
+	# ADR-0028 (DCC adaptation): caster-side taxes/riders, Charm attacks, the
+	# Charm cash-in, and token generation. Mirrors ContentDatabase.EFFECT_TYPES.
+	&"self_damage",
+	&"self_block",
+	&"charm_damage",
+	&"consume_status_damage",
+	&"add_card",
+	# ADR-0029 (injected card layer): curse infliction, item cleanses, found gold.
+	&"inflict_curse",
+	&"cleanse",
+	&"gain_gold",
 ]
 
 
@@ -64,9 +75,44 @@ func resolve(effect: Effect, source: Variant, target: Variant, context: BattleCo
 		&"apply_status":
 			context.apply_status(target, effect.status, effect.stacks)
 		&"draw":
-			context.draw_cards(effect.amount)
+			# ADR-0026: drawn cards go to the CASTER's own hand.
+			var drawer: Combatant = source if source is Combatant else null
+			context.draw_cards(effect.amount, drawer)
 		&"gain_energy":
-			context.add_energy(effect.amount)
+			# ADR-0025: energy gained by a card credits the CASTER's own pool.
+			# Non-Combatant sources (context fakes, source-less seams) fall back
+			# to the context's default pool attribution.
+			var caster: Combatant = source if source is Combatant else null
+			context.add_energy(effect.amount, caster)
+		&"self_damage":
+			# ADR-0028: caster-side tax. apply_effects routes the SOURCE in as the
+			# target (once per card); raw damage — block absorbs, never amplified.
+			context.deal_damage(target if target != null else source, effect.amount)
+		&"self_block":
+			# ADR-0028: caster-side block rider (amount pre-scaled by apply_effects).
+			context.add_block(target if target != null else source, effect.amount)
+		&"charm_damage":
+			# ADR-0028: Charm attack — damage, then Charm equal to the UNBLOCKED
+			# portion. The context owns the block/Charm math.
+			context.charm_strike(target, effect.amount)
+		&"consume_status_damage":
+			# ADR-0028: cash-in (Coup de Grace) — damage equal to the target's
+			# stacks of `status`, then remove them all.
+			context.consume_status_damage(target, effect.status)
+		&"add_card":
+			# ADR-0028: token generation — add params.card_id to the CASTER's hand.
+			var token_owner: Combatant = source if source is Combatant else null
+			context.add_card_to_hand(StringName(String(effect.params.get("card_id", ""))), token_owner)
+		&"inflict_curse":
+			# ADR-0029: curse params.card_id joins the TARGET's discard pile (and is
+			# recorded for run persistence by the context).
+			context.inflict_curse(StringName(String(effect.params.get("card_id", ""))), target)
+		&"cleanse":
+			# ADR-0029: strip every stack of each listed status from the target.
+			context.cleanse(target, effect.params.get("statuses", []))
+		&"gain_gold":
+			# ADR-0029: found gold — banked on the context, credited post-combat.
+			context.add_gold(effect.amount)
 		_:
 			return ResolveResult.new(
 				"EffectResolver: unknown effect.type '%s'" % effect.type

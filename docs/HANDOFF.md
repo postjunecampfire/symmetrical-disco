@@ -1,7 +1,204 @@
 # HANDOFF — start-of-session brief
 
-*Authoritative "where things stand" doc. Last updated 2026-06-08. Read this, then
+*Authoritative "where things stand" doc. Last updated 2026-06-10. Read this, then
 `AGENTS.md` and the ADRs, before picking up work.*
+
+> **2026-06-10 session — the 0021-pt1 → 0025 → 0026 schema epoch + StS-style UI
+> (298 GUT green, run in-sandbox on Godot 4.6 arm64; human gate still advised).**
+> - **ADR-0029 LIVE (M3 injected card layer — agent decision, owner to ratify):**
+>   per-member CURSES (`RunState.member_curses`) count toward the derived-deck
+>   floor (each displaces one Strike/Defend fill; above the floor they swell);
+>   party CONSUMABLES (`RunState.consumables`) inject ON TOP into the first
+>   member's deck, exhaust + are consumed from the inventory when played.
+>   `card_kind: skill|curse|consumable` on CardData (non-skill NEVER in reward
+>   pools); `unplayable` keyword = dead draw (CardPlay + hand-UI guard);
+>   `on_draw_damage` for active curses (hex_mark/vertigo). New effects
+>   `inflict_curse`/`cleanse`/`gain_gold`; event ops `add_curse`/`remove_curse`/
+>   `add_consumable`; shop sells 2 consumables + "Remove a curse"
+>   (`shop_price_curse_removal` 75, the ONLY card removal — skills stay free via
+>   loadout); treasure can roll an item; relic effect `floor_reduction`
+>   ("Travel Light", −4, min floor 12). Content: 8 curses, 10 consumables;
+>   hexer/coven_witch inflict; evt_cursed_shrine now curses; evt_peddlers_cache
+>   new. Old saves remain compatible (new keys default empty).
+> - **ADR-0021 pt1 LIVE:** races are BASE stat templates (pinned: Human 3/3/3/3 ·
+>   Elf 2/5/2/5 · Orc 5/3/4/2; JSON uses plain stat keys, legacy `*_mod` still
+>   parses); classes are small overlays (+2/+1 style). HP = **`base_hp` (new
+>   knob, 4) + CON × hp_per_con** — fighter 6, orc-fighter 14, elf-mage 8. The
+>   party is now genuinely fragile; **scaled Act-1 fights are winnable
+>   (20/20 scripted greedy)**, unscaled authored blocks are deadly (by design).
+> - **ADR-0025 LIVE:** per-character energy (`energy_per_character: 2`;
+>   `energy_per_turn` is dead config). `BattleState.energy` is GONE → use
+>   `energy_of(unit)` / `spend_energy` / `add_energy(n, unit)`; CardPlay = owner
+>   pays. `gain_energy` credits the caster; party-level relics credit the FIRST
+>   living player (provisional until relics get holders).
+> - **ADR-0026 LIVE:** per-member skill collections + active loadouts on
+>   RunState (`run_deck` is GONE); `SkillLoadout.derive_deck()` = copies by
+>   rarity (3/2/1) + alternating Strike/Defend auto-fill to the 20 floor (knobs
+>   on BattleConfig). Strike/Defend are ordinary commons (ADR-0005 reversed;
+>   `play_innate` deleted). Drafts/events/boons/promotions grant SKILLS
+>   (auto-activate while ≤10 slots free — **loadout editor UI still TODO**);
+>   rest-upgrade swaps the skill id (all copies upgrade). Rarity audit done
+>   (mana_surge → uncommon = the engine-stacking cap from the playtest).
+>   **Per-fight seeds + assembly shuffle landed** (the repeated-opening-hand bug
+>   is fixed); old saves are incompatible (run_deck removed) — delete stale
+>   `user://saves`.
+> - **StS-style UI (owner reference screenshots):** map = parchment sheet,
+>   icon-only inked nodes, dashed paths (`MapSheet._draw`), red reachable rings,
+>   bigger boss glyph; **all 18 acts now 17 rows + boss**. Combat = enemies
+>   LEFT / party RIGHT, big DCSS sprites with **HP bars + captions underneath**,
+>   card fan bottom-center (icon-top cards), per-member energy in captions.
+>   Post-combat = **"Rewards!" popup** (take Gold / relic-on-elite / "Add a
+>   card") → **"Choose a Card"** with three big visual cards. **Run currency
+>   (Gold) added** (ADR-0023 slice): `RunState.currency`, earn knobs
+>   `gold_per_combat/elite/boss` (12/25/40 ±25%), shown on the map header.
+>   Shop/treasure nodes still TODO.
+> - **Harness act-parameterized (proposal §7, DONE):** `attrition_sim [seeds]
+>   [act]` (args after `--`) now band-scales every fight via the EnemyScaler
+>   (act 0 = legacy unscaled) and pre-levels the party ~1 level per prior act.
+>   `resolve_combat` gained an optional `band` arg. New GUT **lockstep guard**:
+>   `test_factor_is_linear_lockstep` fails if the factor shape ever goes
+>   non-linear (the dex-turtle re-opener). **First reads under the new economy
+>   (40/20 seeds, kit-only decks — a LOWER bound, drafts not emulated):**
+>   - **Act 1: defensive 35% > greedy 12.5% > dex-turtle 2.5% > turtle 0%.**
+>     The Goldilocks ORDERING the attrition thesis wants, and the perfect-turtle
+>     dominance is **dead** — under 0026/0025 block is drawn (not innate) and
+>     costs half a per-character pool. The block-economy "feel decision"
+>     (HANDOFF §5) may be resolved structurally; re-confirm after drafts.
+>   - **Acts 2–3 (pre-rosters): 0%, everyone at `enc_combat_04`** → fixed by
+>     the per-act rosters below; see the updated reads there.
+> - **Per-act encounter rosters LIVE (ADR-0019 content remainder, 2026-06-10):**
+>   `act_progression.json` gains **`tier_pools`** (per-tier combat/elite/boss
+>   id lists; per-act `encounters` key overrides); loader attaches them to
+>   `ActConfig.encounter_pool` + validates every id resolves;
+>   `RunNavigator.encounter_for` draws from the CURRENT act's roster (global
+>   `encounter_pool.json` = fallback only). **14 new encounters** authored
+>   (enc_t1_* light Weak-only fights … enc_t6_legion), Hard templates pushed to
+>   tier 3+. Harness fights each act's authored ladder now.
+>   **Reads with rosters (20 seeds, kit-only lower bound):**
+>   - **Act 1: defensive 80% · greedy/turtle/dex-turtle 25%.** Forgiving, with
+>     balanced play clearly best — on the proposal's target.
+>   - **Act 2: defensive reaches the boss 20/20 and dies there (×1.375);
+>     Act 3: deaths move up to the elite (×1.75).** The within-tier ramp walls
+>     a kit-only autoplay party; real parties carry ~4 drafts + upgrades +
+>     relics by then, which the sim does NOT emulate — next harness improvement
+>     is draft emulation. If real play confirms the wall, the data knob is the
+>     tier-1 elite/boss band levels (proposal option B) — owner call.
+> - **Shop + treasure nodes LIVE (ADR-0023 COMPLETE, 2026-06-10):** `shop` /
+>   `treasure` node kinds with per-act weights + **guarantees** (≥1 of each per
+>   act, `_ensure_type_present` reuse); both stay fog-visible per the ADR
+>   refinement. `src/run/shop.gd` (`Shop`): deterministic per-node offers —
+>   3 skills (CardReward draft) + 1 un-owned relic + party heal — priced from
+>   BattleConfig (`shop_price_*`, common 55 / uncommon 85 / rare 140 / relic
+>   120 / heal 35) × `(1 + shop_act_scale·(act−1))`; buys deduct gold, grant
+>   into collections, refuse cleanly when short. Treasure: seeded roll of
+>   relic / gold pile (25–60) / skill, applied via `take_treasure`. Merchant +
+>   Treasure screens in `map_view` (big-card stock w/ price tags, SOLD states,
+>   live gold label). Suite: 306 green (test_shop + generator placement).
+>   Gold now has its sink — the Act 2–3 player-power injection the harness
+>   flagged. StS "remove a card" deliberately NOT built (loadout deactivation
+>   is free; revisit with the injected-curse layer).
+> - **Scaling + growth pass (owner, 2026-06-10; 306 GUT green):**
+>   (1) **Neutral-flat rule retired** (superseded ADR-0016 clause): every player
+>   card now scales with its ACTOR (CardPlay passes scale=true) — fixes the
+>   post-0026 regression where basics stopped scaling and **Defend granted 0
+>   block**. (2) **Dynamic card totals**: the hand shows REAL damage/block via
+>   modified_damage/_block (stat × stat_mult + Strength/Weak); reward/shop
+>   previews keep base numbers (no actor context). (3) **Auto-growth**: new
+>   `auto_stats_per_level` (1) — every stat +1 per level-up before the 3 chosen
+>   points, recorded into allocated_stats so HP/heals/combat all see it.
+>   **Reads:** A1 ≈ free for all cohorts (final-HP still orders def 34 > greedy
+>   21 ≈ turtle 21 > dex-turtle 15 — turtle stays non-dominant even with DEX
+>   Defend back); A2–A3 kit-only cohorts now clear everything and die ONLY at
+>   the boss. Remaining pinch = boss fights; real decks (drafts + shop +
+>   upgrades) are the intended closer — re-read after a real playtest before
+>   touching boss bands (proposal option B) / auto growth 2 / hp_per_con 3.
+> - **THE FULL DESIGN ARC LANDED (2026-06-10 session 2; 316 GUT green, full
+>   flow repro'd headless):**
+>   - **ADR-0024 + ADR-0021 pt2 LIVE:** member ids are stable handles
+>     (`hero_1/2`, `PartyMember.character_for` synthesizes race base + class
+>     overlay; legacy class-keyed ids still work). Creation = ONE race ("Choose
+>     Your Origin"); **Act 1 is solo**; the **RNG 1-of-3 recruit offer** fires
+>     on entering Act 2; **both classless members pick Fighter/Rogue/Mage after
+>     the Act-3 boss** (pick = overlay stats + locked attack_stat + class kit
+>     skills). Pre-class attacks use the HIGHEST stat (`attack_stat:
+>     &"highest"`). **Draft pools are gated**: origin tier = neutral-only;
+>     class pools unlock at the pick. Race origin kits (`RaceData.starting_kit`).
+>   - **ADR-0022 LIVE:** `data/progression/*.json` (2+4+8 nodes per line, the
+>     full class-progression.md table) + 24 ULT cards; 1-of-2 picks chain at the
+>     Act 6/9/12 boundaries; **Act-15 Ascension** = "Ascended X", flat
+>     `ascension_mult` step on every card (compounds via the 0020 ladder in
+>     apply_effects) + the capstone Ult as a rare skill. Old promotion_level
+>     plumbing remains only as dormant legacy.
+>   - **ADR-0020 content + AoE rule (owner: "mage autopick"):** 12 B/C cards
+>     authored (×1.5 hybrids / ×2.5 exhaust multipliers, offense+defense per
+>     class); **AoE damage scales at 0.6× stat** and big AoE costs 2
+>     (frost_nova, firestorm, fan_of_knives + plus variants); mage gains
+>     single-target identity (Focused Ray / Arcane Overload). Draft + shop
+>     rarities now **depth-weighted** (`CardReward.weights_for_act`: all-common
+>     tier 1 → rare-heavy tier 6).
+>   - **Party INSPECT menu:** per-member Inspect button (map strip) → stats
+>     (race+class+growth breakdown), skill collection vs loadout with
+>     copies-per-deck, and **relics with their actual trigger/effect/amount**;
+>     loadout TOGGLING at rest nodes ("Manage skills", ADR-0026).
+>   - Old saves invalid again (member model). Loadout editing elsewhere, boss
+>     variety, music wiring, harness draft-emulation still open.
+> - **All starting cards upgradeable (owner, 2026-06-10):** 13 new `_plus`
+>   variants (all class kits + race customs; +3 dmg/block/heal, +1
+>   draw/energy/stacks). Draft pool now EXCLUDES upgrade variants (rest-only).
+>   Strike/Defend deliberately have no variants (slotless auto-fill).
+> - **Sandbox note:** a Godot 4.6 arm64 binary now runs the full GUT gate +
+>   headless flow repros in the dev sandbox; this session's suite is green there.
+
+> **2026-06-09 session — the dungeon is real (committed f143639, 285 GUT green).**
+> - **18-act act-advance flow LIVE (ADR-0019):** boss win → next act (new map from
+>   the act's authored `MapGenConfig`, late_row_bias implemented; HP/deck/relics/levels
+>   carry; position/cleared reset; `RunState.act` persisted); no act 19 → true victory.
+>   Playtest confirmed Acts 1→5 in one run.
+> - **Enemy band scaling LIVE:** `begin_combat(id, band)` scales enemies to the act's
+>   trash/elite/boss level via EnemyScaler; **calibrated baseline 8 / exponent 1.0**
+>   (act-1-3-balance-proposal §1 adopted): Act-1 trash ×0.25 → Act-3 trash ×1.0.
+>   Empty band (sim/tests) = unscaled. Mid-fight summons spawn unscaled (v1 note).
+> - **stat_mult ladder LIVE (ADR-0020):** `Effect.stat_mult` (default 1.0 == old
+>   behavior exactly); damage/block = base + floor(stat × mult). Class B/C cards are
+>   now pure data; none authored yet.
+> - **Balance pass 1 (data):** enemy HP ×1.4 (boss ×1.6), ramps flattened (+1/+2 per
+>   4t), recovery 7/8/16. Sim: greedy 70% · defensive 42.5% (policy artifact) ·
+>   turtle 70% · dex-turtle 100% (block-economy hold). Boss fights now bite (playtest:
+>   A3 boss downed the mage; A4 boss dealt 68). Trash still 1-turns at all depths —
+>   root cause is unbounded engine stacking (mana_surge ×6 + AoE), which ADR-0026's
+>   rarity copy caps (3/2/1) eliminate; deliberately NOT tuned around.
+> - **Telemetry:** interactive runs fully logged (turns, pre-heal damage_taken, every
+>   card_played, act_advanced); editor runs write to `telemetry_dump/` in the repo.
+> - **ADR-0026 accepted** (derived decks from skill loadouts; supersedes 0004/0016
+>   deck model, reverses 0005 innate Strike/Defend) — owner re-confirmed from playtest
+>   ("starting decks too strong; current cards should be pickups"). Implementation
+>   chain is tasked + dependency-linked in Asana.
+> - **NEXT:** ADR-0025 per-character energy pools → ADR-0026 deck arc → ADR-0024
+>   recruitment + ADR-0021 creation/class-pick rework → ADR-0022 trees. Build order
+>   of record: 0020 ✓ → 0021-pt1 → 0025 → 0026 → 0024 → 0021-pt2 → 0022 → 0023 →
+>   0019 content remainder.
+
+> **Asset pass (2026-06-09, parallel session) — first real art/audio, license-safe.**
+> New `assets/` tree (87 files, ~13 MB; all CC0 except game-icons.net CC-BY — see
+> `CREDITS.md`): DCSS sprites for all 19 enemies + 3 classes, resolved **by game id**
+> (`assets/sprites/enemies/<id>.png` ↔ `data/enemies/<id>.json` — drop a file, no
+> schema/loader change); game-icons for all 24 cards / 7 statuses / 6 relics / 8 map
+> glyphs; Kenney card frame + 8 SFX; 5 CC0 music tracks (title/map/combat/boss/rest —
+> staged, **not yet wired**). Code: `src/ui/ui_assets.gd` (guarded by-id resolver —
+> missing/unimported file ⇒ null ⇒ views stay text-only, suite never depends on
+> imports), `src/ui/sfx_player.gd` (round-robin pool, silent fallback). `battle_view`:
+> unit sprites on panels, card icons + Kenney 9-slice frame (tinted by playability;
+> armed keeps the flat border), innate icons, SFX on draw/reshuffle/play/hit/block/
+> victory/defeat. `map_view`: node glyphs incl. the `?` fog glyph. Tests:
+> `tests/ui/test_ui_assets.gd` (fallback contract only; positive loads need the
+> importer). **Pending: human GUT run + one editor boot to import assets.** Sourcing
+> rationale + RPG Maker exclusion: `docs/progress/2026-06-09-asset-sourcing.md`.
+> **Known bug, NOT fixed here (owner to green-light):** the combat deck's initial
+> shuffle is never invoked (`Deck.start_battle()` has zero callers — draws come
+> back-to-front off assembly order) and `begin_combat` reuses `run.seed` every fight,
+> so per-fight draw order repeats. Fix = `deck.start_battle()` in
+> `EncounterAssembler.build` + a per-fight derived seed; both touch seed-sensitive
+> test expectations, so land them with the suite runnable.
 
 > **Playtest-driven implementation pass (2026-06-08, in progress).** After the
 > 2026-06-08 playtest (`docs/progress/2026-06-08-playtest-review.md`) we began

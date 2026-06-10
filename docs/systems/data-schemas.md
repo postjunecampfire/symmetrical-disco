@@ -87,6 +87,16 @@ The loader maps each `type` to a handler. **Prototype set** (build these first):
 | `draw` | Draw `amount` cards. | `amount` |
 | `gain_energy` | Add `amount` energy this turn. | `amount` |
 
+**ADR-0028 (DCC adaptation) extensions:**
+
+| `type` | Meaning | Uses |
+|--------|---------|------|
+| `self_damage` | Caster-side tax: `amount` damage to the CASTER, once per card regardless of target set. Block absorbs; never stat-amplified. | `amount` |
+| `self_block` | Caster-side rider: `amount` block to the CASTER, once per card. DEX-scaled like any block grant. | `amount` |
+| `charm_damage` | Attack: deal `amount` damage, then apply Charm equal to the UNBLOCKED portion. Scales like `damage`. | `amount`, `stat_mult` |
+| `consume_status_damage` | Deal damage equal to the target's stacks of `status`, then remove them all (Coup de Grace). Not stat-scaled. | `status` |
+| `add_card` | Add the card `params.card_id` to the CASTER's hand (token generation); overflow past max_hand goes to discard. Global (once per card). | `params.card_id` |
+
 Positionless (ADR-0013): `move` and `push` were **removed with the grid**.
 
 **Deferred (post-prototype):** `summon`, `multi_hit`, `conditional`, `transform_card`. Add as new handlers; do not overload existing types.
@@ -102,7 +112,10 @@ Reusable status-effect definitions (`/data/status`).
 | `decays_each_turn` | bool | no | `true` | Whether stacks tick down each turn. |
 | `icon` | Texture2D | no | null | Placeholder allowed. |
 
-**Prototype statuses:** `block`, `poison`, `stun`, `strength`, `weak`.
+**Prototype statuses:** `block`, `poison`, `stun`, `strength`, `weak` (+ `vulnerable`, `frail`).
+**ADR-0028:** `charm` — intensity-stacking, never decays. Behaviour in code
+(BattleState): every 10 stacks crossed applies 2 Vulnerable + 2 Weak; at stacks
+>= the target's max HP the target is executed (hp -> 0, bypasses block).
 
 ---
 
@@ -124,6 +137,9 @@ Cards are the action system (ADR-0004). Innate Strike/Defend are Cards flagged `
 | `effects` | Array[Effect] | yes | — | Ordered; applied in sequence. |
 | `art` | Texture2D | no | null | Placeholder allowed. |
 | `upgrade_of` | StringName | no | `""` | If this is a "+" version, the base card id. |
+| `signature` | bool | no | `false` | Tree-signature skill (M3): granted only by a progression-node `unlock_cards` pick; excluded from draft/shop pools. |
+| `card_kind` | StringName | no | `skill` | `skill` \| `curse` \| `consumable` (ADR-0029). Non-`skill` cards NEVER enter draft/shop/treasure reward pools. Curses are per-member, count toward the derived-deck floor (displacing auto-fill basics); consumables are party inventory injected on top, consumed when played. |
+| `on_draw_damage` | int | no | `0` | Curse downside (ADR-0029): damage the DRAWING unit takes when this card is drawn (blockable). |
 
 ```gdscript
 class_name CardData extends Resource

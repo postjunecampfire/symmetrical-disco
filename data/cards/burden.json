@@ -1,0 +1,13 @@
+{
+  "id": "burden",
+  "display_name": "Burden",
+  "description": "Unplayable. Something the shrine made you carry.",
+  "character_tag": "neutral",
+  "card_kind": "curse",
+  "energy_cost": 0,
+  "keywords": ["unplayable"],
+  "rarity": "common",
+  
+  "target": { "target_type": "self" },
+  "effects": []
+}
