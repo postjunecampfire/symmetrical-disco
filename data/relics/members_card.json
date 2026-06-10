@@ -1,0 +1,9 @@
+{
+  "id": "members_card",
+  "display_name": "Member's Card",
+  "description": "Shop prices are 35% lower.",
+  "rarity": "rare",
+  "trigger": "passive",
+  "effect": "shop_discount",
+  "amount": 35
+}

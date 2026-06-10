@@ -1,0 +1,9 @@
+{
+  "id": "cartographers_lens",
+  "display_name": "Cartographer's Lens",
+  "description": "Hidden map nodes are revealed — no more '?' on the map.",
+  "rarity": "uncommon",
+  "trigger": "passive",
+  "effect": "reveal_map",
+  "amount": 0
+}

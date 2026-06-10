@@ -1,0 +1,20 @@
+{
+  "id": "strike_plus",
+  "display_name": "Strike+",
+  "description": "Deal 6 damage to a target in melee range. (Upgraded.)",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "innate": false,
+  "rarity": "common",
+  "target": {
+    "target_type": "enemy"
+  },
+  "effects": [
+    {
+      "type": "damage",
+      "amount": 6
+    }
+  ],
+  "upgrade_of": "strike"
+}

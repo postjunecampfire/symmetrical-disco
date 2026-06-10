@@ -51,29 +51,57 @@ static func copies_for_rarity(rarity: StringName, config: BattleConfig) -> int:
 ##   * `floor_reduction` (relic `floor_reduction` effects, summed by the caller)
 ##     lowers the auto-fill floor, clamped at config.derived_deck_floor_min —
 ##     the earned path back to the small-deck archetype.
+##
+## M3 derivation-modifier relics (summed/queried by the caller via RelicEngine):
+##   * `extra_rare` — each RARE skill in the loadout contributes +N extra copies
+##     (extra_copy_rare).
+##   * `extra_first` — the FIRST resolvable loadout entry contributes +N extra
+##     copies (extra_copy_first; "choose a skill" UI deliberately deferred — the
+##     first active skill is the v1 pick).
+##   * `upgraded_basics` — the auto-fill basics derive as their upgraded variants
+##     (strike+ / defend+ via ContentDatabase.get_upgrade_for); missing upgrade
+##     cards fall back to the base id, so the flag is always safe.
 static func derive_deck(
 	loadout: Array[StringName],
 	db: ContentDatabase,
 	curses: Array[StringName] = [],
 	consumables: Array[StringName] = [],
-	floor_reduction: int = 0
+	floor_reduction: int = 0,
+	extra_rare: int = 0,
+	extra_first: int = 0,
+	upgraded_basics: bool = false
 ) -> Array[StringName]:
 	var config: BattleConfig = db.get_battle_config()
 	var out: Array[StringName] = []
+	var first_seen: bool = false
 	for skill_id in loadout:
 		var card: CardData = db.get_card(skill_id)
 		if card == null:
 			continue
-		for _i in range(copies_for_rarity(card.rarity, config)):
+		var copies: int = copies_for_rarity(card.rarity, config)
+		if card.rarity == &"rare":
+			copies += maxi(0, extra_rare)
+		if not first_seen:
+			copies += maxi(0, extra_first)
+			first_seen = true
+		for _i in range(copies):
 			out.append(skill_id)
 	# Curses BEFORE the fill loop: they occupy floor slots (displacement).
 	for curse_id in curses:
 		if db.get_card(curse_id) != null:
 			out.append(curse_id)
 	var floor_target: int = effective_floor(config, floor_reduction)
+	var fill_ids: Array[StringName] = []
+	for base_id in FILL_BASICS:
+		var fill_id: StringName = base_id
+		if upgraded_basics:
+			var up: CardData = db.get_upgrade_for(base_id)
+			if up != null:
+				fill_id = up.id
+		fill_ids.append(fill_id)
 	var fill_i: int = 0
 	while out.size() < floor_target:
-		out.append(FILL_BASICS[fill_i % FILL_BASICS.size()])
+		out.append(fill_ids[fill_i % fill_ids.size()])
 		fill_i += 1
 	# Consumables AFTER the fill loop: always on top of the floor.
 	for item_id in consumables:

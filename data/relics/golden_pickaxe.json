@@ -1,0 +1,9 @@
+{
+  "id": "golden_pickaxe",
+  "display_name": "Golden Pickaxe",
+  "description": "Gold piles found in treasure chests are 50% larger.",
+  "rarity": "uncommon",
+  "trigger": "passive",
+  "effect": "gold_pile_bonus",
+  "amount": 50
+}

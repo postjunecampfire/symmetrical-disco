@@ -1,0 +1,9 @@
+{
+  "id": "penitents_beads",
+  "display_name": "Penitent's Beads",
+  "description": "Whenever a member draws a Curse, they gain 3 Block.",
+  "rarity": "common",
+  "trigger": "on_curse_drawn",
+  "effect": "gain_block",
+  "amount": 3
+}

@@ -141,6 +141,15 @@ var consumed_items: Array[StringName] = []
 ## RunState.currency by finish_combat.
 var gold_found: int = 0
 
+## Cards the party has played this player turn (M3 on_card_played relics).
+## Incremented by CardPlay at each successful play, reset at start_player_turn.
+var cards_played_this_turn: int = 0
+
+## hp_threshold latch (M3): player units that have already fired their
+## once-per-combat below-half-HP trigger. Keyed by Combatant; never reset
+## mid-fight (the trigger is "the FIRST time each combat").
+var _low_hp_fired: Dictionary = {}
+
 
 ## `battle_config` is the injected world; `battle_deck` is the shared deck (a
 ## default empty one is built if none supplied so the state is always usable).
@@ -270,6 +279,7 @@ func deal_damage(target: Variant, amount: int) -> void:
 		remaining -= absorbed
 	if remaining > 0:
 		unit.hp = max(0, unit.hp - remaining)
+		_after_damage(unit)
 
 
 ## Deal `amount` damage that IGNORES block, straight to hp — for poison and other
@@ -281,6 +291,24 @@ func deal_unblockable(target: Variant, amount: int) -> void:
 	if unit == null or amount <= 0 or not unit.is_alive():
 		return
 	unit.hp = max(0, unit.hp - amount)
+	_after_damage(unit)
+
+
+## Post-damage bookkeeping for the M3 relic triggers: an enemy death fires the
+## on_kill hook; a player unit dropping below HALF max HP fires the hp_threshold
+## hook ONCE per combat (latched in _low_hp_fired). Called from every hp-reducing
+## seam (deal_damage / deal_unblockable / the Charm execute), so DoTs and
+## executes count the same as attacks.
+func _after_damage(unit: Combatant) -> void:
+	if unit == null:
+		return
+	if unit.hp <= 0:
+		if not unit.is_player():
+			_on_enemy_killed(unit)
+		return
+	if unit.is_player() and unit.hp * 2 < unit.max_hp and not _low_hp_fired.has(unit):
+		_low_hp_fired[unit] = true
+		_on_player_low_hp(unit)
 
 
 ## Grant `amount` block to `target`. Block accumulates; the `block` StatusData
@@ -329,6 +357,11 @@ func apply_status(target: Variant, status_id: StringName, stacks: int) -> void:
 		_:
 			# duration / flag: refresh rather than sum.
 			unit.set_status(status_id, max(unit.status_stacks(status_id), stacks))
+	# M3 on_status_applied relics: amplify a landed debuff. The hook adds its
+	# bonus via add_status_stacks directly (never back through apply_status), so
+	# amplification cannot re-trigger itself.
+	if stacks > 0:
+		_on_status_applied(unit, status_id, stacks)
 
 
 ## The deck `unit` plays from (ADR-0026). Falls back to the legacy shared deck
@@ -415,6 +448,7 @@ func _apply_charm(unit: Combatant, stacks: int) -> void:
 	if after >= unit.max_hp:
 		unit.hp = 0
 		charm_executes += 1
+		_after_damage(unit)  # an execute is a death like any other (on_kill relics)
 
 
 ## charm_damage (ADR-0028): block absorbs first (soaking BOTH the damage and the
@@ -614,6 +648,10 @@ func apply_effects(source: Combatant, target: Variant, effects: Array, scale_wit
 					modified.amount = int(floor(float(modified.amount) * VULNERABLE_MULT))
 				# Mark (M3): flat bonus after the multiplier, one stack consumed per hit.
 				modified.amount = _mark_amplified(t, modified.amount)
+				# on_card_played relics (M3): from the 3rd card each player turn,
+				# player `damage` effects gain a flat combo bonus.
+				if e.type == &"damage" and source != null and source.is_player():
+					modified.amount += _combo_damage_bonus()
 				_resolver.resolve(modified, source, t, self)
 			elif e.type == &"block":
 				var mb := e.duplicate() as Effect
@@ -633,6 +671,7 @@ func apply_effects(source: Combatant, target: Variant, effects: Array, scale_wit
 func start_player_turn() -> void:
 	phase = Phase.PLAYER
 	turn_number += 1
+	cards_played_this_turn = 0  # M3 on_card_played relics count per player turn
 	# ADR-0025: each living player's OWN pool refills; the economy scales with
 	# party size (solo Act 1 = one pool) instead of being a flat shared 3.
 	_energy.clear()
@@ -657,8 +696,14 @@ func _apply_on_draw(unit: Combatant, drawn: Array[CardData]) -> void:
 	if unit == null:
 		return
 	for card in drawn:
-		if card != null and card.on_draw_damage > 0:
+		if card == null:
+			continue
+		if card.on_draw_damage > 0:
 			deal_damage(unit, card.on_draw_damage)
+		# M3 on_curse_drawn relics: a drawn curse can pay the drawer back
+		# (energy/block) — the relic layer that softens the junk-draw tax.
+		if card.card_kind == &"curse" and unit.is_alive():
+			_on_curse_drawn(unit, card)
 
 
 ## End the player turn: discard the hand back into the cycle, then run the enemy
@@ -705,6 +750,42 @@ func on_unit_acted(unit: Combatant) -> void:
 ## overrides it to delegate to the injected EnemyAI.
 func _take_enemy_action(_enemy: Combatant) -> void:
 	pass
+
+
+# ============================================================================
+#  M3 relic-trigger hooks (no-op here; EncounterBattle overrides them)
+# ============================================================================
+# BattleState stays relic-agnostic — these virtual seams fire at the moments the
+# M3 relic triggers care about, and the relic-carrying subclass (EncounterBattle)
+# routes them into RelicEngine. Plain fixture battles get the no-ops.
+
+## An ENEMY unit just died (any cause). on_kill relics.
+func _on_enemy_killed(_unit: Combatant) -> void:
+	pass
+
+
+## A PLAYER unit fell below half max HP for the first time this combat.
+## hp_threshold relics.
+func _on_player_low_hp(_unit: Combatant) -> void:
+	pass
+
+
+## A PLAYER unit drew a curse card. on_curse_drawn relics.
+func _on_curse_drawn(_unit: Combatant, _card: CardData) -> void:
+	pass
+
+
+## `stacks` of `status_id` just landed on `target` via apply_status.
+## on_status_applied relics (amplifiers add bonus stacks DIRECTLY, never back
+## through apply_status).
+func _on_status_applied(_target: Combatant, _status_id: StringName, _stacks: int) -> void:
+	pass
+
+
+## The flat damage bonus for the current player play (on_card_played relics,
+## driven by cards_played_this_turn). Zero in a plain battle.
+func _combo_damage_bonus() -> int:
+	return 0
 
 
 # ============================================================================

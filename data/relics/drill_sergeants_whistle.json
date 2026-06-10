@@ -1,0 +1,9 @@
+{
+  "id": "drill_sergeants_whistle",
+  "display_name": "Drill Sergeant's Whistle",
+  "description": "Auto-filled basics enter play upgraded: Strike+ (6 damage) and Defend+ (+3 Block).",
+  "rarity": "rare",
+  "trigger": "passive",
+  "effect": "upgrade_basics",
+  "amount": 0
+}

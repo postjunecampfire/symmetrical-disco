@@ -1,0 +1,9 @@
+{
+  "id": "graveside_candle",
+  "display_name": "Graveside Candle",
+  "description": "Whenever a member draws a Curse, they gain 1 energy.",
+  "rarity": "uncommon",
+  "trigger": "on_curse_drawn",
+  "effect": "gain_energy",
+  "amount": 1
+}

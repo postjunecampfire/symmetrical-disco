@@ -1,0 +1,9 @@
+{
+  "id": "serrated_locket",
+  "display_name": "Serrated Locket",
+  "description": "Whenever you apply Bleed to an enemy, apply 1 more.",
+  "rarity": "uncommon",
+  "trigger": "on_status_applied",
+  "effect": "amplify_bleed",
+  "amount": 1
+}

@@ -1,0 +1,9 @@
+{
+  "id": "survivors_instinct",
+  "display_name": "Survivor's Instinct",
+  "description": "The first time a member falls below half HP each combat, they gain 8 Block.",
+  "rarity": "uncommon",
+  "trigger": "hp_threshold",
+  "effect": "gain_block",
+  "amount": 8
+}

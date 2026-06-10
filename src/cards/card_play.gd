@@ -208,6 +208,9 @@ func _type_error(target_type: StringName, why: String) -> PlayResult:
 ## only after _validate has passed.
 func _spend_and_resolve(unit: Combatant, card: CardData, target: Variant) -> void:
 	battle.spend_energy(unit, card.energy_cost)  # ADR-0025: owner pays
+	# M3 on_card_played relics: count the play BEFORE resolution so the current
+	# card is the Nth — "your 3rd and later cards each turn" includes the 3rd.
+	battle.cards_played_this_turn += 1
 	var targets: Array[Combatant] = battle.resolve_targets(card.target, unit, target)
 	# EVERY player card scales with its actor's sheet (ADR-0014). The old
 	# neutral-flat rule (ADR-0016) existed to dodge per-actor routing in the

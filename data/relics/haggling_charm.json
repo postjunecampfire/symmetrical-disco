@@ -1,0 +1,9 @@
+{
+  "id": "haggling_charm",
+  "display_name": "Haggling Charm",
+  "description": "Shop prices are 20% lower.",
+  "rarity": "uncommon",
+  "trigger": "passive",
+  "effect": "shop_discount",
+  "amount": 20
+}

@@ -1,0 +1,9 @@
+{
+  "id": "trophy_belt",
+  "display_name": "Trophy Belt",
+  "description": "Whenever an enemy dies, the party gains 3 Block.",
+  "rarity": "common",
+  "trigger": "on_kill",
+  "effect": "gain_block",
+  "amount": 3
+}

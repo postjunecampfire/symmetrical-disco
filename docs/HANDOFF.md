@@ -3,6 +3,28 @@
 *Authoritative "where things stand" doc. Last updated 2026-06-10. Read this, then
 `AGENTS.md` and the ADRs, before picking up work.*
 
+> **Relic pool → 36 with new trigger kinds (M3, 2026-06-10; 418 GUT green).**
+> Five new COMBAT triggers ride BattleState virtual hooks that EncounterBattle
+> routes into RelicEngine: `on_kill` (any enemy death — block/energy/run-gold),
+> `on_curse_drawn` (credits the DRAWER), `hp_threshold` (first time below half
+> HP each combat, per-member latch), `on_status_applied` (amplify_burn/bleed/
+> poison, +N stacks on enemy applications only; bonus added via
+> add_status_stacks so it can't self-trigger), `on_card_played` (combo_damage:
+> party's 3rd+ card each turn, counter on BattleState reset per turn, CardPlay
+> increments). RUN-LAYER passive effects are static RelicEngine queries (the
+> floor_reduction pattern): economy (gold_on_win → finish_combat, gold_on_rest
+> → resolve_rest, gold_pile_bonus → treasure, shop_discount capped 60% +
+> curse_removal_discount capped 90% → Shop.build_offer), sight (reveal_map
+> lifts map fog in map_view — enemy intents are ALREADY fully telegraphed, so
+> the second sight relic is reveal_boss: act-boss preview on the map header),
+> derivation (extra_copy_rare / extra_copy_first — "choose a skill" UI
+> deliberately deferred, first-active is the v1 pick — and upgrade_basics:
+> auto-fill derives Strike+/Defend+, NEW upgrade cards; the old "basics have no
+> upgrade variant" guard in test_rest_resolver was updated accordingly).
+> Pool plumbing: BOSS-rarity relics now come ONLY from the Sponsor Box
+> (available_relics + Shop exclude them); the shop's relic slot is a seeded
+> pick instead of first-alphabetical. Rarity spread: 7c/15u/10r/4b.
+
 > **2026-06-10 session — the 0021-pt1 → 0025 → 0026 schema epoch + StS-style UI
 > (298 GUT green, run in-sandbox on Godot 4.6 arm64; human gate still advised).**
 > - **ADR-0029 LIVE (M3 injected card layer — agent decision, owner to ratify):**

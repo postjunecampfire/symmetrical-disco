@@ -1,0 +1,9 @@
+{
+  "id": "bounty_contract",
+  "display_name": "Bounty Contract",
+  "description": "Whenever an enemy dies, gain 5 Gold.",
+  "rarity": "uncommon",
+  "trigger": "on_kill",
+  "effect": "gain_gold",
+  "amount": 5
+}

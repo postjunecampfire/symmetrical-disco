@@ -41,8 +41,11 @@ func skill_price(card: CardData, act: int) -> int:
 
 
 ## Assemble the inventory for a shop node: 3 eligible skills (seeded by run seed
-## + node id, so a resume re-offers the same stock), the first not-yet-owned
-## relic (deterministic), and the heal service price.
+## + node id, so a resume re-offers the same stock), one not-yet-owned relic
+## (seeded pick — with a ~35-relic pool the old "first alphabetically" stock
+## was degenerate), and the heal service price. M3 economy relics then discount
+## the whole shelf (shop_discount, capped) and the curse-removal service
+## additionally (curse_removal_discount).
 func build_offer(run: RunState, node_id: StringName) -> ShopOffer:
 	var offer := ShopOffer.new()
 	var reward := CardReward.new(_db, CardReward.weights_for_act(run.act))
@@ -50,10 +53,13 @@ func build_offer(run: RunState, node_id: StringName) -> ShopOffer:
 	for card in stock:
 		offer.skill_ids.append(card.id)
 		offer.prices[card.id] = skill_price(card, run.act)
-	for rid in _available_relics(run):
+	var relic_pool: Array[StringName] = _available_relics(run)
+	if not relic_pool.is_empty():
+		var relic_rng := RandomNumberGenerator.new()
+		relic_rng.seed = run.seed ^ hash(node_id) ^ 0x4E11C
+		var rid: StringName = relic_pool[relic_rng.randi_range(0, relic_pool.size() - 1)]
 		offer.relic_id = rid
 		offer.prices[rid] = _scaled(_db.get_battle_config().shop_price_relic, run.act)
-		break
 	# Consumables (ADR-0029): up to 2 distinct items, seeded like the skill stock.
 	var pool: Array[StringName] = _consumable_pool()
 	var rng := RandomNumberGenerator.new()
@@ -68,6 +74,19 @@ func build_offer(run: RunState, node_id: StringName) -> ShopOffer:
 	offer.prices[&"__curse_removal"] = _scaled(
 		_db.get_battle_config().shop_price_curse_removal, run.act
 	)
+	# M3 economy relics: shop_discount lowers EVERY price on the shelf (summed
+	# across relics, capped in RelicEngine); curse_removal_discount stacks on the
+	# removal service afterwards. Floors at 1 gold — nothing is ever free.
+	var relics: Array[RelicData] = _run_relics(run)
+	var discount: int = RelicEngine.shop_discount_percent(relics)
+	if discount > 0:
+		for key: Variant in offer.prices.keys():
+			offer.prices[key] = maxi(1, int(offer.prices[key]) * (100 - discount) / 100)
+	var curse_discount: int = RelicEngine.curse_removal_discount_percent(relics)
+	if curse_discount > 0:
+		offer.prices[&"__curse_removal"] = maxi(
+			1, int(offer.prices[&"__curse_removal"]) * (100 - curse_discount) / 100
+		)
 	return offer
 
 
@@ -171,12 +190,20 @@ func treasure_roll(run: RunState, node_id: StringName) -> Dictionary:
 	if not items.is_empty() and roll < 0.55:
 		return {"kind": &"consumable", "id": items[rng.randi_range(0, items.size() - 1)], "amount": 0}
 	if roll < 0.8 or run.party.is_empty():
-		return {"kind": &"gold", "id": &"", "amount": rng.randi_range(cfg.treasure_gold_min, cfg.treasure_gold_max)}
+		return {"kind": &"gold", "id": &"", "amount": _gold_pile(run, rng, cfg)}
 	var reward := CardReward.new(_db, {})
 	var stock: Array[CardData] = reward.draft(run, 1, run.seed ^ hash(node_id))
 	if stock.is_empty():
-		return {"kind": &"gold", "id": &"", "amount": rng.randi_range(cfg.treasure_gold_min, cfg.treasure_gold_max)}
+		return {"kind": &"gold", "id": &"", "amount": _gold_pile(run, rng, cfg)}
 	return {"kind": &"skill", "id": stock[0].id, "amount": 0}
+
+
+## One treasure gold pile: the configured range, then the M3 gold_pile_bonus
+## relic percentage on top ("+X% gold piles").
+func _gold_pile(run: RunState, rng: RandomNumberGenerator, cfg: BattleConfig) -> int:
+	var amount: int = rng.randi_range(cfg.treasure_gold_min, cfg.treasure_gold_max)
+	var bonus: int = RelicEngine.gold_pile_bonus_percent(_run_relics(run))
+	return amount + amount * bonus / 100
 
 
 ## Apply a treasure_roll result to the run. Returns a short human description.
@@ -222,12 +249,29 @@ func _consumable_pool() -> Array[StringName]:
 	return out
 
 
-## Relic ids the run does not own yet, sorted for determinism.
+## Relic ids the run does not own yet, sorted for determinism. BOSS-rarity
+## relics never reach a shop shelf or treasure chest — they arrive only via the
+## act-boss Sponsor Box (ADR-0028), mirroring RunController.available_relics.
 func _available_relics(run: RunState) -> Array[StringName]:
 	var out: Array[StringName] = []
 	for key: Variant in _db.relics.keys():
 		var rid := StringName(String(key))
-		if not run.relics.has(rid):
-			out.append(rid)
+		if run.relics.has(rid):
+			continue
+		var relic: RelicData = _db.get_relic(rid)
+		if relic != null and relic.rarity == &"boss":
+			continue
+		out.append(rid)
 	out.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
+	return out
+
+
+## The run's owned relics resolved to RelicData (unknown ids skipped) — the list
+## the M3 economy queries (discounts / gold pile bonus) read.
+func _run_relics(run: RunState) -> Array[RelicData]:
+	var out: Array[RelicData] = []
+	for rid in run.relics:
+		var relic: RelicData = _db.get_relic(rid)
+		if relic != null:
+			out.append(relic)
 	return out

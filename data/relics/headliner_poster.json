@@ -1,0 +1,9 @@
+{
+  "id": "headliner_poster",
+  "display_name": "Headliner Poster",
+  "description": "Each member's FIRST active skill contributes 1 extra copy to the derived deck.",
+  "rarity": "uncommon",
+  "trigger": "passive",
+  "effect": "extra_copy_first",
+  "amount": 1
+}

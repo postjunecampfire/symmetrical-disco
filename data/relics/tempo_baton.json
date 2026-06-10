@@ -1,0 +1,9 @@
+{
+  "id": "tempo_baton",
+  "display_name": "Tempo Baton",
+  "description": "Your party's 3rd and later cards each turn deal +2 damage.",
+  "rarity": "uncommon",
+  "trigger": "on_card_played",
+  "effect": "combo_damage",
+  "amount": 2
+}

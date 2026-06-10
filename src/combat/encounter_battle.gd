@@ -134,3 +134,42 @@ func start_player_turn() -> void:
 	super()
 	if not relics.is_empty():
 		_relic_engine.apply_turn_start(self, relics)
+
+
+# --- M3 relic-trigger hook overrides (BattleState fires them; we route them) ---
+
+## on_kill relics: an enemy died (any cause — attack, DoT, Charm execute).
+func _on_enemy_killed(_unit: Combatant) -> void:
+	if not relics.is_empty():
+		_relic_engine.apply_on_kill(self, relics)
+
+
+## hp_threshold relics: a member fell below half HP for the first time this combat.
+func _on_player_low_hp(unit: Combatant) -> void:
+	if not relics.is_empty():
+		_relic_engine.apply_hp_threshold(self, relics, unit)
+
+
+## on_curse_drawn relics: the drawing member is credited.
+func _on_curse_drawn(unit: Combatant, _card: CardData) -> void:
+	if not relics.is_empty():
+		_relic_engine.apply_on_curse_drawn(self, relics, unit)
+
+
+## on_status_applied relics: amplify a debuff that landed on an ENEMY. The bonus
+## is added DIRECTLY (add_status_stacks) so it can never re-trigger this hook.
+## Player-side applications (enemy debuffs on the party, self-buffs) are exempt —
+## the relics read "whenever YOU apply X".
+func _on_status_applied(target: Combatant, status_id: StringName, _stacks: int) -> void:
+	if relics.is_empty() or target == null or target.is_player():
+		return
+	var bonus: int = RelicEngine.status_bonus(relics, status_id)
+	if bonus > 0:
+		target.add_status_stacks(status_id, bonus)
+
+
+## on_card_played relics: flat damage bonus from the 3rd party card each turn.
+func _combo_damage_bonus() -> int:
+	if relics.is_empty():
+		return 0
+	return RelicEngine.combo_bonus(relics, cards_played_this_turn)

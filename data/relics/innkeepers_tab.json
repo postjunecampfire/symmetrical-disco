@@ -1,0 +1,9 @@
+{
+  "id": "innkeepers_tab",
+  "display_name": "Innkeeper's Tab",
+  "description": "Gain 12 Gold whenever you rest.",
+  "rarity": "common",
+  "trigger": "passive",
+  "effect": "gold_on_rest",
+  "amount": 12
+}

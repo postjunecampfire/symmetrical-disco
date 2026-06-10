@@ -1,0 +1,9 @@
+{
+  "id": "oracles_eye",
+  "display_name": "Oracle's Eye",
+  "description": "The act's boss is revealed on the map header.",
+  "rarity": "rare",
+  "trigger": "passive",
+  "effect": "reveal_boss",
+  "amount": 0
+}

@@ -1,0 +1,9 @@
+{
+  "id": "lucky_horseshoe",
+  "display_name": "Lucky Horseshoe",
+  "description": "Gain 8 extra Gold after each combat victory.",
+  "rarity": "common",
+  "trigger": "passive",
+  "effect": "gold_on_win",
+  "amount": 8
+}

@@ -1,0 +1,9 @@
+{
+  "id": "hexbreaker_seal",
+  "display_name": "Hexbreaker Seal",
+  "description": "Curse removal at shops costs 50% less.",
+  "rarity": "common",
+  "trigger": "passive",
+  "effect": "curse_removal_discount",
+  "amount": 50
+}

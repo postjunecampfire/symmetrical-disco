@@ -1,0 +1,9 @@
+{
+  "id": "ember_pendant",
+  "display_name": "Ember Pendant",
+  "description": "Whenever you apply Burn to an enemy, apply 1 more.",
+  "rarity": "uncommon",
+  "trigger": "on_status_applied",
+  "effect": "amplify_burn",
+  "amount": 1
+}

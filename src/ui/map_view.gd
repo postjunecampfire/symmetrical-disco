@@ -213,6 +213,11 @@ func _refresh_status() -> void:
 		_legend_label.text = "Act %d   ·   Gold %d   ·   Legend: ? Unknown · Combat · Elite · Rest · Merchant · Treasure · BOSS" % [
 			_controller.run.act, _controller.run.currency
 		]
+		# Sight relic (M3, reveal_boss): preview the act's boss on the header.
+		if RelicEngine.reveals_boss(_run_relics()):
+			var boss_name: String = _boss_preview_name()
+			if boss_name != "":
+				_legend_label.text += "   ·   Boss: %s" % boss_name
 	var run: RunState = _controller.run
 	for cid in run.party:
 		var ch: CharacterData = PartyMember.character_for(_db, _controller.run, cid)
@@ -342,12 +347,16 @@ func _node_button(node: MapNode, reachable: bool) -> Button:
 	btn.custom_minimum_size = Vector2(140, 52)
 	# Selective fog (ADR-0023): a hidden, not-yet-cleared node reads as "?" — its
 	# real type only shows once you've arrived (cleared) or a reveal sets hidden=false.
+	# Sight relic (M3, reveal_map): a Cartographer's-Lens-style relic lifts the
+	# fog for the whole map without mutating node state.
+	var fogged: bool = node.hidden and not cleared \
+			and not RelicEngine.reveals_map(_run_relics())
 	btn.disabled = not reachable
 	# StS look: icon-only nodes inked onto the parchment; the boss glyph is
 	# larger; fogged nodes (ADR-0023) show the "?" glyph; missing art falls back
 	# to a short text label.
 	var glyph_id: StringName = node.node_type
-	if node.hidden and not cleared:
+	if fogged:
 		glyph_id = UiAssets.MAP_GLYPH_UNKNOWN
 	var glyph: Texture2D = UiAssets.map_glyph(glyph_id)
 	var is_boss: bool = node.node_type == &"boss"
@@ -358,7 +367,7 @@ func _node_button(node: MapNode, reachable: bool) -> Button:
 		btn.add_theme_constant_override("icon_max_width", 44 if is_boss else 26)
 		btn.text = ""
 	else:
-		btn.text = "?" if (node.hidden and not cleared) else TYPE_LABEL.get(node.node_type, String(node.node_type))
+		btn.text = "?" if fogged else TYPE_LABEL.get(node.node_type, String(node.node_type))
 	# Ink colors: reachable = StS red, cleared = faded green check, rest = ink.
 	var ink: Color = COL_INK
 	if cleared:
@@ -459,6 +468,37 @@ func _on_combat_finished(outcome: int, bv: BattleView) -> void:
 		_show_rewards_popup(node)
 	else:
 		_refresh()
+
+
+## The run's owned relics resolved to RelicData — the list the M3 sight queries
+## (reveal_map / reveal_boss) read each refresh.
+func _run_relics() -> Array[RelicData]:
+	var out: Array[RelicData] = []
+	if _controller == null:
+		return out
+	for rid in _controller.run.relics:
+		var relic: RelicData = _db.get_relic(rid)
+		if relic != null:
+			out.append(relic)
+	return out
+
+
+## The display name of this act's boss encounter (reveal_boss preview): finds the
+## boss node and resolves it exactly the way travel would (RunNavigator's seeded
+## pick), so the preview is always honest. "" when unresolvable.
+func _boss_preview_name() -> String:
+	if _nav == null:
+		return ""
+	var graph: MapGraph = _nav.map()
+	if graph == null:
+		return ""
+	for key: Variant in graph.nodes.keys():
+		var node: MapNode = graph.nodes[key]
+		if node.node_type != &"boss":
+			continue
+		var enc: EncounterData = _db.get_encounter(_nav.encounter_for(node))
+		return enc.display_name if enc != null else ""
+	return ""
 
 
 ## Award a not-yet-owned relic (deterministic pick) and tell the player. No-op if

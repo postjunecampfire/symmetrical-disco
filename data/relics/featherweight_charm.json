@@ -1,0 +1,9 @@
+{
+  "id": "featherweight_charm",
+  "display_name": "Featherweight Charm",
+  "description": "Your derived decks auto-fill to a floor 2 lower (never below the hard minimum).",
+  "rarity": "uncommon",
+  "trigger": "passive",
+  "effect": "floor_reduction",
+  "amount": 2
+}

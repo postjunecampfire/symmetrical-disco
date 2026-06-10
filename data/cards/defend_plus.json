@@ -1,0 +1,20 @@
+{
+  "id": "defend_plus",
+  "display_name": "Defend+",
+  "description": "Gain 3 Block plus your Dexterity. (Upgraded.)",
+  "character_tag": "neutral",
+  "energy_cost": 1,
+  "keywords": [],
+  "innate": false,
+  "rarity": "common",
+  "target": {
+    "target_type": "self"
+  },
+  "effects": [
+    {
+      "type": "block",
+      "amount": 3
+    }
+  ],
+  "upgrade_of": "defend"
+}

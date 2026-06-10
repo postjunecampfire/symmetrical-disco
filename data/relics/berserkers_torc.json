@@ -1,0 +1,9 @@
+{
+  "id": "berserkers_torc",
+  "display_name": "Berserker's Torc",
+  "description": "The first time a member falls below half HP each combat, they gain 2 Strength.",
+  "rarity": "rare",
+  "trigger": "hp_threshold",
+  "effect": "add_strength",
+  "amount": 2
+}

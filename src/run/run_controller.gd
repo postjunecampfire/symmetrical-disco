@@ -138,13 +138,20 @@ func begin_combat(encounter_id: StringName, band: StringName = &"") -> Encounter
 	# the first-member attribution mirrors party-level relic crediting); relic
 	# `floor_reduction` lowers the auto-fill floor (min derived_deck_floor_min).
 	var member_decks: Dictionary = {}
-	var floor_red: int = RelicEngine.floor_reduction_total(_active_relics())
+	# M3 derivation-modifier relics ride in alongside floor_reduction: extra rare
+	# copies, an extra copy of the first active skill, upgraded auto-fill basics.
+	var relic_data: Array[RelicData] = _active_relics()
+	var floor_red: int = RelicEngine.floor_reduction_total(relic_data)
+	var extra_rare: int = RelicEngine.extra_rare_copies(relic_data)
+	var extra_first: int = RelicEngine.extra_first_copies(relic_data)
+	var up_basics: bool = RelicEngine.upgrades_basics(relic_data)
 	for cid in run.party:
 		var items: Array[StringName] = []
 		if cid == run.party[0]:
 			items = run.consumables
 		member_decks[cid] = SkillLoadout.derive_deck(
-			loadout_of(cid), db, run.curses_of(cid), items, floor_red
+			loadout_of(cid), db, run.curses_of(cid), items, floor_red,
+			extra_rare, extra_first, up_basics
 		)
 	# Per-fight seed: the run seed stays the run's identity, but each fight
 	# shuffles/rolls differently (act + encounter + progress salt) — fixes the
@@ -499,6 +506,9 @@ func finish_combat(encounter_id: StringName, battle: BattleState, turns: int = 0
 	if outcome == BattleState.Outcome.WIN:
 		_award_combat_xp()
 		fame_gained = _award_fame(battle, damage_taken, turns)
+		# M3 economy relics: gold_on_win pays out on every won combat (on top of
+		# the node gold the UI/reward layer grants).
+		run.currency += RelicEngine.gold_on_win_total(_active_relics())
 
 	if telemetry != null:
 		telemetry.log_event(&"combat_result", {
@@ -654,13 +664,20 @@ func grant_relic(relic_id: StringName, source: String = "") -> bool:
 
 
 ## Relic ids the run does not yet own (acquisition candidates), sorted for
-## deterministic selection by a caller.
+## deterministic selection by a caller. BOSS-rarity relics are excluded — they
+## arrive only via the Sponsor Box at an act boss (ADR-0028), the one rarity
+## gate the relic economy has (M3; elite/shop/treasure rolls are otherwise a
+## uniform pick over the un-owned pool).
 func available_relics() -> Array[StringName]:
 	var out: Array[StringName] = []
 	for key: Variant in db.relics.keys():
 		var rid: StringName = StringName(String(key))
-		if not run.relics.has(rid):
-			out.append(rid)
+		if run.relics.has(rid):
+			continue
+		var relic: RelicData = db.get_relic(rid)
+		if relic != null and relic.rarity == &"boss":
+			continue
+		out.append(rid)
 	out.sort_custom(func(a: StringName, b: StringName) -> bool: return String(a) < String(b))
 	return out
 
@@ -685,6 +702,10 @@ func resolve_rest(kind: StringName, card_id: StringName = &"") -> bool:
 			detail = "upgrade:%s" % card_id
 		_:
 			return false
+	if applied:
+		# M3 economy relics: gold_on_rest ("interest") pays out at every resolved
+		# rest, whichever service was chosen.
+		run.currency += RelicEngine.gold_on_rest_total(_active_relics())
 	if applied and telemetry != null:
 		telemetry.log_event(&"rest_choice", {
 			"kind": String(kind),

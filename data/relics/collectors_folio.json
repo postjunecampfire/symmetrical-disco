@@ -1,0 +1,9 @@
+{
+  "id": "collectors_folio",
+  "display_name": "Collector's Folio",
+  "description": "Each RARE skill in an active loadout contributes 1 extra copy to the derived deck.",
+  "rarity": "rare",
+  "trigger": "passive",
+  "effect": "extra_copy_rare",
+  "amount": 1
+}

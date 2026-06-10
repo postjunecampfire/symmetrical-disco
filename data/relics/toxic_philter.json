@@ -1,0 +1,9 @@
+{
+  "id": "toxic_philter",
+  "display_name": "Toxic Philter",
+  "description": "Whenever you apply Poison to an enemy, apply 1 more.",
+  "rarity": "rare",
+  "trigger": "on_status_applied",
+  "effect": "amplify_poison",
+  "amount": 1
+}

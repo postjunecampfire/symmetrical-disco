@@ -1,0 +1,9 @@
+{
+  "id": "merchants_ledger",
+  "display_name": "Merchant's Ledger",
+  "description": "Gain 15 extra Gold after each combat victory.",
+  "rarity": "uncommon",
+  "trigger": "passive",
+  "effect": "gold_on_win",
+  "amount": 15
+}
